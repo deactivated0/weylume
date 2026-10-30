@@ -21,7 +21,7 @@
   "clipboardImagesEnabled": true,
   "clipboardHistoryLimit": 50,
   "clipboardSensitiveFilter": true,
-  "screenshotMode": "region",
+  "screenshotMode": "window",
   "screenshotCopy": true,
   "screenshotAnnotate": true,
   "recordingSource": "screen",

@@ -1117,9 +1117,9 @@ PopupWindow {
                 width: 140
                 height: powerMenuCol.implicitHeight + 12
                 radius: 7
-                color: Theme.card
+                color: Theme.isDark ? "#000000" : Theme.card
                 border.width: 1
-                border.color: Theme.border
+                border.color: Theme.isDark ? "#282834" : Theme.border
                 anchors.right: parent.right
                 anchors.rightMargin: 10
                 anchors.bottom: bottomBar.top
@@ -1171,7 +1171,7 @@ PopupWindow {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 height: 48
-                color: Theme.card
+                color: Theme.isDark ? "#000000" : Theme.card
                 radius: 10
 
                 Rectangle {
@@ -1179,7 +1179,7 @@ PopupWindow {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     height: 1
-                    color: Theme.border
+                    color: Theme.isDark ? "#1C1C24" : Theme.border
                 }
 
                 RowLayout {
@@ -1193,9 +1193,9 @@ PopupWindow {
                         Layout.preferredWidth: 210
                         implicitHeight: 28
                         radius: 6
-                        color: Theme.background
+                        color: Theme.isDark ? "#0A0A0E" : Theme.background
                         border.width: 1
-                        border.color: search.activeFocus ? Theme.accent : Theme.border
+                        border.color: search.activeFocus ? (Theme.isDark ? "#FFFFFF" : Theme.accent) : (Theme.isDark ? "#242430" : Theme.border)
 
                         MouseArea {
                             anchors.fill: parent
@@ -1366,9 +1366,9 @@ PopupWindow {
                 width: 175
                 height: menuCol.implicitHeight + 14
                 radius: 7
-                color: "#f8121212"
+                color: Theme.isDark ? "#000000" : "#f8121212"
                 border.width: 1
-                border.color: Theme.border
+                border.color: Theme.isDark ? "#282834" : Theme.border
 
                 property var currentApp: null
 
