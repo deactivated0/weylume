@@ -113,11 +113,25 @@ Scope {
         reminder.stop();
         if (!root.loaded || root.pendingReminder) return;
         const now = Date.now();
-        const pending = root.events.filter(e => !e.completed && !e.reminded && !root.failedReminders.includes(e.id) && Number(e.reminderTimestamp) > 0 && Number(e.startTimestamp) > now)
-            .sort((a,b) => Number(a.reminderTimestamp) - Number(b.reminderTimestamp));
-        if (!pending.length) { root.nextReminderId = ""; return; }
-        root.nextReminderId = pending[0].id;
-        reminder.interval = Math.max(1, Math.min(2147483647, Number(pending[0].reminderTimestamp) - now));
+        let earliest = null;
+        let earliestTimestamp = Infinity;
+        const failed = root.failedReminders;
+        const evs = root.events;
+        for (let i = 0; i < evs.length; i++) {
+            const e = evs[i];
+            if (e.completed || e.reminded) continue;
+            const rt = Number(e.reminderTimestamp);
+            const st = Number(e.startTimestamp);
+            if (rt > 0 && st > now && !failed.includes(e.id)) {
+                if (rt < earliestTimestamp) {
+                    earliestTimestamp = rt;
+                    earliest = e;
+                }
+            }
+        }
+        if (!earliest) { root.nextReminderId = ""; return; }
+        root.nextReminderId = earliest.id;
+        reminder.interval = Math.max(1, Math.min(2147483647, earliestTimestamp - now));
         reminder.start();
     }
     Timer {

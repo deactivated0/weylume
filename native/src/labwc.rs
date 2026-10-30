@@ -1,9 +1,10 @@
 use crate::util::*;
 use serde_json::{json, Value};
-use std::{fs, path::PathBuf};
+use std::{fs, path::{Path, PathBuf}, sync::OnceLock};
 use xmltree::{Element, EmitterConfig, XMLNode};
-fn dir() -> PathBuf {
-    config().join("labwc")
+fn dir() -> &'static Path {
+    static DIR: OnceLock<PathBuf> = OnceLock::new();
+    DIR.get_or_init(|| config().join("labwc"))
 }
 fn environment_layout() -> String {
     for l in read(dir().join("environment")).lines() {
