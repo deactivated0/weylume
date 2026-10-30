@@ -133,30 +133,38 @@ Scope {
                             font.letterSpacing: -0.35
                         }
 
-                        // Password / PIN Form Pill
+                        // Password / PIN Form Pill (Pure AMOLED)
                         Item {
                             id: formWrapper
-                            width: Math.min(254, lockRoot.width - 48)
-                            height: 39
+                            width: Math.min(270, lockRoot.width - 48)
+                            height: 44
                             anchors.horizontalCenter: parent.horizontalCenter
 
                             Rectangle {
                                 id: formPill
                                 width: parent.width
                                 height: parent.height
-                                radius: 10
-                                color: pinInput.activeFocus ? Qt.rgba(1, 1, 1, 0.18) : Qt.rgba(1, 1, 1, 0.13)
-                                border.width: 1
-                                border.color: pinInput.activeFocus ? Qt.rgba(1, 1, 1, 0.63) : Qt.rgba(1, 1, 1, 0.31)
+                                radius: 22
+                                color: pinInput.activeFocus ? "#0A0A0D" : "#000000"
+                                border.width: pinInput.activeFocus ? 1.5 : 1.0
+                                border.color: pinInput.activeFocus ? "#FFFFFF" : (pillHoverMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.45) : Qt.rgba(1, 1, 1, 0.22))
 
-                                Behavior on color { ColorAnimation { duration: 150 } }
-                                Behavior on border.color { ColorAnimation { duration: 150 } }
+                                Behavior on color { ColorAnimation { duration: 120 } }
+                                Behavior on border.color { ColorAnimation { duration: 120 } }
+
+                                MouseArea {
+                                    id: pillHoverMouse
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.IBeamCursor
+                                    onClicked: pinInput.forceActiveFocus()
+                                }
 
                                 RowLayout {
                                     anchors.fill: parent
-                                    anchors.leftMargin: 12
-                                    anchors.rightMargin: 7
-                                    spacing: 4
+                                    anchors.leftMargin: 16
+                                    anchors.rightMargin: 6
+                                    spacing: 6
 
                                     TextInput {
                                         id: pinInput
@@ -165,9 +173,12 @@ Scope {
                                         verticalAlignment: TextInput.AlignVCenter
                                         echoMode: lockRoot.revealPassword ? TextInput.Normal : TextInput.Password
                                         color: "#FFFFFF"
+                                        selectionColor: Qt.rgba(1, 1, 1, 0.25)
+                                        selectedTextColor: "#FFFFFF"
                                         font.family: Theme.fontFamily
-                                        font.pixelSize: 13
-                                        font.weight: Font.Medium
+                                        font.pixelSize: lockRoot.revealPassword ? 14 : 16
+                                        font.weight: Font.DemiBold
+                                        font.letterSpacing: lockRoot.revealPassword ? 0.5 : 3.0
                                         clip: true
                                         selectByMouse: true
                                         focus: true
@@ -191,19 +202,22 @@ Scope {
                                             anchors.verticalCenter: parent.verticalCenter
                                             visible: !pinInput.text && !pinInput.inputMethodComposing
                                             text: SettingsService.lockscreenMode === "pin" ? "Enter PIN" : "Enter Password"
-                                            color: Qt.rgba(1, 1, 1, 0.82)
+                                            color: Qt.rgba(1, 1, 1, 0.40)
                                             font.family: Theme.fontFamily
                                             font.pixelSize: 13
                                             font.weight: Font.Normal
+                                            font.letterSpacing: 0
                                         }
                                     }
 
                                     // Eye Icon Button (Toggle visibility)
                                     Rectangle {
-                                        Layout.preferredWidth: 26
+                                        Layout.preferredWidth: 30
                                         Layout.preferredHeight: 30
-                                        radius: 6
-                                        color: eyeMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : "transparent"
+                                        radius: 15
+                                        color: eyeMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.12) : "transparent"
+
+                                        Behavior on color { ColorAnimation { duration: 100 } }
 
                                         MouseArea {
                                             id: eyeMouse
@@ -216,50 +230,27 @@ Scope {
                                             }
                                         }
 
-                                        Item {
+                                        Image {
                                             anchors.centerIn: parent
                                             width: 16
                                             height: 16
-
-                                            Rectangle {
-                                                anchors.centerIn: parent
-                                                width: 14
-                                                height: 9
-                                                radius: 4
-                                                color: "transparent"
-                                                border.width: 1.5
-                                                border.color: Qt.rgba(1, 1, 1, 0.85)
-                                            }
-
-                                            Rectangle {
-                                                anchors.centerIn: parent
-                                                width: 5
-                                                height: 5
-                                                radius: 2.5
-                                                color: Qt.rgba(1, 1, 1, 0.85)
-                                            }
-
-                                            // Slash line when password is hidden
-                                            Rectangle {
-                                                visible: !lockRoot.revealPassword
-                                                anchors.centerIn: parent
-                                                width: 15
-                                                height: 1.5
-                                                rotation: -45
-                                                color: Qt.rgba(1, 1, 1, 0.85)
-                                            }
+                                            source: lockRoot.revealPassword ? "assets/eye-off.svg" : "assets/eye.svg"
+                                            opacity: eyeMouse.containsMouse ? 1.0 : 0.65
+                                            Behavior on opacity { NumberAnimation { duration: 100 } }
                                         }
                                     }
 
                                     // Submit Circular Button (Arrow Right)
                                     Rectangle {
                                         id: submitBtn
-                                        Layout.preferredWidth: 26
-                                        Layout.preferredHeight: 26
-                                        radius: 13
-                                        color: submitMouse.containsMouse ? "#FFFFFF" : Qt.rgba(1, 1, 1, 0.88)
+                                        Layout.preferredWidth: 32
+                                        Layout.preferredHeight: 32
+                                        radius: 16
+                                        color: submitMouse.pressed ? Qt.rgba(1, 1, 1, 0.75) : (submitMouse.containsMouse ? "#FFFFFF" : Qt.rgba(1, 1, 1, 0.90))
+                                        scale: submitMouse.pressed ? 0.92 : (submitMouse.containsMouse ? 1.05 : 1.0)
 
                                         Behavior on color { ColorAnimation { duration: 100 } }
+                                        Behavior on scale { NumberAnimation { duration: 100 } }
 
                                         MouseArea {
                                             id: submitMouse
@@ -269,36 +260,11 @@ Scope {
                                             onClicked: lockRoot.attemptUnlock()
                                         }
 
-                                        // Arrow Right Icon
-                                        Item {
+                                        Image {
                                             anchors.centerIn: parent
                                             width: 14
                                             height: 14
-
-                                            Rectangle {
-                                                anchors.centerIn: parent
-                                                width: 9
-                                                height: 1.8
-                                                color: "#202020"
-                                            }
-
-                                            Rectangle {
-                                                x: 7; y: 4
-                                                width: 6
-                                                height: 1.8
-                                                rotation: 45
-                                                transformOrigin: Item.TopLeft
-                                                color: "#202020"
-                                            }
-
-                                            Rectangle {
-                                                x: 7; y: 10
-                                                width: 6
-                                                height: 1.8
-                                                rotation: -45
-                                                transformOrigin: Item.BottomLeft
-                                                color: "#202020"
-                                            }
+                                            source: "assets/arrow-right.svg"
                                         }
                                     }
                                 }
