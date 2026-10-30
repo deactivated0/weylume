@@ -832,6 +832,7 @@ PanelWindow {
         anchors.fill: parent
         fillMode: Image.PreserveAspectCrop
         source: root.effectiveWallpaper ? (root.effectiveWallpaper.startsWith("file://") ? root.effectiveWallpaper : "file://" + root.effectiveWallpaper) : ""
+        sourceSize: Qt.size(root.width > 0 ? root.width : 1920, root.height > 0 ? root.height : 1080)
         visible: Boolean(root.effectiveWallpaper && root.effectiveWallpaper !== "")
         smooth: true
         mipmap: true
