@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Quickshell
 import qs
 
 ScrollView {
@@ -85,27 +84,25 @@ ScrollView {
                     description: "Minimum 4 numbers or characters. Default PIN is 1234."
                     text: SettingsService.lockscreenPin
                     placeholder: "1234"
+                    secret: true
                     onAccepted: value => {
-                        const trimmed = value.trim();
+                        let trimmed = value.trim();
+                        if (SettingsService.lockscreenMode === "pin") {
+                            trimmed = trimmed.replace(/[^0-9]/g, "");
+                        }
                         if (trimmed.length >= 4) {
                             SettingsService.lockscreenPin = trimmed;
+                        } else {
+                            text = SettingsService.lockscreenPin;
                         }
                     }
                 }
 
                 SettingsToggle {
                     label: "Direct auto-unlock"
-                    description: "4 or more numbers: logs in directly without pressing Enter when correct"
+                    description: "4 or more numbers: logs in directly without pressing Enter when correct (PIN mode only)"
                     checked: SettingsService.autoUnlockPin
                     onToggled: value => SettingsService.autoUnlockPin = value
-                }
-
-                SettingsField {
-                    label: "User display name"
-                    description: "Custom label shown above user input on the lock screen"
-                    text: SettingsService.lockscreenUserName
-                    placeholder: Quickshell.env("USER") || "pc"
-                    onAccepted: value => SettingsService.lockscreenUserName = value.trim()
                 }
             }
 

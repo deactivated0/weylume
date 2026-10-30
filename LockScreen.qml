@@ -16,7 +16,10 @@ Scope {
             WlSessionLockSurface {
                 id: surfaceWindow
                 color: "#000000"
-                onVisibleChanged: if (visible) Qt.callLater(() => pinInput.forceActiveFocus())
+
+                readonly property bool isPrimaryScreen: !surfaceWindow.screen || surfaceWindow.screen === Quickshell.screens[0]
+
+                onVisibleChanged: if (visible && isPrimaryScreen) Qt.callLater(() => pinInput.forceActiveFocus())
 
                 Rectangle {
                     id: lockRoot
@@ -66,12 +69,30 @@ Scope {
                         onClicked: pinInput.forceActiveFocus()
                     }
 
-                    // Initial focus timer
+                    // Focus retry timer: only for primary screen, stops as soon as activeFocus is achieved
                     Timer {
+                        id: focusRetryTimer
+                        property int attempts: 0
                         interval: 80
-                        running: true
-                        repeat: false
-                        onTriggered: pinInput.forceActiveFocus()
+                        repeat: true
+                        running: surfaceWindow.isPrimaryScreen && !pinInput.activeFocus && attempts < 15
+                        onTriggered: {
+                            attempts++;
+                            pinInput.forceActiveFocus();
+                            if (pinInput.activeFocus) stop();
+                        }
+                    }
+
+                    Keys.onEscapePressed: {
+                        pinInput.text = "";
+                        helperText.text = "";
+                        pinInput.forceActiveFocus();
+                    }
+
+                    Keys.onPressed: event => {
+                        if (!pinInput.activeFocus) {
+                            pinInput.forceActiveFocus();
+                        }
                     }
 
                     Connections {
@@ -80,7 +101,11 @@ Scope {
                             if (ShellState.isLocked) {
                                 pinInput.text = "";
                                 helperText.text = "";
-                                Qt.callLater(() => pinInput.forceActiveFocus());
+                                if (surfaceWindow.isPrimaryScreen) {
+                                    focusRetryTimer.attempts = 0;
+                                    focusRetryTimer.start();
+                                    Qt.callLater(() => pinInput.forceActiveFocus());
+                                }
                             }
                         }
                     }
@@ -107,9 +132,11 @@ Scope {
                             text: lockRoot.formatTime(ShellState.currentHour, ShellState.currentMinute)
                             color: "#FFFFFF"
                             font.family: Theme.fontFamily
-                            font.pixelSize: Math.max(104, Math.min(184, lockRoot.width * 0.124))
+                            readonly property real clockSize: Math.max(104, Math.min(184, lockRoot.width * 0.124))
+                            font.pixelSize: clockSize
                             font.weight: Font.DemiBold
-                            font.letterSpacing: -6.0
+                            font.letterSpacing: Math.round(-0.035 * clockSize)
+                            font.features: { "tnum": 1 }
                         }
                     }
 
@@ -118,7 +145,7 @@ Scope {
                         id: loginCol
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.bottom: parent.bottom
-                        anchors.bottomMargin: Math.max(105, Math.min(170, lockRoot.height * 0.144))
+                        anchors.bottomMargin: Math.max(115, Math.min(175, lockRoot.height * 0.155))
                         spacing: 0
 
                         // Password / PIN Form Pill (Pure AMOLED)
@@ -130,12 +157,12 @@ Scope {
 
                             Rectangle {
                                 id: formPill
-                                width: parent.width
-                                height: parent.height
+                                anchors.fill: parent
                                 radius: 22
+                                transform: Translate { id: pillTranslate; x: 0 }
                                 color: pinInput.activeFocus ? "#0A0A0D" : "#000000"
                                 border.width: pinInput.activeFocus ? 1.5 : 1.0
-                                border.color: pinInput.activeFocus ? "#FFFFFF" : (pillHoverMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.45) : Qt.rgba(1, 1, 1, 0.22))
+                                border.color: pinInput.activeFocus ? "#FFFFFF" : ((pillHoverMouse.containsMouse || eyeMouse.containsMouse || submitMouse.containsMouse) ? Qt.rgba(1, 1, 1, 0.45) : Qt.rgba(1, 1, 1, 0.22))
 
                                 Behavior on color { ColorAnimation { duration: 120 } }
                                 Behavior on border.color { ColorAnimation { duration: 120 } }
@@ -144,8 +171,12 @@ Scope {
                                     id: pillHoverMouse
                                     anchors.fill: parent
                                     hoverEnabled: true
+                                    propagateComposedEvents: true
                                     cursorShape: Qt.IBeamCursor
-                                    onClicked: pinInput.forceActiveFocus()
+                                    onClicked: mouse => {
+                                        pinInput.forceActiveFocus();
+                                        mouse.accepted = false;
+                                    }
                                 }
 
                                 RowLayout {
@@ -170,13 +201,29 @@ Scope {
                                         clip: true
                                         selectByMouse: true
                                         focus: true
+                                        activeFocusOnTab: true
+
+                                        validator: SettingsService.lockscreenMode === "pin" ? pinValidator : null
+                                        inputMethodHints: SettingsService.lockscreenMode === "pin"
+                                            ? (Qt.ImhDigitsOnly | Qt.ImhHiddenText | Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText)
+                                            : (Qt.ImhHiddenText | Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText)
+
+                                        RegularExpressionValidator {
+                                            id: pinValidator
+                                            regularExpression: /^[0-9]*$/
+                                        }
+
+                                        Keys.onEscapePressed: {
+                                            pinInput.text = "";
+                                            helperText.text = "";
+                                        }
 
                                         onAccepted: lockRoot.attemptUnlock()
 
                                         onTextChanged: {
                                             helperText.text = "";
-                                            // Auto-unlock requirement: 4 or more numbers if correct logs in directly without pressing enter
-                                            if (SettingsService.autoUnlockPin && text.length >= 4) {
+                                            // Auto-unlock requirement: 4 or more numbers if correct logs in directly without pressing enter (PIN mode only)
+                                            if (SettingsService.autoUnlockPin && SettingsService.lockscreenMode === "pin" && text.length >= 4) {
                                                 if (text === SettingsService.lockscreenPin) {
                                                     helperText.text = "";
                                                     text = "";
@@ -262,11 +309,15 @@ Scope {
                         // Shake animation on incorrect attempt
                         SequentialAnimation {
                             id: shakeAnim
-                            NumberAnimation { target: formPill; property: "x"; to: -10; duration: 40; easing.type: Easing.OutQuad }
-                            NumberAnimation { target: formPill; property: "x"; to: 10; duration: 40; easing.type: Easing.InOutQuad }
-                            NumberAnimation { target: formPill; property: "x"; to: -8; duration: 40; easing.type: Easing.InOutQuad }
-                            NumberAnimation { target: formPill; property: "x"; to: 8; duration: 40; easing.type: Easing.InOutQuad }
-                            NumberAnimation { target: formPill; property: "x"; to: 0; duration: 40; easing.type: Easing.OutQuad }
+                            alwaysRunToEnd: true
+                            onStarted: pillTranslate.x = 0
+                            onStopped: pillTranslate.x = 0
+                            NumberAnimation { target: pillTranslate; property: "x"; to: -12; duration: 42; easing.type: Easing.OutQuad }
+                            NumberAnimation { target: pillTranslate; property: "x"; to: 12; duration: 42; easing.type: Easing.InOutQuad }
+                            NumberAnimation { target: pillTranslate; property: "x"; to: -8; duration: 42; easing.type: Easing.InOutQuad }
+                            NumberAnimation { target: pillTranslate; property: "x"; to: 8; duration: 42; easing.type: Easing.InOutQuad }
+                            NumberAnimation { target: pillTranslate; property: "x"; to: -3; duration: 35; easing.type: Easing.InOutQuad }
+                            NumberAnimation { target: pillTranslate; property: "x"; to: 0; duration: 35; easing.type: Easing.OutQuad }
                         }
 
                         // Helper / Error Text
@@ -463,7 +514,7 @@ Scope {
                         Row {
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: 6
-                            visible: UPower.displayDevice?.isPresent ?? false
+                            visible: (UPower.displayDevice?.ready ?? false) && (UPower.displayDevice?.isLaptopBattery ?? false)
 
                             Rectangle {
                                 width: 24

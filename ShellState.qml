@@ -85,6 +85,12 @@ Scope {
         }
     }
 
+    Component.onCompleted: {
+        if (SettingsService.loaded && SettingsService.lockOnStart && SettingsService.lockscreenEnabled) {
+            root.isLocked = true;
+        }
+    }
+
     // Bind PipeWire nodes once for the entire shell instead of once per panel/monitor.
     PwObjectTracker {
         objects: Pipewire.nodes ? Pipewire.nodes.values : []
@@ -158,6 +164,7 @@ Scope {
     }
 
     function toggleStart(screenName) {
+        if (isLocked) return;
         useScreen(screenName);
         const next = !startOpen;
         closeFlyouts(false);
@@ -165,6 +172,7 @@ Scope {
     }
 
     function toggleQuick(screenName) {
+        if (isLocked) return;
         useScreen(screenName);
         const next = !quickOpen;
         closeFlyouts(false);
@@ -172,6 +180,7 @@ Scope {
     }
 
     function toggleTray(screenName) {
+        if (isLocked) return;
         useScreen(screenName);
         const next = !trayOpen;
         closeFlyouts(false);
@@ -179,6 +188,7 @@ Scope {
     }
 
     function openCalendar(screenName) {
+        if (isLocked) return;
         useScreen(screenName);
         notifCenterTab = "calendar";
         closeFlyouts(false);
@@ -186,6 +196,7 @@ Scope {
     }
 
     function openNotifications(screenName) {
+        if (isLocked) return;
         useScreen(screenName);
         notifCenterTab = "notifications";
         closeFlyouts(false);
@@ -193,6 +204,7 @@ Scope {
     }
 
     function toggleNotif(screenName, tab) {
+        if (isLocked) return;
         useScreen(screenName);
         if (tab) notifCenterTab = tab;
         const next = !notifOpen;
@@ -201,6 +213,7 @@ Scope {
     }
 
     function toggleMixer(screenName) {
+        if (isLocked) return;
         useScreen(screenName);
         const next = !audioMixerOpen;
         closeFlyouts(false);
@@ -208,10 +221,12 @@ Scope {
     }
 
     function toggleSettings(screenName) {
+        if (isLocked) return;
         settingsOpen = !settingsOpen;
     }
 
     function toggleClipboard(screenName) {
+        if (isLocked) return;
         useScreen(screenName);
         const next = !clipboardOpen;
         closeFlyouts(false);
@@ -219,6 +234,7 @@ Scope {
     }
 
     function toggleEmoji(screenName) {
+        if (isLocked) return;
         useScreen(screenName);
         const next = !emojiOpen;
         closeFlyouts(false);
@@ -226,6 +242,7 @@ Scope {
     }
 
     function toggleSidebar() {
+        if (isLocked) return;
         sidebarVisible = !sidebarVisible;
     }
 
@@ -236,6 +253,9 @@ Scope {
     function lock() {
         if (!SettingsService.lockscreenEnabled) return;
         closeFlyouts(false);
+        settingsOpen = false;
+        sessionDialogOpen = false;
+        pendingSessionAction = "";
         isLocked = true;
     }
 
@@ -249,7 +269,7 @@ Scope {
             lock();
             return;
         }
-        if (!SettingsService.confirmSessionActions) {
+        if (isLocked || !SettingsService.confirmSessionActions || action === "suspend") {
             SystemService.enqueue(["session", action], "session", "session", false);
             return;
         }
