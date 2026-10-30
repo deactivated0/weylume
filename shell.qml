@@ -48,7 +48,10 @@ ShellRoot {
     Connections { target: StateStore; function onErrorChanged() { if (StateStore.error) OsdService.show("Configuration startup failed", StateStore.error, "dialog-error", -1, true); } }
 
     PolkitDialog {}
-    SessionDialog {}
+    LazyLoader {
+        active: ShellState.sessionDialogOpen
+        SessionDialog {}
+    }
     LazyLoader {
         active: ShellState.settingsOpen
         SettingsCenter {}
