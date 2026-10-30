@@ -75,11 +75,33 @@ pub fn capture() -> Result<()> {
         } else {
             atomic(&path, &data)?;
         }
-        emit(&json!({"type":"image","path":path,"mime":mime,"hash":digest}))?;
+        #[derive(serde::Serialize)]
+        struct ImageMessage<'a> {
+            r#type: &'static str,
+            path: &'a std::path::Path,
+            mime: &'a str,
+            hash: &'a str,
+        }
+        let out = io::stdout();
+        let mut out = out.lock();
+        serde_json::to_writer(&mut out, &ImageMessage { r#type: "image", path: &path, mime, hash: &digest })?;
+        use std::io::Write;
+        out.write_all(b"\n")?;
+        out.flush()?;
     } else if !data.contains(&0) {
         if let Ok(text) = std::str::from_utf8(&data) {
             if !text.trim().is_empty() {
-                emit(&json!({"type":"text","text":text}))?;
+                #[derive(serde::Serialize)]
+                struct TextMessage<'a> {
+                    r#type: &'static str,
+                    text: &'a str,
+                }
+                let out = io::stdout();
+                let mut out = out.lock();
+                serde_json::to_writer(&mut out, &TextMessage { r#type: "text", text })?;
+                use std::io::Write;
+                out.write_all(b"\n")?;
+                out.flush()?;
             }
         }
     }

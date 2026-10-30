@@ -876,7 +876,9 @@ PanelWindow {
     }
 
     LazyLoader {
-        active: root.ownsPopup()
+        property bool loaded: false
+        active: (ShellState.startOpen && root.ownsPopup()) || (!SettingsService.unloadClosedFlyouts && loaded)
+        onActiveChanged: if (ShellState.startOpen && root.ownsPopup()) loaded = true
         StartMenu { anchorItem: startButton }
     }
 

@@ -548,8 +548,9 @@ PopupWindow {
             const matching = [];
             for (let j = 0; j < cat.apps.length; j++) {
                 const app = cat.apps[j];
-                const name = (app.name || "").toLowerCase();
-                if (name.includes(query) || (app.comment && app.comment.toLowerCase().includes(query))) {
+                const name = app._lcName || (app._lcName = (app.name || "").toLowerCase());
+                const comment = app._lcComment || (app._lcComment = (app.comment || "").toLowerCase());
+                if (name.includes(query) || (comment && comment.includes(query))) {
                     matching.push(app);
                 }
             }

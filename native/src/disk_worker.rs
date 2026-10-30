@@ -15,7 +15,7 @@ pub struct Worker {
 }
 impl Worker {
     pub fn new() -> Result<Self> {
-        let mut command = Command::new(std::env::current_exe()?);
+        let mut command = Command::new(current_exe());
         command
             .arg("disk-metrics")
             .stdin(Stdio::null())

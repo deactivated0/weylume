@@ -47,19 +47,28 @@ PopupWindow {
         for (let i = 0; i < devices.length; i++) if (devices[i].connected) return devices[i];
         return null;
     }
-    readonly property var displayedBtDevices: (BluetoothService.adapter?.devices.values || []).map(device => ({
-        nativeDevice: device,
-        mac: device.address,
-        name: device.name || device.address,
-        connected: device.connected,
-        paired: device.paired,
-        pairing: device.pairing,
-        trusted: device.trusted,
-        batteryAvailable: device.batteryAvailable,
-        battery: device.battery,
-        icon: device.icon,
-        blocked: device.blocked
-    }))
+    readonly property var displayedBtDevices: {
+        if (root.currentPage !== "bluetooth") return [];
+        const raw = BluetoothService.adapter?.devices.values || [];
+        const res = new Array(raw.length);
+        for (let i = 0; i < raw.length; i++) {
+            const device = raw[i];
+            res[i] = {
+                nativeDevice: device,
+                mac: device.address,
+                name: device.name || device.address,
+                connected: device.connected,
+                paired: device.paired,
+                pairing: device.pairing,
+                trusted: device.trusted,
+                batteryAvailable: device.batteryAvailable,
+                battery: device.battery,
+                icon: device.icon,
+                blocked: device.blocked
+            };
+        }
+        return res;
+    }
 
     Connections {
         target: BluetoothService.adapter

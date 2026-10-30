@@ -95,10 +95,16 @@ fn security(ap: &Value) -> String {
     }
     names
 }
+pub fn data_with_bus(b: &Bus) -> Value {
+    snapshot_with_bus(b).unwrap_or_else(|e| json!({"available":false,"error":e.to_string()}))
+}
 pub fn snapshot() -> Result<Value> {
     let b = Bus::system()?;
+    snapshot_with_bus(&b)
+}
+pub fn snapshot_with_bus(b: &Bus) -> Result<Value> {
     let manager = b.properties(NM, ROOT, NM)?;
-    let profiles = profiles(&b)?;
+    let profiles = profiles(b)?;
     let mut saved = BTreeMap::new();
     let mut vpns = Vec::new();
     let mut active = Vec::new();

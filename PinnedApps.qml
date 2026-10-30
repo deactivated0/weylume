@@ -83,11 +83,19 @@ Scope {
         return appId || title || ("win_" + index);
     }
 
+    function cleanAppStrings(values) {
+        const list = Array.isArray(values) ? values : [values];
+        const res = [];
+        for (let i = 0; i < list.length; ++i) {
+            const v = String(list[i] || "").trim().toLowerCase();
+            if (v.length > 0) res.push(v);
+        }
+        return res;
+    }
+
     function matchesApp(candidateValues, targetValues) {
-        const candidates = (Array.isArray(candidateValues) ? candidateValues : [candidateValues])
-            .map(value => String(value || "").trim().toLowerCase()).filter(value => value.length > 0);
-        const targets = (Array.isArray(targetValues) ? targetValues : [targetValues])
-            .map(value => String(value || "").trim().toLowerCase()).filter(value => value.length > 0);
+        const candidates = cleanAppStrings(candidateValues);
+        const targets = cleanAppStrings(targetValues);
         if (candidates.length === 0 || targets.length === 0) return false;
 
         const candidateFlavor = candidateDiscordFlavor(candidates);
@@ -95,9 +103,17 @@ Scope {
         if (candidateFlavor || targetFlavor)
             return candidateFlavor !== null && candidateFlavor === targetFlavor;
 
-        return candidates.some(candidate => targets.some(target =>
-            candidate === target || (Math.min(candidate.length, target.length) > 2
-                && (candidate.includes(target) || target.includes(candidate)))));
+        for (let c = 0; c < candidates.length; ++c) {
+            const cand = candidates[c];
+            for (let t = 0; t < targets.length; ++t) {
+                const target = targets[t];
+                if (cand === target || (Math.min(cand.length, target.length) > 2
+                    && (cand.includes(target) || target.includes(cand)))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     function loadPinned() {

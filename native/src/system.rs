@@ -16,15 +16,24 @@ fn available_commands() -> serde_json::Map<String, Value> {
         if remaining.is_empty() {
             break;
         }
+        if !dir.is_dir() {
+            continue;
+        }
+        let mut p = dir;
         remaining.retain(|&cmd| {
-            let p = dir.join(cmd);
-            if let Ok(m) = fs::metadata(&p) {
+            p.push(cmd);
+            let found = if let Ok(m) = fs::metadata(&p) {
                 if m.is_file() && m.permissions().mode() & 0o111 != 0 {
                     map.insert(cmd.to_string(), json!(true));
-                    return false;
+                    true
+                } else {
+                    false
                 }
-            }
-            true
+            } else {
+                false
+            };
+            p.pop();
+            !found
         });
     }
     map
@@ -105,9 +114,15 @@ fn session_status() -> Value {
     session::status()
 }
 fn status() -> Value {
-    let mut state = session_status();
-    state["powerProfile"] = json!(session::profile().unwrap_or("unavailable".into()));
-    state
+    if let Ok(b) = bus::Bus::system() {
+        let mut state = session::status_with_bus(&b);
+        state["powerProfile"] = json!(session::profile_with_bus(&b).unwrap_or("unavailable".into()));
+        state
+    } else {
+        let mut state = session_status();
+        state["powerProfile"] = json!("unavailable");
+        state
+    }
 }
 fn audio_default(id: &str, name: &str, source: bool) -> (bool, String) {
     // Quickshell sets the preferred default natively. Only migrate existing
@@ -273,9 +288,22 @@ pub fn action(args: &[String]) -> Result<(bool, String, Value)> {
         ("startup-data", _) => {
             let limit = a.first().unwrap_or(&"96").parse::<usize>()?.clamp(8, 512);
             let age = a.get(1).unwrap_or(&"6").parse::<u64>()?.clamp(1, 168);
+            let sys_bus = bus::Bus::system().ok();
+            let sys_val = if let Some(ref b) = sys_bus {
+                let mut s = session::status_with_bus(b);
+                s["powerProfile"] = json!(session::profile_with_bus(b).unwrap_or("unavailable".into()));
+                s
+            } else {
+                status()
+            };
+            let net_val = if let Some(ref b) = sys_bus {
+                network::data_with_bus(b)
+            } else {
+                network::data()
+            };
             answer(
                 "Startup state loaded",
-                json!({"recovery":session::recover(),"outputRecovery":match crate::outputs::restore(){Ok(v)=>json!({"restored":v}),Err(e)=>json!({"error":e.to_string()})},"capabilities":capabilities(),"preview":clean(limit,age)?,"labwc":labwc::data(),"system":status(),"network":network::data()}),
+                json!({"recovery":session::recover(),"outputRecovery":match crate::outputs::restore(){Ok(v)=>json!({"restored":v}),Err(e)=>json!({"error":e.to_string()})},"capabilities":capabilities(),"preview":clean(limit,age)?,"labwc":labwc::data(),"system":sys_val,"network":net_val}),
             )
         }
         ("diagnostics", []) => answer("Diagnostics complete", crate::diagnostics::data()),

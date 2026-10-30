@@ -78,7 +78,7 @@ pub fn data() -> Value {
     summary.push("Lock contract: configure a locker that reports logind LockedHint only after acquiring the session lock".into());
     summary.push("Labwc reload is a request, not a compositor acknowledgement; validate live behavior on target".into());
     summary.push("Cross-application portal sharing enumeration/revocation is unavailable in the portable API".into());
-    json!({"architecture":std::env::consts::ARCH,"binaryBytes":std::env::current_exe().ok().and_then(|p|fs::metadata(p).ok()).map(|m|m.len()),"summary":summary})
+    json!({"architecture":std::env::consts::ARCH,"binaryBytes":fs::metadata(current_exe()).ok().map(|m|m.len()),"summary":summary})
 }
 fn counters(pid: u32) -> Result<(u64, u64, u64, u64)> {
     let stat = fs::read_to_string(format!("/proc/{pid}/stat"))?;

@@ -29,15 +29,24 @@ Scope {
         text = String(text || "");
         if (!text || sensitive(text)) return;
         const existing = root.history.find(item => item.text === text);
+        const isPinned = Boolean(existing?.pinned);
         const item = {
             type: "text",
             text: text,
             timestamp: Date.now(),
-            pinned: Boolean(existing?.pinned)
+            pinned: isPinned
         };
-        let next = [item].concat(root.history.filter(entry => entry.text !== text));
-        const pinned = next.filter(entry => entry.pinned);
-        const normal = next.filter(entry => !entry.pinned).slice(0, Math.max(0, SettingsService.clipboardHistoryLimit - pinned.length));
+        const pinned = isPinned ? [item] : [];
+        const normal = isPinned ? [] : [item];
+        const old = root.history;
+        for (let i = 0; i < old.length; ++i) {
+            const entry = old[i];
+            if (entry.text === text) continue;
+            if (entry.pinned) pinned.push(entry);
+            else normal.push(entry);
+        }
+        const maxNormal = Math.max(0, SettingsService.clipboardHistoryLimit - pinned.length);
+        if (normal.length > maxNormal) normal.length = maxNormal;
         root.history = pinned.concat(normal).sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
         saveTimer.restart();
     }
@@ -47,15 +56,23 @@ Scope {
             return;
         }
         const existing = root.history.find(item => item.type === "image" && item.hash === message.hash);
+        const isPinned = Boolean(existing?.pinned);
         const item = {
             type: "image", path: String(message.path), mime: String(message.mime || "image/png"),
-            hash: String(message.hash), timestamp: Date.now(), pinned: Boolean(existing?.pinned)
+            hash: String(message.hash), timestamp: Date.now(), pinned: isPinned
         };
-        let next = [item].concat(root.history.filter(entry => entry.type !== "image" || entry.hash !== item.hash));
-        const pinned = next.filter(entry => entry.pinned);
-        const normal = next.filter(entry => !entry.pinned).slice(0, Math.max(0, SettingsService.clipboardHistoryLimit - pinned.length));
-        const retained = pinned.concat(normal).sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
-        root.history = retained;
+        const pinned = isPinned ? [item] : [];
+        const normal = isPinned ? [] : [item];
+        const old = root.history;
+        for (let i = 0; i < old.length; ++i) {
+            const entry = old[i];
+            if (entry.type === "image" && entry.hash === item.hash) continue;
+            if (entry.pinned) pinned.push(entry);
+            else normal.push(entry);
+        }
+        const maxNormal = Math.max(0, SettingsService.clipboardHistoryLimit - pinned.length);
+        if (normal.length > maxNormal) normal.length = maxNormal;
+        root.history = pinned.concat(normal).sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
         saveTimer.restart();
     }
 

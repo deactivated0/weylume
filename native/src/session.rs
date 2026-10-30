@@ -14,6 +14,9 @@ pub fn status() -> Value {
     let Ok(b) = Bus::system() else {
         return json!({"canSuspend":false,"canHibernate":false,"inhibitors":[],"powerAvailable":false,"error":"System bus unavailable"});
     };
+    status_with_bus(&b)
+}
+pub fn status_with_bus(b: &Bus) -> Value {
     let mut value = json!({"inhibitors":[],"powerAvailable":true});
     for (key, method) in [
         ("Suspend", "CanSuspend"),
@@ -21,7 +24,7 @@ pub fn status() -> Value {
         ("PowerOff", "CanPowerOff"),
         ("Reboot", "CanReboot"),
     ] {
-        let p = permission(&b, method);
+        let p = permission(b, method);
         value[format!("can{key}")] = json!(["yes", "challenge"].contains(&p.as_str()));
         value[format!("permission{key}")] = json!(p);
     }
@@ -90,6 +93,26 @@ pub fn action(action: &str) -> Result<()> {
     b.call_interactive(LOGIN, PATH, MANAGER, method, "b", &[json!(true)])?;
     Ok(())
 }
+pub fn profile_with_bus(b: &Bus) -> Result<String> {
+    for (name, path) in [
+        (
+            "org.freedesktop.UPower.PowerProfiles",
+            "/org/freedesktop/UPower/PowerProfiles",
+        ),
+        ("net.hadess.PowerProfiles", "/net/hadess/PowerProfiles"),
+    ] {
+        if let Ok(v) = b.get(name, path, name, "ActiveProfile") {
+            if let Some(s) = v.as_str() {
+                return Ok(s.to_string());
+            }
+        }
+    }
+    Err("Power profiles service is unavailable".into())
+}
+pub fn profile() -> Result<String> {
+    let b = Bus::system()?;
+    profile_with_bus(&b)
+}
 fn power_bus() -> Result<(Bus, &'static str, &'static str)> {
     let b = Bus::system()?;
     for (name, path) in [
@@ -104,13 +127,6 @@ fn power_bus() -> Result<(Bus, &'static str, &'static str)> {
         }
     }
     Err("Power profiles service is unavailable".into())
-}
-pub fn profile() -> Result<String> {
-    let (b, n, p) = power_bus()?;
-    Ok(b.get(n, p, n, "ActiveProfile")?
-        .as_str()
-        .ok_or("Invalid power profile")?
-        .into())
 }
 pub fn set_profile(profile: &str) -> Result<()> {
     let (b, n, p) = power_bus()?;

@@ -118,14 +118,17 @@ Scope {
             }
 
             const streamIds = record.ids;
-            const isMatch = targets.some(target => {
-                return streamIds.some(id => {
-                    if (id === target) return true;
-                    if (target.length >= 3 && (id.includes(target) || target.includes(id))) return true;
-                    if (id.endsWith("." + target) || target.endsWith("." + id)) return true;
-                    return false;
-                });
-            });
+            let isMatch = false;
+            targetLoop: for (let t = 0; t < targets.length; ++t) {
+                const target = targets[t];
+                for (let s = 0; s < streamIds.length; ++s) {
+                    const id = streamIds[s];
+                    if (id === target || (target.length >= 3 && (id.includes(target) || target.includes(id))) || id.endsWith("." + target) || target.endsWith("." + id)) {
+                        isMatch = true;
+                        break targetLoop;
+                    }
+                }
+            }
 
             if (isMatch) matched.push(n);
         }

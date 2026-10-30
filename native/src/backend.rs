@@ -93,9 +93,54 @@ impl Sensors {
         }
     }
 }
-fn temperature(paths: &[PathBuf]) -> String {
+#[derive(Default)]
+struct MetricFiles {
+    stat: Option<fs::File>,
+    net_dev: Option<fs::File>,
+    net_route: Option<fs::File>,
+    meminfo: Option<fs::File>,
+    uptime: Option<fs::File>,
+    cpufreq: Option<fs::File>,
+    cpu_temp: Option<fs::File>,
+    gpu_temp: Option<fs::File>,
+    gpu_busy: Option<fs::File>,
+}
+
+fn read_proc_buf<'a>(
+    file_opt: &mut Option<fs::File>,
+    path: impl AsRef<Path>,
+    buf: &'a mut [u8],
+) -> Option<&'a [u8]> {
+    use std::io::{Read, Seek};
+    if file_opt.is_none() {
+        *file_opt = fs::File::open(path.as_ref()).ok();
+    }
+    let file = file_opt.as_mut()?;
+    if file.seek(io::SeekFrom::Start(0)).is_err() {
+        *file_opt = fs::File::open(path.as_ref()).ok();
+        let file = file_opt.as_mut()?;
+        let n = file.read(buf).ok()?;
+        return Some(&buf[..n]);
+    }
+    let n = file.read(buf).ok()?;
+    Some(&buf[..n])
+}
+
+fn read_file_u64(file_opt: &mut Option<fs::File>, path: impl AsRef<Path>) -> u64 {
+    let mut buf = [0u8; 48];
+    read_proc_buf(file_opt, path, &mut buf).map_or(0, parse_ascii_u64)
+}
+
+fn temperature(file_opt: &mut Option<fs::File>, paths: &[PathBuf]) -> String {
+    if let Some(first) = paths.first() {
+        let v = read_file_u64(file_opt, first);
+        if v > 0 && v < 200000 {
+            return format!("{}°C", v / 1000);
+        }
+    }
     paths
         .iter()
+        .skip(1)
         .map(read_u64)
         .find(|v| *v > 0 && *v < 200000)
         .map(|v| format!("{}°C", v / 1000))
@@ -126,10 +171,16 @@ fn trim_ascii(mut b: &[u8]) -> &[u8] {
     }
     b
 }
-fn metrics(prev: &mut Previous, sensors: &Sensors, cpu_name: &str) -> Value {
+fn emit_metrics(
+    out_buf: &mut String,
+    files: &mut MetricFiles,
+    prev: &mut Previous,
+    sensors: &Sensors,
+    cpu_name: &str,
+) -> io::Result<()> {
     let mut buf = [0u8; 4096];
     let (total, idle) = {
-        if let Some(data) = read_buf("/proc/stat", &mut buf) {
+        if let Some(data) = read_proc_buf(&mut files.stat, "/proc/stat", &mut buf) {
             let first_line = data.split(|&b| b == b'\n').next().unwrap_or(&[]);
             let mut it = first_line
                 .split(|&b| b.is_ascii_whitespace())
@@ -154,7 +205,7 @@ fn metrics(prev: &mut Previous, sensors: &Sensors, cpu_name: &str) -> Value {
     let (mut rx, mut tx) = (0u64, 0u64);
     let mut fallback_buf = [0u8; 32];
     let mut fallback_len = 0;
-    if let Some(data) = read_buf("/proc/net/dev", &mut buf) {
+    if let Some(data) = read_proc_buf(&mut files.net_dev, "/proc/net/dev", &mut buf) {
         for l in data.split(|&b| b == b'\n') {
             if let Some(colon) = l.iter().position(|&b| b == b':') {
                 let name = trim_ascii(&l[..colon]);
@@ -182,7 +233,7 @@ fn metrics(prev: &mut Previous, sensors: &Sensors, cpu_name: &str) -> Value {
 
     let mut iface_buf = [0u8; 32];
     let mut iface_len = 0;
-    if let Some(data) = read_buf("/proc/net/route", &mut buf) {
+    if let Some(data) = read_proc_buf(&mut files.net_route, "/proc/net/route", &mut buf) {
         for l in data.split(|&b| b == b'\n').skip(1) {
             let mut v = l.split(|&b| b.is_ascii_whitespace()).filter(|s| !s.is_empty());
             let Some(name) = v.next() else { continue };
@@ -229,7 +280,7 @@ fn metrics(prev: &mut Previous, sensors: &Sensors, cpu_name: &str) -> Value {
     };
 
     let (mut mt, mut ma) = (0u64, 0u64);
-    if let Some(data) = read_buf("/proc/meminfo", &mut buf) {
+    if let Some(data) = read_proc_buf(&mut files.meminfo, "/proc/meminfo", &mut buf) {
         for l in data.split(|&b| b == b'\n') {
             if l.starts_with(b"MemTotal:") {
                 let mut it = l[9..].split(|&b| b.is_ascii_whitespace()).filter(|s| !s.is_empty());
@@ -246,7 +297,7 @@ fn metrics(prev: &mut Previous, sensors: &Sensors, cpu_name: &str) -> Value {
     }
 
     let mut uptime_buf = [0u8; 64];
-    let mins = if let Some(data) = read_buf("/proc/uptime", &mut uptime_buf) {
+    let mins = if let Some(data) = read_proc_buf(&mut files.uptime, "/proc/uptime", &mut uptime_buf) {
         let first = data.split(|&b| b.is_ascii_whitespace()).next().unwrap_or(&[]);
         std::str::from_utf8(first)
             .ok()
@@ -257,16 +308,37 @@ fn metrics(prev: &mut Previous, sensors: &Sensors, cpu_name: &str) -> Value {
         0
     };
     let (days, hours, minutes) = (mins / 1440, (mins % 1440) / 60, mins % 60);
-    let uptime = if days > 0 {
-        format!("{days}d {hours}h {minutes}m")
-    } else {
-        format!("{hours}h {minutes}m")
-    };
-    let freq = read_u64("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq");
-    let gpu = sensors.gpu.as_ref().map(read_u64).unwrap_or(0);
+    let freq = read_file_u64(&mut files.cpufreq, "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq");
+    let gpu = sensors.gpu.as_ref().map(|p| read_file_u64(&mut files.gpu_busy, p)).unwrap_or(0);
     let used = mt.saturating_sub(ma);
-    let data = json!({"uptime":uptime,"cpu":{"model":cpu_name,"frequency":if freq>0{format!("{:.2} GHz",freq as f64/1000000.)}else{"—".into()},"temperature":temperature(&sensors.cpu),"usage":cpu},"gpu":{"model":sensors.gpu_label,"temperature":temperature(&sensors.gpu_temp),"usage":if gpu<=100{gpu}else{0}},"memory":{"used":human(used*1024),"total":human(mt*1024),"usage":(used*100).checked_div(mt).unwrap_or(0)},"network":{"interface":interface,"receive":format!("{:.1} MB/s",rr/1048576.),"send":format!("{:.1} MB/s",tr/1048576.)}});
-    json!({"type":"metrics","data":data})
+    let cpu_temp = temperature(&mut files.cpu_temp, &sensors.cpu);
+    let gpu_temp = temperature(&mut files.gpu_temp, &sensors.gpu_temp);
+    let mem_used = human(used * 1024);
+    let mem_total = human(mt * 1024);
+    let mem_usage = (used * 100).checked_div(mt).unwrap_or(0);
+    let gpu_usage = if gpu <= 100 { gpu } else { 0 };
+
+    out_buf.clear();
+    use std::fmt::Write as FmtWrite;
+    let _ = write!(out_buf, "{{\"type\":\"metrics\",\"data\":{{\"uptime\":\"");
+    if days > 0 {
+        let _ = write!(out_buf, "{days}d {hours}h {minutes}m");
+    } else {
+        let _ = write!(out_buf, "{hours}h {minutes}m");
+    }
+    let _ = write!(out_buf, "\",\"cpu\":{{\"model\":\"{cpu_name}\",\"frequency\":\"");
+    if freq > 0 {
+        let _ = write!(out_buf, "{:.2} GHz", freq as f64 / 1000000.);
+    } else {
+        let _ = write!(out_buf, "—");
+    }
+    let _ = write!(out_buf, "\",\"temperature\":\"{cpu_temp}\",\"usage\":{cpu}}},\"gpu\":{{\"model\":\"{}\",\"temperature\":\"{gpu_temp}\",\"usage\":{gpu_usage}}},\"memory\":{{\"used\":\"{mem_used}\",\"total\":\"{mem_total}\",\"usage\":{mem_usage}}},\"network\":{{\"interface\":\"{interface}\",\"receive\":\"{:.1} MB/s\",\"send\":\"{:.1} MB/s\"}}}}}}\n", sensors.gpu_label, rr / 1048576., tr / 1048576.);
+
+    use std::io::Write as IoWrite;
+    let out = io::stdout();
+    let mut out = out.lock();
+    out.write_all(out_buf.as_bytes())?;
+    out.flush()
 }
 fn extension_icon(p: &Path) -> &'static str {
     let Some(e) = p.extension().and_then(|s| s.to_str()) else {
@@ -357,17 +429,29 @@ fn freedesktop_hash(p: &Path) -> Option<String> {
         }
     }
     let digest = md5::compute(uri.as_bytes());
-    Some(format!("{:x}", digest))
+    const LOWER_HEX: &[u8; 16] = b"0123456789abcdef";
+    let mut hash_bytes = [0u8; 32];
+    for (i, &b) in digest.0.iter().enumerate() {
+        hash_bytes[i * 2] = LOWER_HEX[(b >> 4) as usize];
+        hash_bytes[i * 2 + 1] = LOWER_HEX[(b & 0x0f) as usize];
+    }
+    Some(String::from_utf8(hash_bytes.to_vec()).unwrap())
 }
 
 fn find_cached_thumbnail(p: &Path) -> Option<PathBuf> {
+    static THUMB_LARGE: std::sync::OnceLock<PathBuf> = std::sync::OnceLock::new();
+    static THUMB_NORMAL: std::sync::OnceLock<PathBuf> = std::sync::OnceLock::new();
     let hash = freedesktop_hash(p)?;
-    let thumb_cache = home().join(".cache/thumbnails");
-    let large = thumb_cache.join("large").join(format!("{}.png", hash));
+    let file_name = format!("{hash}.png");
+    let large = THUMB_LARGE
+        .get_or_init(|| home().join(".cache/thumbnails/large"))
+        .join(&file_name);
     if large.exists() {
         return Some(large);
     }
-    let normal = thumb_cache.join("normal").join(format!("{}.png", hash));
+    let normal = THUMB_NORMAL
+        .get_or_init(|| home().join(".cache/thumbnails/normal"))
+        .join(&file_name);
     if normal.exists() {
         return Some(normal);
     }
@@ -581,6 +665,8 @@ pub fn main() -> Result<()> {
         })
         .unwrap_or_else(|| "CPU".into());
     let mut prev = Previous::default();
+    let mut metric_files = MetricFiles::default();
+    let mut metrics_out_buf = String::with_capacity(1024);
     let mut interval = 1000u64;
     let mut next = Instant::now();
     let mut sleep_inhibitor = None;
@@ -824,7 +910,7 @@ pub fn main() -> Result<()> {
                     sensors = Sensors::discover();
                 }
             }
-            emit(&metrics(&mut prev, &sensors, &cpu_name))?;
+            emit_metrics(&mut metrics_out_buf, &mut metric_files, &mut prev, &sensors, &cpu_name)?;
             next = Instant::now() + Duration::from_millis(interval);
         }
     }

@@ -44,18 +44,46 @@ impl AutostartEntry {
 }
 
 fn get_running_processes() -> HashMap<String, u32> {
-    let mut map = HashMap::new();
-    if let Ok(entries) = fs::read_dir("/proc") {
-        for entry in entries.flatten() {
-            let file_name = entry.file_name();
-            let name_str = file_name.to_string_lossy();
-            if let Ok(pid) = name_str.parse::<u32>() {
-                let comm_path = entry.path().join("comm");
-                if let Ok(comm) = fs::read_to_string(comm_path) {
-                    let c = comm.trim().to_lowercase();
-                    if !c.is_empty() {
-                        map.entry(c).or_insert(pid);
+    let mut map = HashMap::with_capacity(256);
+    let Ok(entries) = fs::read_dir("/proc") else { return map };
+    let mut path_buf = Vec::with_capacity(32);
+    let mut comm_buf = [0u8; 32];
+    for entry in entries.flatten() {
+        let name_bytes = entry.file_name().into_encoded_bytes();
+        if name_bytes.is_empty() || !name_bytes.iter().all(|b| b.is_ascii_digit()) {
+            continue;
+        }
+        let pid = crate::util::parse_ascii_u64(&name_bytes) as u32;
+        if pid == 0 {
+            continue;
+        }
+        path_buf.clear();
+        path_buf.extend_from_slice(b"/proc/");
+        path_buf.extend_from_slice(&name_bytes);
+        path_buf.extend_from_slice(b"/comm\0");
+        let fd = unsafe {
+            libc::open(
+                path_buf.as_ptr().cast(),
+                libc::O_RDONLY | libc::O_CLOEXEC,
+            )
+        };
+        if fd >= 0 {
+            let n = unsafe { libc::read(fd, comm_buf.as_mut_ptr().cast(), comm_buf.len()) };
+            unsafe { libc::close(fd); }
+            if n > 0 {
+                let mut slice = &comm_buf[..n as usize];
+                while let Some((&first, rest)) = slice.split_first() {
+                    if first.is_ascii_whitespace() { slice = rest; } else { break; }
+                }
+                while let Some((&last, rest)) = slice.split_last() {
+                    if last.is_ascii_whitespace() { slice = rest; } else { break; }
+                }
+                if !slice.is_empty() {
+                    let mut s = String::with_capacity(slice.len());
+                    for &b in slice {
+                        s.push((b as char).to_ascii_lowercase());
                     }
+                    map.entry(s).or_insert(pid);
                 }
             }
         }

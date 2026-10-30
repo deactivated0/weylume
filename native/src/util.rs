@@ -13,28 +13,41 @@ use std::{
     time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-pub fn home() -> PathBuf {
-    env::var_os("HOME")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("/tmp"))
+pub fn home() -> &'static Path {
+    static HOME: OnceLock<PathBuf> = OnceLock::new();
+    HOME.get_or_init(|| {
+        env::var_os("HOME")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| PathBuf::from("/tmp"))
+    })
 }
-pub fn config() -> PathBuf {
-    env::var_os("XDG_CONFIG_HOME")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| home().join(".config"))
+pub fn config() -> &'static Path {
+    static CONFIG: OnceLock<PathBuf> = OnceLock::new();
+    CONFIG.get_or_init(|| {
+        env::var_os("XDG_CONFIG_HOME")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| home().join(".config"))
+    })
+}
+pub fn current_exe() -> &'static Path {
+    static EXE: OnceLock<PathBuf> = OnceLock::new();
+    EXE.get_or_init(|| env::current_exe().unwrap())
 }
 pub fn shell() -> &'static Path {
     static DIRECTORY: OnceLock<PathBuf> = OnceLock::new();
-    DIRECTORY.get_or_init(|| env::current_exe().unwrap().parent().unwrap().to_path_buf())
+    DIRECTORY.get_or_init(|| current_exe().parent().unwrap().to_path_buf())
 }
-pub fn cache() -> PathBuf {
-    env::var_os("XDG_CACHE_HOME")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| home().join(".cache"))
+pub fn cache() -> &'static Path {
+    static CACHE: OnceLock<PathBuf> = OnceLock::new();
+    CACHE.get_or_init(|| {
+        env::var_os("XDG_CACHE_HOME")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| home().join(".cache"))
+    })
 }
 pub fn expand(s: &str) -> PathBuf {
     if s == "~" {
-        home()
+        home().to_path_buf()
     } else if let Some(t) = s.strip_prefix("~/") {
         home().join(t)
     } else {

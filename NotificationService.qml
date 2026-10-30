@@ -19,9 +19,14 @@ Scope {
     }
 
     function isMuted(notification) {
-        const muted = SettingsService.mutedNotificationApps.split(",")
-            .map(value => value.trim().toLowerCase()).filter(value => value.length > 0);
-        return muted.includes(appKey(notification));
+        const raw = SettingsService.mutedNotificationApps;
+        if (!raw || raw.trim().length === 0) return false;
+        const key = appKey(notification);
+        const parts = raw.split(",");
+        for (let i = 0; i < parts.length; ++i) {
+            if (parts[i].trim().toLowerCase() === key) return true;
+        }
+        return false;
     }
 
     function safeHint(hints, key, fallback) {

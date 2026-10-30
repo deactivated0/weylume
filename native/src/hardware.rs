@@ -91,25 +91,25 @@ pub fn mounts() -> Vec<(PathBuf, String)> {
         .lines()
         .filter_map(|line| {
             let path_field = line.split_whitespace().nth(4)?;
-            let path = unescape_mount(path_field);
-            if path != "/"
-                && !path.starts_with("/mnt/")
-                && !path.starts_with("/media/")
-                && !path.starts_with("/run/media/")
+            if path_field != "/"
+                && !path_field.starts_with("/mnt/")
+                && !path_field.starts_with("/media/")
+                && !path_field.starts_with("/run/media/")
             {
                 return None;
             }
-            if !seen.insert(path.clone()) {
+            let path = unescape_mount(path_field);
+            let p = PathBuf::from(path);
+            if !seen.insert(p.clone()) {
                 return None;
             }
-            let label = if path == "/" {
+            let label = if p == Path::new("/") {
                 "SSD".into()
             } else {
-                Path::new(&path)
-                    .file_name()
+                p.file_name()
                     .map_or("Disk".into(), |s| s.to_string_lossy().into_owned())
             };
-            Some((path.into(), label))
+            Some((p, label))
         })
         .take(32)
         .collect()
