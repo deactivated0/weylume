@@ -113,7 +113,7 @@ Scope {
                         }
                     }
 
-                    // CENTER: User silhouette, Username, and Password Pill Form
+                    // CENTER: Username and Password Pill Form
                     Column {
                         id: loginCol
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -121,47 +121,10 @@ Scope {
                         anchors.bottomMargin: Math.max(105, Math.min(170, lockRoot.height * 0.144))
                         spacing: 0
 
-                        // Avatar Silhouette (88px circle)
-                        Rectangle {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            width: 88
-                            height: 88
-                            radius: 44
-                            color: "#303033"
-                            border.width: 1
-                            border.color: Qt.rgba(1, 1, 1, 0.18)
-                            clip: true
-
-                            Item {
-                                anchors.fill: parent
-
-                                // Head
-                                Rectangle {
-                                    width: 38
-                                    height: 38
-                                    radius: 19
-                                    color: "#F8F8FA"
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    y: 16
-                                }
-
-                                // Shoulders
-                                Rectangle {
-                                    width: 76
-                                    height: 50
-                                    radius: 25
-                                    color: "#F8F8FA"
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    y: 52
-                                }
-                            }
-                        }
-
                         // Username
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
-                            topPadding: 14
-                            bottomPadding: 14
+                            bottomPadding: 16
                             text: SettingsService.lockscreenUserName ? SettingsService.lockscreenUserName : (Quickshell.env("USER") || "pc")
                             color: "#FFFFFF"
                             font.family: Theme.fontFamily

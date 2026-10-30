@@ -64,5 +64,11 @@
   "startCustomFolder1Name": "",
   "startCustomFolder1Path": "",
   "startCustomFolder2Name": "",
-  "startCustomFolder2Path": ""
+  "startCustomFolder2Path": "",
+  "lockscreenEnabled": true,
+  "lockscreenMode": "pin",
+  "lockscreenPin": "3669",
+  "autoUnlockPin": true,
+  "lockOnStart": false,
+  "lockscreenUserName": ""
 }

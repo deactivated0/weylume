@@ -102,7 +102,7 @@ ScrollView {
 
                 SettingsField {
                     label: "User display name"
-                    description: "Custom label shown below the user silhouette on the lock screen"
+                    description: "Custom label shown above user input on the lock screen"
                     text: SettingsService.lockscreenUserName
                     placeholder: Quickshell.env("USER") || "pc"
                     onAccepted: value => SettingsService.lockscreenUserName = value.trim()
