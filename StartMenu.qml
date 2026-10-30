@@ -1291,27 +1291,25 @@ PopupWindow {
                         Layout.fillWidth: true
                     }
 
-                    // Sleep Power Button (Elegant pill button)
+                    // Sleep Power Button (Pure AMOLED Black)
                     Rectangle {
-                        implicitWidth: 102
+                        implicitWidth: 84
                         implicitHeight: 30
                         radius: 6
                         color: (powerMouse.containsMouse || powerFlyout.visible)
-                            ? (Theme.isDark ? "#282834" : "#E2E2E8")
-                            : (Theme.isDark ? "#14141A" : "#F0F0F4")
+                            ? (Theme.isDark ? "#141418" : "#E5E5EB")
+                            : (Theme.isDark ? "#000000" : "#F4F4F6")
                         border.width: 1
                         border.color: (powerMouse.containsMouse || powerFlyout.visible)
-                            ? (Theme.isDark ? "#444456" : "#D0D0DA")
-                            : (Theme.isDark ? "#22222C" : "#E2E2E6")
+                            ? (Theme.isDark ? "#383844" : "#D0D0DA")
+                            : (Theme.isDark ? "#1C1C22" : "#E2E2E6")
 
                         Behavior on color { ColorAnimation { duration: 100 } }
                         Behavior on border.color { ColorAnimation { duration: 100 } }
 
                         RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: 8
-                            anchors.rightMargin: 8
-                            spacing: 6
+                            anchors.centerIn: parent
+                            spacing: 7
 
                             Image {
                                 source: Theme.moonIcon
@@ -1327,24 +1325,6 @@ PopupWindow {
                                 font.family: Theme.fontFamily
                                 font.pixelSize: 12
                                 font.weight: Font.Medium
-                                Layout.alignment: Qt.AlignVCenter
-                            }
-
-                            Item {
-                                Layout.fillWidth: true
-                            }
-
-                            Rectangle {
-                                Layout.preferredWidth: 1
-                                Layout.preferredHeight: 14
-                                color: Theme.isDark ? "#2C2C38" : "#D4D4DC"
-                                Layout.alignment: Qt.AlignVCenter
-                            }
-
-                            Text {
-                                text: "▾"
-                                color: Theme.muted
-                                font.pixelSize: 9
                                 Layout.alignment: Qt.AlignVCenter
                             }
                         }
