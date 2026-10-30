@@ -257,7 +257,9 @@ PopupWindow {
         Layout.rightMargin: 4
         implicitHeight: 22
         radius: 4
-        color: !actionRoot.disabled && (actionMouse.containsMouse || actionRoot.active) ? "#ffffff" : "transparent"
+        color: !actionRoot.disabled && (actionMouse.containsMouse || actionRoot.active)
+            ? (Theme.isDark ? "#ffffff" : "#000000")
+            : "transparent"
 
         RowLayout {
             anchors.fill: parent
@@ -269,10 +271,10 @@ PopupWindow {
                 Layout.fillWidth: true
                 text: actionRoot.label
                 color: actionRoot.disabled
-                    ? "#45ffffff"
+                    ? (Theme.isDark ? "#45ffffff" : "#45000000")
                     : ((actionMouse.containsMouse || actionRoot.active)
-                        ? (actionRoot.danger ? "#d00000" : "#000000")
-                        : (actionRoot.danger ? "#ff6060" : "#ffffff"))
+                        ? (actionRoot.danger ? "#d00000" : (Theme.isDark ? "#000000" : "#ffffff"))
+                        : (actionRoot.danger ? Theme.danger : Theme.text))
                 elide: Text.ElideRight
                 font.family: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif'
                 font.pixelSize: 12
@@ -282,7 +284,9 @@ PopupWindow {
             Text {
                 visible: actionRoot.hasArrow
                 text: "›"
-                color: (actionMouse.containsMouse || actionRoot.active) && !actionRoot.disabled ? "#000000" : "#90ffffff"
+                color: (actionMouse.containsMouse || actionRoot.active) && !actionRoot.disabled
+                    ? (Theme.isDark ? "#000000" : "#ffffff")
+                    : Theme.muted
                 font.pixelSize: 13
                 lineHeight: 1.0
                 font.family: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif'
@@ -291,7 +295,9 @@ PopupWindow {
             Text {
                 visible: !actionRoot.hasArrow && actionRoot.shortcutText.length > 0
                 text: actionRoot.shortcutText
-                color: (actionMouse.containsMouse || actionRoot.active) && !actionRoot.disabled ? "#000000" : "#45ffffff"
+                color: (actionMouse.containsMouse || actionRoot.active) && !actionRoot.disabled
+                    ? (Theme.isDark ? "#000000" : "#ffffff")
+                    : Theme.muted
                 font.pixelSize: 10
                 font.family: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif'
             }
@@ -400,7 +406,7 @@ PopupWindow {
                     anchors.rightMargin: 11
                     y: 3
                     height: 1
-                    color: "#24ffffff"
+                    color: Theme.border
                 }
             }
 
@@ -433,7 +439,7 @@ PopupWindow {
                     anchors.rightMargin: 11
                     y: 3
                     height: 1
-                    color: "#24ffffff"
+                    color: Theme.border
                 }
             }
 
@@ -475,7 +481,7 @@ PopupWindow {
                     anchors.rightMargin: 11
                     y: 3
                     height: 1
-                    color: "#24ffffff"
+                    color: Theme.border
                 }
             }
 
@@ -582,7 +588,7 @@ PopupWindow {
                     anchors.rightMargin: 11
                     y: 3
                     height: 1
-                    color: "#24ffffff"
+                    color: Theme.border
                 }
             }
 
@@ -657,7 +663,7 @@ PopupWindow {
                     anchors.rightMargin: 11
                     y: 3
                     height: 1
-                    color: "#24ffffff"
+                    color: Theme.border
                 }
             }
 
@@ -700,7 +706,7 @@ PopupWindow {
                     anchors.rightMargin: 11
                     y: 3
                     height: 1
-                    color: "#24ffffff"
+                    color: Theme.border
                 }
             }
 
@@ -773,7 +779,7 @@ PopupWindow {
                     anchors.rightMargin: 11
                     y: 3
                     height: 1
-                    color: "#24ffffff"
+                    color: Theme.border
                 }
             }
 

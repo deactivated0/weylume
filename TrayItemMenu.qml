@@ -250,9 +250,9 @@ PopupWindow {
 
                 Rectangle {
                     width: 22; height: 22; radius: 5
-                    color: "#080808"
+                    color: Theme.card
                     border.width: 1
-                    border.color: "#181818"
+                    border.color: Theme.border
 
                     Image {
                         id: headerIconImg
@@ -270,7 +270,7 @@ PopupWindow {
                         anchors.centerIn: parent
                         text: root.getCleanAppTitle().charAt(0).toUpperCase()
                         visible: !headerIconImg.visible
-                        color: "#ffffff"
+                        color: Theme.text
                         font.pixelSize: 10
                         font.weight: Font.Bold
                     }
@@ -282,7 +282,7 @@ PopupWindow {
 
                     Text {
                         text: root.getCleanAppTitle()
-                        color: "#ffffff"
+                        color: Theme.text
                         font.family: Theme.fontFamily
                         font.pixelSize: 11
                         font.weight: Font.DemiBold
@@ -292,7 +292,7 @@ PopupWindow {
 
                     Text {
                         text: root.isAudioItem ? (Math.round((Pipewire.defaultAudioSink?.audio?.volume ?? 0) * 100) + "% volume") : (root.currentItem?.isSystem ? "System Shortcut" : "Application")
-                        color: "#777777"
+                        color: Theme.muted
                         font.family: Theme.fontFamily
                         font.pixelSize: 8
                     }
@@ -302,7 +302,7 @@ PopupWindow {
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 1
-                color: "#141414"
+                color: Theme.border
                 Layout.topMargin: 1
                 Layout.bottomMargin: 2
             }
@@ -335,9 +335,9 @@ PopupWindow {
                             Layout.fillWidth: true
                             implicitHeight: 32
                             radius: 6
-                            color: isDefault ? "#141414" : (sinkMouse.containsMouse ? "#101010" : "transparent")
+                            color: isDefault ? Theme.cardHover : (sinkMouse.containsMouse ? Theme.card : "transparent")
                             border.width: 1
-                            border.color: isDefault ? "#ffffff" : (sinkMouse.containsMouse ? "#242424" : "transparent")
+                            border.color: isDefault ? Theme.accent : (sinkMouse.containsMouse ? Theme.border : "transparent")
 
                             RowLayout {
                                 anchors.fill: parent
@@ -347,7 +347,7 @@ PopupWindow {
 
                                 Text {
                                     text: sinkItem.isDefault ? "✓" : " "
-                                    color: "#ffffff"
+                                    color: Theme.text
                                     font.pixelSize: 11
                                     font.weight: Font.Bold
                                     Layout.preferredWidth: 12
@@ -355,7 +355,7 @@ PopupWindow {
 
                                 Text {
                                     text: sinkItem.modelData.properties?.["node.description"] || sinkItem.modelData.properties?.["node.nick"] || sinkItem.modelData.name || "Audio Device"
-                                    color: sinkItem.isDefault ? "#ffffff" : "#c0c0c0"
+                                    color: sinkItem.isDefault ? Theme.text : Theme.muted
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 10
                                     font.weight: sinkItem.isDefault ? Font.DemiBold : Font.Normal
@@ -365,7 +365,7 @@ PopupWindow {
 
                                 Text {
                                     text: Math.round((sinkItem.modelData.audio?.volume ?? 1.0) * 100) + "%"
-                                    color: "#727272"
+                                    color: Theme.muted
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 9
                                 }
@@ -420,9 +420,9 @@ PopupWindow {
                                 Layout.fillWidth: true
                                 implicitHeight: 28
                                 radius: 6
-                                color: (dbusEntryWrapper.modelData?.enabled && (menuEntryMouse.containsMouse || dbusEntryWrapper.isExpanded)) ? "#121212" : "transparent"
+                                color: (dbusEntryWrapper.modelData?.enabled && (menuEntryMouse.containsMouse || dbusEntryWrapper.isExpanded)) ? Theme.cardHover : "transparent"
                                 border.width: 1
-                                border.color: (dbusEntryWrapper.modelData?.enabled && (menuEntryMouse.containsMouse || dbusEntryWrapper.isExpanded)) ? "#202020" : "transparent"
+                                border.color: (dbusEntryWrapper.modelData?.enabled && (menuEntryMouse.containsMouse || dbusEntryWrapper.isExpanded)) ? Theme.border : "transparent"
                                 opacity: (dbusEntryWrapper.modelData?.enabled ?? true) ? 1.0 : 0.4
 
                                 RowLayout {
@@ -436,7 +436,7 @@ PopupWindow {
                                         Layout.preferredWidth: 12
                                         horizontalAlignment: Text.AlignHCenter
                                         text: "✓"
-                                        color: "#ffffff"
+                                        color: Theme.text
                                         font.family: Theme.fontFamily
                                         font.pixelSize: 10
                                         font.weight: Font.Bold
@@ -461,7 +461,7 @@ PopupWindow {
                                     Text {
                                         Layout.fillWidth: true
                                         text: dbusEntryWrapper.itemText
-                                        color: (menuEntryMouse.containsMouse || dbusEntryWrapper.isExpanded) ? "#ffffff" : "#e4e4e4"
+                                        color: Theme.text
                                         font.family: Theme.fontFamily
                                         font.pixelSize: 10
                                         font.weight: (menuEntryMouse.containsMouse || dbusEntryWrapper.isExpanded) ? Font.DemiBold : Font.Normal
@@ -471,7 +471,7 @@ PopupWindow {
                                     Text {
                                         visible: dbusEntryWrapper.shortcutText.length > 0
                                         text: dbusEntryWrapper.shortcutText
-                                        color: menuEntryMouse.containsMouse ? "#cccccc" : "#727272"
+                                        color: Theme.muted
                                         font.family: Theme.fontFamily
                                         font.pixelSize: 9
                                     }
@@ -479,7 +479,7 @@ PopupWindow {
                                     Text {
                                         visible: dbusEntryWrapper.hasChildren
                                         text: dbusEntryWrapper.isExpanded ? "▾" : "›"
-                                        color: (menuEntryMouse.containsMouse || dbusEntryWrapper.isExpanded) ? "#ffffff" : "#727272"
+                                        color: (menuEntryMouse.containsMouse || dbusEntryWrapper.isExpanded) ? Theme.text : Theme.muted
                                         font.pixelSize: dbusEntryWrapper.isExpanded ? 11 : 13
                                         Layout.preferredWidth: 10
                                         horizontalAlignment: Text.AlignHCenter
@@ -553,9 +553,9 @@ PopupWindow {
                                             visible: !subItemWrapper.subIsSep
                                             anchors.fill: parent
                                             radius: 5
-                                            color: (subItemWrapper.modelData?.enabled && subMouse.containsMouse) ? "#161616" : "transparent"
+                                            color: (subItemWrapper.modelData?.enabled && subMouse.containsMouse) ? Theme.cardHover : "transparent"
                                             border.width: 1
-                                            border.color: (subItemWrapper.modelData?.enabled && subMouse.containsMouse) ? "#242424" : "transparent"
+                                            border.color: (subItemWrapper.modelData?.enabled && subMouse.containsMouse) ? Theme.border : "transparent"
                                             opacity: (subItemWrapper.modelData?.enabled ?? true) ? 1.0 : 0.4
 
                                             RowLayout {
@@ -569,7 +569,7 @@ PopupWindow {
                                                     Layout.preferredWidth: 10
                                                     horizontalAlignment: Text.AlignHCenter
                                                     text: "✓"
-                                                    color: "#ffffff"
+                                                    color: Theme.text
                                                     font.family: Theme.fontFamily
                                                     font.pixelSize: 9
                                                     font.weight: Font.Bold
@@ -578,7 +578,7 @@ PopupWindow {
                                                 Text {
                                                     Layout.fillWidth: true
                                                     text: subItemWrapper.subItemText
-                                                    color: subMouse.containsMouse ? "#ffffff" : "#d0d0d0"
+                                                    color: Theme.text
                                                     font.family: Theme.fontFamily
                                                     font.pixelSize: 9
                                                     font.weight: subMouse.containsMouse ? Font.DemiBold : Font.Normal
@@ -588,7 +588,7 @@ PopupWindow {
                                                 Text {
                                                     visible: subItemWrapper.subShortcut.length > 0
                                                     text: subItemWrapper.subShortcut
-                                                    color: subMouse.containsMouse ? "#cccccc" : "#686868"
+                                                    color: Theme.muted
                                                     font.family: Theme.fontFamily
                                                     font.pixelSize: 8
                                                 }
@@ -623,9 +623,9 @@ PopupWindow {
                         Layout.fillWidth: true
                         implicitHeight: 28
                         radius: 6
-                        color: openMouse.containsMouse ? "#121212" : "transparent"
+                        color: openMouse.containsMouse ? Theme.cardHover : "transparent"
                         border.width: 1
-                        border.color: openMouse.containsMouse ? "#202020" : "transparent"
+                        border.color: openMouse.containsMouse ? Theme.border : "transparent"
 
                         RowLayout {
                             anchors.fill: parent
@@ -636,7 +636,7 @@ PopupWindow {
                             Text {
                                 Layout.fillWidth: true
                                 text: "Open " + root.getCleanAppTitle()
-                                color: "#ffffff"
+                                color: Theme.text
                                 font.family: Theme.fontFamily
                                 font.pixelSize: 10
                                 font.weight: Font.DemiBold
@@ -666,9 +666,9 @@ PopupWindow {
                         Layout.fillWidth: true
                         implicitHeight: 28
                         radius: 6
-                        color: openMixerMouse.containsMouse ? "#121212" : "transparent"
+                        color: openMixerMouse.containsMouse ? Theme.cardHover : "transparent"
                         border.width: 1
-                        border.color: openMixerMouse.containsMouse ? "#202020" : "transparent"
+                        border.color: openMixerMouse.containsMouse ? Theme.border : "transparent"
 
                         RowLayout {
                             anchors.fill: parent
@@ -679,7 +679,7 @@ PopupWindow {
                             Text {
                                 Layout.fillWidth: true
                                 text: "Open Volume Mixer"
-                                color: "#ffffff"
+                                color: Theme.text
                                 font.family: Theme.fontFamily
                                 font.pixelSize: 10
                                 font.weight: Font.DemiBold
@@ -687,7 +687,7 @@ PopupWindow {
 
                             Text {
                                 text: "›"
-                                color: "#727272"
+                                color: Theme.muted
                                 font.pixelSize: 12
                             }
                         }
@@ -709,7 +709,7 @@ PopupWindow {
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 1
-                color: "#141414"
+                color: Theme.border
                 Layout.topMargin: 2
                 Layout.bottomMargin: 2
             }
@@ -721,9 +721,9 @@ PopupWindow {
                 Layout.fillWidth: true
                 implicitHeight: 28
                 radius: 6
-                color: pinToggleMouse.containsMouse ? "#121212" : "transparent"
+                color: pinToggleMouse.containsMouse ? Theme.cardHover : "transparent"
                 border.width: 1
-                border.color: pinToggleMouse.containsMouse ? "#202020" : "transparent"
+                border.color: pinToggleMouse.containsMouse ? Theme.border : "transparent"
 
                 RowLayout {
                     anchors.fill: parent
@@ -734,7 +734,7 @@ PopupWindow {
                     Text {
                         Layout.fillWidth: true
                         text: pinToggleRow.isPinned ? "Hide from taskbar" : "Pin to taskbar"
-                        color: "#c0c0c0"
+                        color: Theme.text
                         font.family: Theme.fontFamily
                         font.pixelSize: 10
                     }

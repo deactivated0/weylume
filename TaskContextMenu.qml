@@ -117,9 +117,9 @@ PopupWindow {
 
                 Rectangle {
                     width: 22; height: 22; radius: 5
-                    color: "#080808"
+                    color: Theme.card
                     border.width: 1
-                    border.color: "#181818"
+                    border.color: Theme.border
 
                     Image {
                         id: appHeaderIcon
@@ -144,7 +144,7 @@ PopupWindow {
                         anchors.centerIn: parent
                         text: (root.desktopEntry?.name || root.appLabel || "A").charAt(0).toUpperCase()
                         visible: !appHeaderIcon.visible
-                        color: "#ffffff"
+                        color: Theme.text
                         font.pixelSize: 10
                         font.weight: Font.Bold
                     }
@@ -157,7 +157,7 @@ PopupWindow {
                     Text {
                         Layout.fillWidth: true
                         text: root.desktopEntry?.name || root.appLabel
-                        color: "#ffffff"
+                        color: Theme.text
                         elide: Text.ElideRight
                         font.family: Theme.fontFamily
                         font.pixelSize: 11
@@ -167,7 +167,7 @@ PopupWindow {
                     Text {
                         Layout.fillWidth: true
                         text: root.targetWindow ? (root.targetWindow.title || "Running Window") : "Application"
-                        color: "#777777"
+                        color: Theme.muted
                         elide: Text.ElideRight
                         font.family: Theme.fontFamily
                         font.pixelSize: 8
@@ -179,7 +179,7 @@ PopupWindow {
                 visible: root.targetWindow !== null
                 Layout.fillWidth: true
                 implicitHeight: 1
-                color: "#141414"
+                color: Theme.border
                 Layout.topMargin: 1
                 Layout.bottomMargin: 1
             }
@@ -248,7 +248,7 @@ PopupWindow {
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 1
-                color: "#141414"
+                color: Theme.border
                 Layout.topMargin: 1
                 Layout.bottomMargin: 1
             }
@@ -337,11 +337,11 @@ PopupWindow {
         implicitHeight: 28
         radius: 6
         color: actionRoot.enabled && actionMouse.containsMouse
-            ? (danger ? "#2c1216" : "#121212")
+            ? (danger ? (Theme.isDark ? "#2c1216" : "#ffebee") : Theme.cardHover)
             : "transparent"
         border.width: 1
         border.color: actionRoot.enabled && actionMouse.containsMouse
-            ? (danger ? "#4a181c" : "#202020")
+            ? (danger ? (Theme.isDark ? "#4a181c" : "#ffcdd2") : Theme.border)
             : "transparent"
         opacity: actionRoot.enabled ? 1 : 0.38
 
@@ -362,7 +362,7 @@ PopupWindow {
             Text {
                 Layout.fillWidth: true
                 text: actionRoot.label
-                color: actionRoot.danger ? "#ff5555" : "#e4e4e4"
+                color: actionRoot.danger ? Theme.danger : Theme.text
                 elide: Text.ElideRight
                 font.family: Theme.fontFamily
                 font.pixelSize: 10
