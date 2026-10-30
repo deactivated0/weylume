@@ -35,6 +35,7 @@ FloatingWindow {
         if (visible) {
             SystemService.refreshLabwc();
             SystemService.refreshSystem();
+            OutputService.refresh();
         }
     }
 
@@ -57,7 +58,7 @@ FloatingWindow {
         if (root.page === "integrations") return "Per-game rule overrides, Bluetooth devices, and system service integrations";
         if (root.page === "labwc") return "Labwc Wayland compositor, window tiling, input behavior, and display presentation";
         if (root.page === "system") return "Kernel, power profiles, audio stack recovery, pacman updates, and installed diagnostic tools";
-        return "Desktop interface, notification history, screenshot capture, clipboard cache, and telemetry";
+        return "Display scaling (100% to 200%), desktop interface, notification history, screenshot capture, and telemetry";
     }
 
     function cycleScreenshotMode() {
@@ -1047,6 +1048,370 @@ FloatingWindow {
                     anchors.rightMargin: 24
                     anchors.topMargin: 18
                     spacing: 16
+
+                    SettingsGroup {
+                        title: "DISPLAYS & SCALING (100% - 200%)"
+
+                        // Revert / Keep confirmation banner
+                        Rectangle {
+                            visible: OutputService.confirming
+                            Layout.fillWidth: true
+                            implicitHeight: 52
+                            radius: 8
+                            color: root.isDark ? "#2D1D00" : "#FFF9E6"
+                            border.width: 1
+                            border.color: root.isDark ? "#855800" : "#FFD54F"
+
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.leftMargin: 14
+                                anchors.rightMargin: 14
+                                spacing: 12
+
+                                Text {
+                                    text: "Display scale applied. Automatically reverting in 15 seconds unless kept."
+                                    color: root.isDark ? "#FFD54F" : "#B78103"
+                                    font.family: Theme.fontFamily
+                                    font.pixelSize: 12
+                                    font.weight: Font.Medium
+                                    Layout.fillWidth: true
+                                    wrapMode: Text.Wrap
+                                }
+
+                                Rectangle {
+                                    implicitWidth: 74
+                                    implicitHeight: 28
+                                    radius: 6
+                                    color: keepMouse.containsMouse ? (root.isDark ? "#388E3C" : "#2E7D32") : (root.isDark ? "#4CAF50" : "#388E3C")
+                                    Text { anchors.centerIn: parent; text: "Keep"; color: "#FFFFFF"; font.family: Theme.fontFamily; font.pixelSize: 12; font.weight: Font.DemiBold }
+                                    MouseArea {
+                                        id: keepMouse
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: OutputService.respond(true)
+                                    }
+                                }
+
+                                Rectangle {
+                                    implicitWidth: 74
+                                    implicitHeight: 28
+                                    radius: 6
+                                    color: revertMouse.containsMouse ? (root.isDark ? "#D32F2F" : "#C62828") : (root.isDark ? "#F44336" : "#D32F2F")
+                                    Text { anchors.centerIn: parent; text: "Revert"; color: "#FFFFFF"; font.family: Theme.fontFamily; font.pixelSize: 12; font.weight: Font.DemiBold }
+                                    MouseArea {
+                                        id: revertMouse
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: OutputService.respond(false)
+                                    }
+                                }
+                            }
+                        }
+
+                        // Display list
+                        Repeater {
+                            model: OutputService.outputs
+                            ColumnLayout {
+                                id: displayItem
+                                required property var modelData
+                                required property int index
+                                Layout.fillWidth: true
+                                spacing: 10
+
+                                readonly property real currentScale: Number(modelData.scale || 1.0)
+                                readonly property int currentScalePercent: Math.round(currentScale * 100)
+
+                                // Display Monitor Header
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    implicitHeight: 46
+                                    radius: 8
+                                    color: root.isDark ? "#141418" : "#F0F0F3"
+                                    border.width: 1
+                                    border.color: root.colBorder
+
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.leftMargin: 12
+                                        anchors.rightMargin: 12
+                                        spacing: 10
+
+                                        Rectangle {
+                                            Layout.preferredWidth: 26
+                                            Layout.preferredHeight: 26
+                                            radius: 6
+                                            color: root.isDark ? "#24242C" : "#E2E2E8"
+                                            Image {
+                                                anchors.centerIn: parent
+                                                width: 14; height: 14
+                                                source: "assets/settings.svg"
+                                                opacity: 0.8
+                                            }
+                                        }
+
+                                        ColumnLayout {
+                                            Layout.fillWidth: true
+                                            spacing: 1
+
+                                            Text {
+                                                text: displayItem.modelData.name + (displayItem.modelData.model ? " • " + displayItem.modelData.model : "")
+                                                color: root.colTextPrimary
+                                                font.family: Theme.fontFamily
+                                                font.pixelSize: 13
+                                                font.weight: Font.DemiBold
+                                            }
+
+                                            Text {
+                                                text: displayItem.modelData.width + " × " + displayItem.modelData.height + " @ " + (displayItem.modelData.refresh / 1000).toFixed(2) + " Hz"
+                                                color: root.colTextSecondary
+                                                font.family: Theme.fontFamily
+                                                font.pixelSize: 11
+                                            }
+                                        }
+
+                                        // Current scale badge
+                                        Rectangle {
+                                            implicitWidth: scaleBadgeText.implicitWidth + 16
+                                            implicitHeight: 24
+                                            radius: 12
+                                            color: root.isDark ? "#282832" : "#E0E0E6"
+                                            border.width: 1
+                                            border.color: root.isDark ? "#3A3A48" : "#D0D0D8"
+
+                                            Text {
+                                                id: scaleBadgeText
+                                                anchors.centerIn: parent
+                                                text: displayItem.currentScalePercent + "%"
+                                                color: root.colTextPrimary
+                                                font.family: Theme.fontFamily
+                                                font.pixelSize: 11
+                                                font.weight: Font.DemiBold
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Quick Scale Presets (100% to 200%)
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 4
+
+                                    Text {
+                                        text: "DISPLAY SCALE PRESETS"
+                                        color: root.colTextSecondary
+                                        font.family: Theme.fontFamily
+                                        font.pixelSize: 10
+                                        font.weight: Font.Medium
+                                        Layout.leftMargin: 4
+                                    }
+
+                                    RowLayout {
+                                        Layout.fillWidth: true
+                                        spacing: 6
+
+                                        Repeater {
+                                            model: [
+                                                { label: "100%", scale: 1.0, desc: "Native" },
+                                                { label: "125%", scale: 1.25, desc: "Compact" },
+                                                { label: "150%", scale: 1.5, desc: "Recommended" },
+                                                { label: "175%", scale: 1.75, desc: "Large" },
+                                                { label: "200%", scale: 2.0, desc: "2× HiDPI" }
+                                            ]
+
+                                            Rectangle {
+                                                id: presetBtn
+                                                required property var modelData
+                                                Layout.fillWidth: true
+                                                implicitHeight: 48
+                                                radius: 8
+                                                readonly property bool isSelected: Math.abs(displayItem.currentScale - presetBtn.modelData.scale) < 0.02
+
+                                                color: isSelected
+                                                    ? (root.isDark ? "#FFFFFF" : "#000000")
+                                                    : (presetMouse.containsMouse ? (root.isDark ? "#22222A" : "#E5E5EB") : (root.isDark ? "#141418" : "#F4F4F6"))
+                                                border.width: 1
+                                                border.color: isSelected ? (root.isDark ? "#FFFFFF" : "#000000") : root.colBorder
+
+                                                Behavior on color { ColorAnimation { duration: 100 } }
+
+                                                ColumnLayout {
+                                                    anchors.centerIn: parent
+                                                    spacing: 1
+
+                                                    Text {
+                                                        Layout.alignment: Qt.AlignHCenter
+                                                        text: presetBtn.modelData.label
+                                                        color: presetBtn.isSelected ? (root.isDark ? "#000000" : "#FFFFFF") : root.colTextPrimary
+                                                        font.family: Theme.fontFamily
+                                                        font.pixelSize: 13
+                                                        font.weight: presetBtn.isSelected ? Font.Bold : Font.Medium
+                                                    }
+
+                                                    Text {
+                                                        Layout.alignment: Qt.AlignHCenter
+                                                        text: presetBtn.modelData.desc
+                                                        color: presetBtn.isSelected ? (root.isDark ? "#333333" : "#CCCCCC") : root.colTextSecondary
+                                                        font.family: Theme.fontFamily
+                                                        font.pixelSize: 9
+                                                    }
+                                                }
+
+                                                MouseArea {
+                                                    id: presetMouse
+                                                    anchors.fill: parent
+                                                    hoverEnabled: true
+                                                    cursorShape: Qt.PointingHandCursor
+                                                    onClicked: {
+                                                        OutputService.edit(displayItem.index, "scale", presetBtn.modelData.scale);
+                                                        OutputService.apply(OutputService.outputs);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Fine-grain Scale Slider (100% to 200%)
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    implicitHeight: 52
+                                    radius: 8
+                                    color: root.isDark ? "#101014" : "#F7F7F9"
+                                    border.width: 1
+                                    border.color: root.colBorder
+
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.leftMargin: 14
+                                        anchors.rightMargin: 14
+                                        spacing: 12
+
+                                        ColumnLayout {
+                                            Layout.preferredWidth: 100
+                                            spacing: 1
+
+                                            Text {
+                                                text: "Fine Scaling"
+                                                color: root.colTextPrimary
+                                                font.family: Theme.fontFamily
+                                                font.pixelSize: 12
+                                                font.weight: Font.Medium
+                                            }
+
+                                            Text {
+                                                text: Math.round(scaleSlider.value * 100) + "% (" + (Math.round(scaleSlider.value * 100) / 100).toFixed(2) + "×)"
+                                                color: root.colTextSecondary
+                                                font.family: Theme.fontFamily
+                                                font.pixelSize: 11
+                                            }
+                                        }
+
+                                        Slider {
+                                            id: scaleSlider
+                                            Layout.fillWidth: true
+                                            from: 1.0
+                                            to: 2.0
+                                            stepSize: 0.05
+                                            value: displayItem.currentScale
+                                            onMoved: {
+                                                const rounded = Math.round(value * 100) / 100;
+                                                OutputService.edit(displayItem.index, "scale", rounded);
+                                            }
+
+                                            background: Rectangle {
+                                                x: scaleSlider.leftPadding
+                                                y: scaleSlider.topPadding + scaleSlider.availableHeight / 2 - 2
+                                                width: scaleSlider.availableWidth
+                                                height: 4
+                                                radius: 2
+                                                color: root.isDark ? "#282830" : "#E5E5EA"
+
+                                                Rectangle {
+                                                    width: Math.min(parent.width, Math.max(0, ((scaleSlider.value - 1.0) / 1.0) * parent.width))
+                                                    height: parent.height
+                                                    color: root.isDark ? "#FFFFFF" : "#000000"
+                                                    radius: 2
+                                                }
+                                            }
+
+                                            handle: Rectangle {
+                                                x: scaleSlider.leftPadding + Math.max(0, Math.min(scaleSlider.availableWidth - width, ((scaleSlider.value - 1.0) / 1.0) * (scaleSlider.availableWidth - width)))
+                                                y: scaleSlider.topPadding + scaleSlider.availableHeight / 2 - height / 2
+                                                implicitWidth: 14
+                                                implicitHeight: 14
+                                                radius: 7
+                                                color: root.isDark ? "#FFFFFF" : "#000000"
+                                                border.width: 1
+                                                border.color: root.colBorder
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            implicitWidth: 80
+                                            implicitHeight: 28
+                                            radius: 6
+                                            color: applyBtnMouse.containsMouse ? (root.isDark ? "#32323D" : "#DCDCE2") : (root.isDark ? "#22222A" : "#EAEAEA")
+                                            border.width: 1
+                                            border.color: root.colBorder
+
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: "Apply"
+                                                color: root.colTextPrimary
+                                                font.family: Theme.fontFamily
+                                                font.pixelSize: 12
+                                                font.weight: Font.Medium
+                                            }
+
+                                            MouseArea {
+                                                id: applyBtnMouse
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: OutputService.apply(OutputService.outputs)
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Resolution & Refresh Rate Selector
+                                SettingsChoice {
+                                    label: "Resolution & Refresh Rate"
+                                    description: displayItem.modelData.width + " × " + displayItem.modelData.height + " @ " + (displayItem.modelData.refresh / 1000).toFixed(2) + " Hz"
+                                    value: String(displayItem.modelData.modes.findIndex(m => m.width === displayItem.modelData.width && m.height === displayItem.modelData.height && m.refresh === displayItem.modelData.refresh))
+                                    choices: displayItem.modelData.modes.map((m, i) => ({
+                                        value: String(i),
+                                        label: m.width + " × " + m.height + " @ " + (m.refresh / 1000).toFixed(2) + " Hz" + (m.preferred ? " (Recommended)" : "")
+                                    }))
+                                    onSelected: value => {
+                                        const mode = displayItem.modelData.modes[Number(value)];
+                                        const copy = OutputService.outputs.map(o => Object.assign({}, o));
+                                        Object.assign(copy[displayItem.index], { width: mode.width, height: mode.height, refresh: mode.refresh });
+                                        OutputService.outputs = copy;
+                                        OutputService.apply(OutputService.outputs);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Display Profiles & Auto-Restore
+                        SettingsToggle {
+                            label: "Auto-restore display scaling"
+                            description: "Automatically reapply saved scale and layout when monitors are reconnected"
+                            checked: SettingsService.outputAutoRestore
+                            onToggled: value => SettingsService.outputAutoRestore = value
+                        }
+
+                        SettingsButton {
+                            label: "Refresh connected displays"
+                            description: "Query hardware outputs and EDID via Wayland output management"
+                            buttonText: "Refresh"
+                            enabled: !OutputService.busy
+                            onClicked: OutputService.refresh()
+                        }
+                    }
 
                     SettingsGroup {
                         title: "INTERFACE & MOTION"

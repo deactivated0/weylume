@@ -10,7 +10,9 @@ Scope {
     property bool busy: guard.running
     property var request: []
     property bool hotplug: false
-    function initialize() {}
+    function initialize() {
+        refresh();
+    }
     function refresh() { SystemService.enqueue(["outputs"], "outputs", "outputs", true); }
     function save(name) { SystemService.enqueue(["output-save", name], "output-save", "", false); }
     function apply(values) {

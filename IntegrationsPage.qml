@@ -116,7 +116,19 @@ ScrollView {
                                 OutputService.outputs = copy;
                             }
                         }
-                        SettingsField { label: "Scale"; text: String(outputRow.modelData.scale); onAccepted: value => OutputService.edit(outputRow.index,"scale",Number(value)) }
+                        SettingsChoice {
+                            label: "Display scale (100% - 200%)"
+                            description: Math.round((outputRow.modelData.scale || 1.0) * 100) + "% (" + (outputRow.modelData.scale || 1.0) + "×)"
+                            value: String(outputRow.modelData.scale || 1.0)
+                            choices: [
+                                { label: "100% (Standard 1.0×)", value: "1" },
+                                { label: "125% (1.25×)", value: "1.25" },
+                                { label: "150% (Recommended 1.5×)", value: "1.5" },
+                                { label: "175% (1.75×)", value: "1.75" },
+                                { label: "200% (2.0× HiDPI)", value: "2" }
+                            ]
+                            onSelected: value => OutputService.edit(outputRow.index, "scale", Number(value))
+                        }
                         SettingsField { label: "Position x,y"; text: outputRow.modelData.x + "," + outputRow.modelData.y; onAccepted: value => { const xy=value.split(","); if(xy.length===2 && xy.every(v => Number.isFinite(Number(v)))) { const copy=OutputService.outputs.map(o=>Object.assign({},o)); Object.assign(copy[outputRow.index],{x:Number(xy[0]),y:Number(xy[1])}); OutputService.outputs=copy; } } }
                         SettingsChoice { label: "Rotation / transform"; description: String(outputRow.modelData.transform); choices: ["Normal","90°","180°","270°","Flipped","Flipped 90°","Flipped 180°","Flipped 270°"].map((label,i)=>({label:label,value:String(i)})); onSelected: value => OutputService.edit(outputRow.index,"transform",Number(value)) }
                         SettingsToggle { label: "Variable refresh rate"; description: outputRow.modelData.adaptiveSync === null ? "Not exposed by this compositor" : "The compositor tests whether this output supports the request"; enabled: outputRow.modelData.adaptiveSync !== null; checked: outputRow.modelData.adaptiveSync === true; onToggled: value => OutputService.edit(outputRow.index,"adaptiveSync",value) }
