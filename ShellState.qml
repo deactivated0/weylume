@@ -19,6 +19,7 @@ Scope {
     property bool emojiOpen: false
     property bool sidebarVisible: false
     property bool sessionDialogOpen: false
+    property bool isLocked: false
     property string pendingSessionAction: ""
     property bool isDraggingFile: false
     property var dragFileData: null
@@ -71,6 +72,15 @@ Scope {
                 root.wallpaperPath = parsed?.path || "";
             } catch (error) {
                 root.wallpaperPath = "";
+            }
+        }
+    }
+
+    Connections {
+        target: SettingsService
+        function onLoadedChanged() {
+            if (SettingsService.loaded && SettingsService.lockOnStart && SettingsService.lockscreenEnabled) {
+                root.isLocked = true;
             }
         }
     }
@@ -223,11 +233,24 @@ Scope {
         SystemService.cycleKeyboardLayout();
     }
 
+    function lock() {
+        if (!SettingsService.lockscreenEnabled) return;
+        closeFlyouts(false);
+        isLocked = true;
+    }
+
+    function unlock() {
+        isLocked = false;
+    }
+
     function requestSessionAction(action) {
         closeFlyouts();
-        if (!SettingsService.confirmSessionActions || action === "lock") {
-            if (action === "lock") SystemService.enqueue(["lock"], "session", "session", false);
-            else SystemService.enqueue(["session", action], "session", "session", false);
+        if (action === "lock") {
+            lock();
+            return;
+        }
+        if (!SettingsService.confirmSessionActions) {
+            SystemService.enqueue(["session", action], "session", "session", false);
             return;
         }
         pendingSessionAction = action;

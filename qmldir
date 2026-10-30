@@ -54,3 +54,6 @@ IntegrationsPage 1.0 IntegrationsPage.qml
 AutostartPage 1.0 AutostartPage.qml
 singleton AutostartService 1.0 AutostartService.qml
 singleton NetworkService 1.0 NetworkService.qml
+LockScreen 1.0 LockScreen.qml
+SoundPage 1.0 SoundPage.qml
+LockscreenPage 1.0 LockscreenPage.qml

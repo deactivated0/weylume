@@ -40,6 +40,8 @@ FloatingWindow {
 
     function pageTitle() {
         if (root.page === "startmenu") return "Start Menu";
+        if (root.page === "sound") return "Sound";
+        if (root.page === "lockscreen") return "Lock Screen & Security";
         if (root.page === "autostart") return "Autostart Applications";
         if (root.page === "integrations") return "Integrations";
         if (root.page === "labwc") return "Window Manager";
@@ -49,6 +51,8 @@ FloatingWindow {
 
     function pageDescription() {
         if (root.page === "startmenu") return "Customize layout, dimensions, sidebar quick access, custom folders, and search runner";
+        if (root.page === "sound") return "Configure output devices, input microphones, per-application audio stream mixer, and test sounds";
+        if (root.page === "lockscreen") return "macOS-inspired AMOLED lock screen, PIN/password authentication, direct auto-unlock, and startup lock";
         if (root.page === "autostart") return "Startup programs, service delays, process execution states, and session initialization";
         if (root.page === "integrations") return "Per-game rule overrides, Bluetooth devices, and system service integrations";
         if (root.page === "labwc") return "Labwc Wayland compositor, window tiling, input behavior, and display presentation";
@@ -199,6 +203,8 @@ FloatingWindow {
                                 id: navRepeater
                                 model: [
                                     { id: "quickshell", label: "General & Display", detail: "Shell, capture, clipboard", icon: "assets/settings.svg" },
+                                    { id: "sound", label: "Sound", detail: "Volume, outputs, mixer", icon: "assets/volume.svg" },
+                                    { id: "lockscreen", label: "Lock Screen", detail: "PIN, password, auto-lock", icon: "assets/shield.svg" },
                                     { id: "startmenu", label: "Start Menu", detail: "Layout, sidebar, custom folders", icon: "assets/plus.svg" },
                                     { id: "autostart", label: "Autostart Apps", detail: "Startup apps, delays, services", icon: "assets/play.svg" },
                                     { id: "labwc", label: "Window Manager", detail: "Compositor, inputs, display", icon: "assets/edit.svg" },
@@ -489,7 +495,7 @@ FloatingWindow {
                         id: settingsPageLoader
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        sourceComponent: root.page === "startmenu" ? startMenuPage : root.page === "autostart" ? autostartPage : root.page === "integrations" ? integrationsPage : root.page === "labwc" ? labwcPage : root.page === "system" ? systemPage : quickshellPage
+                        sourceComponent: root.page === "startmenu" ? startMenuPage : root.page === "sound" ? soundPage : root.page === "lockscreen" ? lockscreenPage : root.page === "autostart" ? autostartPage : root.page === "integrations" ? integrationsPage : root.page === "labwc" ? labwcPage : root.page === "system" ? systemPage : quickshellPage
                     }
                 }
             }
@@ -498,6 +504,8 @@ FloatingWindow {
 
     Component { id: autostartPage; AutostartPage {} }
     Component { id: integrationsPage; IntegrationsPage {} }
+    Component { id: soundPage; SoundPage {} }
+    Component { id: lockscreenPage; LockscreenPage {} }
 
     // PAGE 1: START MENU ADVANCED CONFIGURATION
     Component {

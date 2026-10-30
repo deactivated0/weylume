@@ -50,6 +50,14 @@ Scope {
     property string gamingPreviousPowerProfile: "balanced"
     property bool gamingPreviousTearing: false
 
+    // Lock Screen & Security
+    property bool lockscreenEnabled: true
+    property string lockscreenMode: "pin" // "pin" or "password"
+    property string lockscreenPin: "1234"
+    property bool autoUnlockPin: true
+    property bool lockOnStart: false
+    property string lockscreenUserName: ""
+
     // Labwc/input defaults. Actual compositor state is refreshed by SystemService.
     property string bluetoothAdapter: ""
     property string gamingApps: ""
@@ -100,7 +108,8 @@ Scope {
             "persistentNotificationHistory", "unloadClosedFlyouts", "clipboardEnabled",
             "clipboardImagesEnabled", "clipboardSensitiveFilter", "screenshotCopy", "screenshotAnnotate",
             "recordingMicrophone", "dndEnabled", "confirmSessionActions", "gamingMode",
-            "gamingDnd", "gamingPerformanceProfile", "gamingAllowTearing", "gamingPreviousTearing"
+            "gamingDnd", "gamingPerformanceProfile", "gamingAllowTearing", "gamingPreviousTearing",
+            "lockscreenEnabled", "autoUnlockPin", "lockOnStart"
         ];
         for (let i = 0; i < booleanKeys.length; ++i) {
             const key = booleanKeys[i];
@@ -134,6 +143,10 @@ Scope {
             root.gamingPreviousPowerProfile = data.gamingPreviousPowerProfile;
         if (typeof data.desktopIconScale === "number" && isFinite(data.desktopIconScale))
             root.desktopIconScale = Math.max(0.70, Math.min(1.50, Math.round(data.desktopIconScale * 100) / 100));
+
+        if (["pin", "password"].includes(data.lockscreenMode)) root.lockscreenMode = data.lockscreenMode;
+        if (typeof data.lockscreenPin === "string" && data.lockscreenPin.length >= 4) root.lockscreenPin = data.lockscreenPin;
+        if (typeof data.lockscreenUserName === "string") root.lockscreenUserName = data.lockscreenUserName.slice(0, 64);
 
         const startMenuBooleans = [
             "startDefaultAllPrograms", "startCompactMode", "startShowUserFolder",
@@ -200,7 +213,13 @@ Scope {
             startCustomFolder1Name: root.startCustomFolder1Name,
             startCustomFolder1Path: root.startCustomFolder1Path,
             startCustomFolder2Name: root.startCustomFolder2Name,
-            startCustomFolder2Path: root.startCustomFolder2Path
+            startCustomFolder2Path: root.startCustomFolder2Path,
+            lockscreenEnabled: root.lockscreenEnabled,
+            lockscreenMode: root.lockscreenMode,
+            lockscreenPin: root.lockscreenPin,
+            autoUnlockPin: root.autoUnlockPin,
+            lockOnStart: root.lockOnStart,
+            lockscreenUserName: root.lockscreenUserName
         };
     }
 
@@ -284,6 +303,12 @@ Scope {
         root.startCustomFolder1Path = "";
         root.startCustomFolder2Name = "";
         root.startCustomFolder2Path = "";
+        root.lockscreenEnabled = true;
+        root.lockscreenMode = "pin";
+        root.lockscreenPin = "1234";
+        root.autoUnlockPin = true;
+        root.lockOnStart = false;
+        root.lockscreenUserName = "";
         root.loaded = true;
         saveNow();
     }
@@ -378,4 +403,10 @@ Scope {
     onStartCustomFolder1PathChanged: save()
     onStartCustomFolder2NameChanged: save()
     onStartCustomFolder2PathChanged: save()
+    onLockscreenEnabledChanged: save()
+    onLockscreenModeChanged: save()
+    onLockscreenPinChanged: save()
+    onAutoUnlockPinChanged: save()
+    onLockOnStartChanged: save()
+    onLockscreenUserNameChanged: save()
 }

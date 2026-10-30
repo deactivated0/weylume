@@ -1,0 +1,579 @@
+import QtQuick
+import QtQuick.Layouts
+import Quickshell
+import Quickshell.Wayland
+import Quickshell.Services.UPower
+import qs
+
+Scope {
+    id: root
+
+    WlSessionLock {
+        id: sessionLock
+        locked: ShellState.isLocked
+
+        surface: Component {
+            WlSessionLockSurface {
+                id: surfaceWindow
+                color: "#000000"
+                onVisibleChanged: if (visible) Qt.callLater(() => pinInput.forceActiveFocus())
+
+                Rectangle {
+                    id: lockRoot
+                    anchors.fill: parent
+                    color: "#000000"
+                    clip: true
+                    focus: true
+                    Keys.forwardTo: [pinInput]
+
+                    property bool revealPassword: false
+
+                    function formatDate(d) {
+                        return Qt.formatDate(d, "dddd, MMMM d");
+                    }
+
+                    function formatTime(h, m) {
+                        if (SettingsService.clock24Hour) {
+                            return (h < 10 ? "0" + h : h) + ":" + (m < 10 ? "0" + m : m);
+                        }
+                        const hr = h % 12 || 12;
+                        return hr + ":" + (m < 10 ? "0" + m : m);
+                    }
+
+                    function attemptUnlock() {
+                        const val = pinInput.text;
+                        const target = SettingsService.lockscreenPin;
+                        if (!val) {
+                            helperText.text = "Enter " + (SettingsService.lockscreenMode === "pin" ? "PIN" : "password");
+                            pinInput.forceActiveFocus();
+                            return;
+                        }
+                        if (val === target) {
+                            helperText.text = "";
+                            pinInput.text = "";
+                            ShellState.unlock();
+                        } else {
+                            helperText.text = "Incorrect " + (SettingsService.lockscreenMode === "pin" ? "PIN" : "password");
+                            shakeAnim.restart();
+                            pinInput.selectAll();
+                            pinInput.forceActiveFocus();
+                        }
+                    }
+
+                    // Background Click Area (refocuses PIN input when clicked anywhere)
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: pinInput.forceActiveFocus()
+                    }
+
+                    // Initial focus timer
+                    Timer {
+                        interval: 80
+                        running: true
+                        repeat: false
+                        onTriggered: pinInput.forceActiveFocus()
+                    }
+
+                    Connections {
+                        target: ShellState
+                        function onIsLockedChanged() {
+                            if (ShellState.isLocked) {
+                                pinInput.text = "";
+                                helperText.text = "";
+                                Qt.callLater(() => pinInput.forceActiveFocus());
+                            }
+                        }
+                    }
+
+                    // TOP: Date and Clock
+                    Column {
+                        id: clockCol
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        y: Math.max(55, Math.min(128, lockRoot.height * 0.102))
+                        spacing: 4
+
+                        Text {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: lockRoot.formatDate(ShellState.currentDate)
+                            color: Qt.rgba(1, 1, 1, 0.96)
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Math.max(18, Math.min(23, lockRoot.width * 0.015))
+                            font.weight: Font.Medium
+                            font.letterSpacing: -0.4
+                        }
+
+                        Text {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: lockRoot.formatTime(ShellState.currentHour, ShellState.currentMinute)
+                            color: "#FFFFFF"
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Math.max(104, Math.min(184, lockRoot.width * 0.124))
+                            font.weight: Font.DemiBold
+                            font.letterSpacing: -6.0
+                        }
+                    }
+
+                    // CENTER: User silhouette, Username, and Password Pill Form
+                    Column {
+                        id: loginCol
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: Math.max(105, Math.min(170, lockRoot.height * 0.144))
+                        spacing: 0
+
+                        // Avatar Silhouette (88px circle)
+                        Rectangle {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            width: 88
+                            height: 88
+                            radius: 44
+                            color: "#303033"
+                            border.width: 1
+                            border.color: Qt.rgba(1, 1, 1, 0.18)
+                            clip: true
+
+                            Item {
+                                anchors.fill: parent
+
+                                // Head
+                                Rectangle {
+                                    width: 38
+                                    height: 38
+                                    radius: 19
+                                    color: "#F8F8FA"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    y: 16
+                                }
+
+                                // Shoulders
+                                Rectangle {
+                                    width: 76
+                                    height: 50
+                                    radius: 25
+                                    color: "#F8F8FA"
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    y: 52
+                                }
+                            }
+                        }
+
+                        // Username
+                        Text {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            topPadding: 14
+                            bottomPadding: 14
+                            text: SettingsService.lockscreenUserName ? SettingsService.lockscreenUserName : (Quickshell.env("USER") || "pc")
+                            color: "#FFFFFF"
+                            font.family: Theme.fontFamily
+                            font.pixelSize: 21
+                            font.weight: Font.DemiBold
+                            font.letterSpacing: -0.35
+                        }
+
+                        // Password / PIN Form Pill
+                        Item {
+                            id: formWrapper
+                            width: Math.min(254, lockRoot.width - 48)
+                            height: 39
+                            anchors.horizontalCenter: parent.horizontalCenter
+
+                            Rectangle {
+                                id: formPill
+                                width: parent.width
+                                height: parent.height
+                                radius: 10
+                                color: pinInput.activeFocus ? Qt.rgba(1, 1, 1, 0.18) : Qt.rgba(1, 1, 1, 0.13)
+                                border.width: 1
+                                border.color: pinInput.activeFocus ? Qt.rgba(1, 1, 1, 0.63) : Qt.rgba(1, 1, 1, 0.31)
+
+                                Behavior on color { ColorAnimation { duration: 150 } }
+                                Behavior on border.color { ColorAnimation { duration: 150 } }
+
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.leftMargin: 12
+                                    anchors.rightMargin: 7
+                                    spacing: 4
+
+                                    TextInput {
+                                        id: pinInput
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        verticalAlignment: TextInput.AlignVCenter
+                                        echoMode: lockRoot.revealPassword ? TextInput.Normal : TextInput.Password
+                                        color: "#FFFFFF"
+                                        font.family: Theme.fontFamily
+                                        font.pixelSize: 13
+                                        font.weight: Font.Medium
+                                        clip: true
+                                        selectByMouse: true
+                                        focus: true
+
+                                        onAccepted: lockRoot.attemptUnlock()
+
+                                        onTextChanged: {
+                                            helperText.text = "";
+                                            // Auto-unlock requirement: 4 or more numbers if correct logs in directly without pressing enter
+                                            if (SettingsService.autoUnlockPin && text.length >= 4) {
+                                                if (text === SettingsService.lockscreenPin) {
+                                                    helperText.text = "";
+                                                    text = "";
+                                                    ShellState.unlock();
+                                                }
+                                            }
+                                        }
+
+                                        Text {
+                                            anchors.left: parent.left
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            visible: !pinInput.text && !pinInput.inputMethodComposing
+                                            text: SettingsService.lockscreenMode === "pin" ? "Enter PIN" : "Enter Password"
+                                            color: Qt.rgba(1, 1, 1, 0.82)
+                                            font.family: Theme.fontFamily
+                                            font.pixelSize: 13
+                                            font.weight: Font.Normal
+                                        }
+                                    }
+
+                                    // Eye Icon Button (Toggle visibility)
+                                    Rectangle {
+                                        Layout.preferredWidth: 26
+                                        Layout.preferredHeight: 30
+                                        radius: 6
+                                        color: eyeMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : "transparent"
+
+                                        MouseArea {
+                                            id: eyeMouse
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                lockRoot.revealPassword = !lockRoot.revealPassword;
+                                                pinInput.forceActiveFocus();
+                                            }
+                                        }
+
+                                        Item {
+                                            anchors.centerIn: parent
+                                            width: 16
+                                            height: 16
+
+                                            Rectangle {
+                                                anchors.centerIn: parent
+                                                width: 14
+                                                height: 9
+                                                radius: 4
+                                                color: "transparent"
+                                                border.width: 1.5
+                                                border.color: Qt.rgba(1, 1, 1, 0.85)
+                                            }
+
+                                            Rectangle {
+                                                anchors.centerIn: parent
+                                                width: 5
+                                                height: 5
+                                                radius: 2.5
+                                                color: Qt.rgba(1, 1, 1, 0.85)
+                                            }
+
+                                            // Slash line when password is hidden
+                                            Rectangle {
+                                                visible: !lockRoot.revealPassword
+                                                anchors.centerIn: parent
+                                                width: 15
+                                                height: 1.5
+                                                rotation: -45
+                                                color: Qt.rgba(1, 1, 1, 0.85)
+                                            }
+                                        }
+                                    }
+
+                                    // Submit Circular Button (Arrow Right)
+                                    Rectangle {
+                                        id: submitBtn
+                                        Layout.preferredWidth: 26
+                                        Layout.preferredHeight: 26
+                                        radius: 13
+                                        color: submitMouse.containsMouse ? "#FFFFFF" : Qt.rgba(1, 1, 1, 0.88)
+
+                                        Behavior on color { ColorAnimation { duration: 100 } }
+
+                                        MouseArea {
+                                            id: submitMouse
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: lockRoot.attemptUnlock()
+                                        }
+
+                                        // Arrow Right Icon
+                                        Item {
+                                            anchors.centerIn: parent
+                                            width: 14
+                                            height: 14
+
+                                            Rectangle {
+                                                anchors.centerIn: parent
+                                                width: 9
+                                                height: 1.8
+                                                color: "#202020"
+                                            }
+
+                                            Rectangle {
+                                                x: 7; y: 4
+                                                width: 6
+                                                height: 1.8
+                                                rotation: 45
+                                                transformOrigin: Item.TopLeft
+                                                color: "#202020"
+                                            }
+
+                                            Rectangle {
+                                                x: 7; y: 10
+                                                width: 6
+                                                height: 1.8
+                                                rotation: -45
+                                                transformOrigin: Item.BottomLeft
+                                                color: "#202020"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Shake animation on incorrect attempt
+                        SequentialAnimation {
+                            id: shakeAnim
+                            NumberAnimation { target: formPill; property: "x"; to: -10; duration: 40; easing.type: Easing.OutQuad }
+                            NumberAnimation { target: formPill; property: "x"; to: 10; duration: 40; easing.type: Easing.InOutQuad }
+                            NumberAnimation { target: formPill; property: "x"; to: -8; duration: 40; easing.type: Easing.InOutQuad }
+                            NumberAnimation { target: formPill; property: "x"; to: 8; duration: 40; easing.type: Easing.InOutQuad }
+                            NumberAnimation { target: formPill; property: "x"; to: 0; duration: 40; easing.type: Easing.OutQuad }
+                        }
+
+                        // Helper / Error Text
+                        Item {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            width: formWrapper.width
+                            height: 24
+
+                            Text {
+                                id: helperText
+                                anchors.centerIn: parent
+                                text: ""
+                                color: "#FF6B6B"
+                                font.family: Theme.fontFamily
+                                font.pixelSize: 11
+                                font.weight: Font.Medium
+                            }
+                        }
+                    }
+
+                    // BOTTOM FOOTER: Power actions
+                    Row {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: Math.max(28, 32)
+                        spacing: Math.max(30, Math.min(44, lockRoot.width * 0.03))
+
+                        // Sleep
+                        Column {
+                            spacing: 7
+                            width: 50
+
+                            Rectangle {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                width: 35
+                                height: 35
+                                radius: 17.5
+                                color: sleepMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.25) : Qt.rgba(1, 1, 1, 0.12)
+                                border.width: 1
+                                border.color: Qt.rgba(1, 1, 1, 0.16)
+                                y: sleepMouse.containsMouse ? -2 : 0
+
+                                Behavior on y { NumberAnimation { duration: 120 } }
+                                Behavior on color { ColorAnimation { duration: 120 } }
+
+                                Image {
+                                    anchors.centerIn: parent
+                                    width: 16
+                                    height: 16
+                                    source: "assets/moon.svg"
+                                }
+
+                                MouseArea {
+                                    id: sleepMouse
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: ShellState.requestSessionAction("suspend")
+                                }
+                            }
+
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "Sleep"
+                                color: Qt.rgba(1, 1, 1, 0.92)
+                                font.family: Theme.fontFamily
+                                font.pixelSize: 10
+                                font.weight: Font.Medium
+                            }
+                        }
+
+                        // Restart
+                        Column {
+                            spacing: 7
+                            width: 50
+
+                            Rectangle {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                width: 35
+                                height: 35
+                                radius: 17.5
+                                color: restartMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.25) : Qt.rgba(1, 1, 1, 0.12)
+                                border.width: 1
+                                border.color: Qt.rgba(1, 1, 1, 0.16)
+                                y: restartMouse.containsMouse ? -2 : 0
+
+                                Behavior on y { NumberAnimation { duration: 120 } }
+                                Behavior on color { ColorAnimation { duration: 120 } }
+
+                                Image {
+                                    anchors.centerIn: parent
+                                    width: 15
+                                    height: 15
+                                    source: "assets/flask.svg"
+                                }
+
+                                MouseArea {
+                                    id: restartMouse
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: ShellState.requestSessionAction("reboot")
+                                }
+                            }
+
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "Restart"
+                                color: Qt.rgba(1, 1, 1, 0.92)
+                                font.family: Theme.fontFamily
+                                font.pixelSize: 10
+                                font.weight: Font.Medium
+                            }
+                        }
+
+                        // Shut Down
+                        Column {
+                            spacing: 7
+                            width: 50
+
+                            Rectangle {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                width: 35
+                                height: 35
+                                radius: 17.5
+                                color: shutMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.25) : Qt.rgba(1, 1, 1, 0.12)
+                                border.width: 1
+                                border.color: Qt.rgba(1, 1, 1, 0.16)
+                                y: shutMouse.containsMouse ? -2 : 0
+
+                                Behavior on y { NumberAnimation { duration: 120 } }
+                                Behavior on color { ColorAnimation { duration: 120 } }
+
+                                Image {
+                                    anchors.centerIn: parent
+                                    width: 15
+                                    height: 15
+                                    source: "assets/power.svg"
+                                }
+
+                                MouseArea {
+                                    id: shutMouse
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: ShellState.requestSessionAction("shutdown")
+                                }
+                            }
+
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "Shut Down"
+                                color: Qt.rgba(1, 1, 1, 0.92)
+                                font.family: Theme.fontFamily
+                                font.pixelSize: 10
+                                font.weight: Font.Medium
+                            }
+                        }
+                    }
+
+                    // BOTTOM RIGHT STATUS: Wi-Fi and Battery
+                    Row {
+                        anchors.right: parent.right
+                        anchors.rightMargin: 30
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: Math.max(36, 40)
+                        spacing: 16
+
+                        // Wi-Fi Icon
+                        Image {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 18
+                            height: 18
+                            source: "assets/wifi.svg"
+                            opacity: SystemService.wifiEnabled ? 0.9 : 0.4
+                        }
+
+                        // Battery Indicator
+                        Row {
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 6
+                            visible: UPower.displayDevice?.isPresent ?? false
+
+                            Rectangle {
+                                width: 24
+                                height: 13
+                                radius: 3
+                                color: "transparent"
+                                border.width: 1.5
+                                border.color: Qt.rgba(1, 1, 1, 0.85)
+
+                                Rectangle {
+                                    anchors.left: parent.left
+                                    anchors.top: parent.top
+                                    anchors.bottom: parent.bottom
+                                    anchors.margins: 2
+                                    width: Math.max(2, (parent.width - 4) * Math.min(1.0, (UPower.displayDevice?.percentage ?? 1.0)))
+                                    radius: 1.5
+                                    color: (UPower.displayDevice?.percentage ?? 1.0) < 0.2 ? "#FF5555" : "#FFFFFF"
+                                }
+
+                                // Battery nipple
+                                Rectangle {
+                                    anchors.left: parent.right
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: 2
+                                    height: 5
+                                    radius: 1
+                                    color: Qt.rgba(1, 1, 1, 0.85)
+                                }
+                            }
+
+                            Text {
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: Math.round((UPower.displayDevice?.percentage ?? 1.0) * 100) + "%"
+                                color: Qt.rgba(1, 1, 1, 0.80)
+                                font.family: Theme.fontFamily
+                                font.pixelSize: 12
+                                font.weight: Font.Medium
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

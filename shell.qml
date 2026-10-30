@@ -48,6 +48,7 @@ ShellRoot {
     Connections { target: StateStore; function onErrorChanged() { if (StateStore.error) OsdService.show("Configuration startup failed", StateStore.error, "dialog-error", -1, true); } }
 
     PolkitDialog {}
+    LockScreen {}
     LazyLoader {
         active: ShellState.sessionDialogOpen
         SessionDialog {}
@@ -83,6 +84,8 @@ ShellRoot {
         function toggleGaming(): void { SystemService.setGamingMode(!SettingsService.gamingMode); }
         function workspace(index: int): void { WorkspaceService.activate(index); }
         function session(action: string): void { ShellState.requestSessionAction(action); }
+        function lock(): void { ShellState.lock(); }
+        function unlock(): void { ShellState.unlock(); }
         function launchPinned(num: int): void { PinnedApps.launchPinIndex(num - 1); }
         function createItem(type: string): void {
             newItemDialogLoader.active = true;
