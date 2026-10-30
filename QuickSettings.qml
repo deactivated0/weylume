@@ -234,6 +234,31 @@ PopupWindow {
         }
     }
 
+    function tileBg(active, hovered) {
+        if (active) return Theme.accent;
+        return hovered ? Theme.cardHover : Theme.card;
+    }
+    function tileBorder(active, hovered) {
+        if (active) return Theme.accent;
+        return hovered ? (Theme.isDark ? "#282828" : "#c0c0c0") : Theme.border;
+    }
+    function tileIconBg(active) {
+        if (active) return Theme.accent;
+        return Theme.isDark ? "#161616" : "#e8e8e8";
+    }
+    function tileIconColor(active) {
+        if (active) return Theme.background;
+        return Theme.text;
+    }
+    function tileTextColor(active) {
+        if (active) return Theme.background;
+        return Theme.text;
+    }
+    function tileSubColor(active) {
+        if (active) return Theme.isDark ? "#333333" : "#cccccc";
+        return Theme.muted;
+    }
+
     // AMOLED Shell Container
     Rectangle {
         anchors.fill: parent
@@ -254,21 +279,21 @@ PopupWindow {
             RowLayout {
                 Layout.fillWidth: true
                 Rectangle {
-                    width: 28; height: 28; radius: 14; color: backMouse.containsMouse ? "#20ffffff" : "transparent"
-                    Text { anchors.centerIn: parent; text: "‹"; color: "#f5f5f5"; font.pixelSize: 18 }
+                    width: 28; height: 28; radius: 14; color: backMouse.containsMouse ? Theme.cardHover : "transparent"
+                    Text { anchors.centerIn: parent; text: "‹"; color: Theme.text; font.pixelSize: 18 }
                     MouseArea { id: backMouse; anchors.fill: parent; hoverEnabled: true; onClicked: root.page = "main" }
                 }
                 Text {
                     text: root.page === "network" ? "Network Settings" : root.page === "bluetooth" ? "Bluetooth Devices" : root.page === "nightlight" ? "Night Light Settings" : "Volume Mixer"
-                    color: "#f5f5f5"
+                    color: Theme.text
                     font.family: Theme.fontFamily
                     font.pixelSize: 13
                     font.weight: Font.DemiBold
                 }
                 Item { Layout.fillWidth: true }
                 Rectangle {
-                    width: 28; height: 28; radius: 14; color: closeSubMouse.containsMouse ? "#20ffffff" : "transparent"
-                    Text { anchors.centerIn: parent; text: "✕"; color: "#a6a6a6"; font.pixelSize: 10 }
+                    width: 28; height: 28; radius: 14; color: closeSubMouse.containsMouse ? Theme.cardHover : "transparent"
+                    Text { anchors.centerIn: parent; text: "✕"; color: Theme.muted; font.pixelSize: 10 }
                     MouseArea { id: closeSubMouse; anchors.fill: parent; hoverEnabled: true; onClicked: ShellState.closeFlyouts() }
                 }
             }
@@ -311,14 +336,14 @@ PopupWindow {
                                 const m = String(ShellState.currentMinute).padStart(2, "0");
                                 return h + ":" + m;
                             }
-                            color: "#f5f5f5"
+                            color: Theme.text
                             font.family: Theme.fontFamily
                             font.pixelSize: 28
                             font.weight: Font.Normal
                         }
                         Text {
                             text: Qt.formatDate(new Date(), "dddd, MMMM d")
-                            color: "#b8b8b8"
+                            color: Theme.muted
                             font.family: Theme.fontFamily
                             font.pixelSize: 11
                         }
@@ -330,26 +355,26 @@ PopupWindow {
                     RowLayout {
                         spacing: 4
                         Rectangle {
-                            width: 32; height: 32; radius: 16; color: searchBtnMouse.containsMouse ? "#171717" : "transparent"
+                            width: 32; height: 32; radius: 16; color: searchBtnMouse.containsMouse ? Theme.cardHover : "transparent"
                             Image { id: sIcon; anchors.centerIn: parent; width: 14; height: 14; source: "assets/search.svg"; visible: false }
-                            MultiEffect { anchors.fill: sIcon; source: sIcon; colorization: 1.0; colorizationColor: "#ffffff" }
+                            MultiEffect { anchors.fill: sIcon; source: sIcon; colorization: 1.0; colorizationColor: Theme.accent }
                             MouseArea { id: searchBtnMouse; anchors.fill: parent; hoverEnabled: true; onClicked: root.searchOpen = !root.searchOpen }
                         }
                         Rectangle {
-                            width: 32; height: 32; radius: 16; color: setBtnMouse.containsMouse ? (Theme.isDark ? "#171717" : "#E2E2E6") : "transparent"
+                            width: 32; height: 32; radius: 16; color: setBtnMouse.containsMouse ? Theme.cardHover : "transparent"
                             Image { id: setIcon; anchors.centerIn: parent; width: 15; height: 15; source: "assets/settings.svg"; visible: false }
                             MultiEffect { anchors.fill: setIcon; source: setIcon; colorization: 1.0; colorizationColor: Theme.accent }
                             MouseArea { id: setBtnMouse; anchors.fill: parent; hoverEnabled: true; onClicked: ShellState.toggleSettings(ShellState.popupScreenName) }
                         }
                         Rectangle {
-                            width: 32; height: 32; radius: 16; color: layBtnMouse.containsMouse ? "#171717" : "transparent"
+                            width: 32; height: 32; radius: 16; color: layBtnMouse.containsMouse ? Theme.cardHover : "transparent"
                             Image { id: eIcon; anchors.centerIn: parent; width: 14; height: 14; source: "assets/edit.svg"; visible: false }
-                            MultiEffect { anchors.fill: eIcon; source: eIcon; colorization: 1.0; colorizationColor: "#ffffff" }
+                            MultiEffect { anchors.fill: eIcon; source: eIcon; colorization: 1.0; colorizationColor: Theme.accent }
                             MouseArea { id: layBtnMouse; anchors.fill: parent; hoverEnabled: true; onClicked: ShellState.toggleLayout() }
                         }
                         Rectangle {
-                            width: 32; height: 32; radius: 16; color: closeBtnMouse.containsMouse ? "#171717" : "transparent"
-                            Text { anchors.centerIn: parent; text: "✕"; color: "#a6a6a6"; font.pixelSize: 11 }
+                            width: 32; height: 32; radius: 16; color: closeBtnMouse.containsMouse ? Theme.cardHover : "transparent"
+                            Text { anchors.centerIn: parent; text: "✕"; color: closeBtnMouse.containsMouse ? Theme.text : Theme.muted; font.pixelSize: 11 }
                             MouseArea { id: closeBtnMouse; anchors.fill: parent; hoverEnabled: true; onClicked: ShellState.closeFlyouts() }
                         }
                     }
@@ -361,9 +386,9 @@ PopupWindow {
                     Layout.fillWidth: true
                     implicitHeight: 32
                     radius: 10
-                    color: "#101010"
+                    color: Theme.card
                     border.width: 1
-                    border.color: "#2c2c2c"
+                    border.color: Theme.border
 
                     RowLayout {
                         anchors.fill: parent
@@ -374,20 +399,20 @@ PopupWindow {
                             Layout.preferredHeight: 12
                             Layout.alignment: Qt.AlignVCenter
                             Image { id: searchInputIcon; anchors.fill: parent; source: "assets/search.svg"; visible: false }
-                            MultiEffect { anchors.fill: parent; source: searchInputIcon; colorization: 1.0; colorizationColor: "#888888" }
+                            MultiEffect { anchors.fill: parent; source: searchInputIcon; colorization: 1.0; colorizationColor: Theme.muted }
                         }
                         TextInput {
                             id: searchInput
                             Layout.fillWidth: true
-                            color: "#ffffff"
+                            color: Theme.text
                             font.family: Theme.fontFamily
                             font.pixelSize: 11
                             text: root.searchText
                             onTextChanged: root.searchText = text
                         }
                         Rectangle {
-                            width: 18; height: 18; radius: 9; color: "#22ffffff"; visible: searchInput.text.length > 0
-                            Text { anchors.centerIn: parent; text: "✕"; font.pixelSize: 8; color: "#fff" }
+                            width: 18; height: 18; radius: 9; color: Theme.cardHover; visible: searchInput.text.length > 0
+                            Text { anchors.centerIn: parent; text: "✕"; font.pixelSize: 8; color: Theme.text }
                             MouseArea { anchors.fill: parent; onClicked: { searchInput.text = ""; root.searchOpen = false; } }
                         }
                     }
@@ -409,9 +434,9 @@ PopupWindow {
                         Layout.fillWidth: true
                         implicitHeight: 56
                         radius: 14
-                        color: tileNet.isPrimary ? "#ffffff" : (netTileMouse.containsMouse ? "#141414" : "#0c0c0c")
+                        color: root.tileBg(tileNet.isPrimary, netTileMouse.containsMouse)
                         border.width: 1
-                        border.color: tileNet.isPrimary ? "#ffffff" : (netTileMouse.containsMouse ? "#282828" : "#1c1c1c")
+                        border.color: root.tileBorder(tileNet.isPrimary, netTileMouse.containsMouse)
 
                         RowLayout {
                             anchors.fill: parent
@@ -421,7 +446,7 @@ PopupWindow {
 
                             Rectangle {
                                 width: 32; height: 32; radius: 16
-                                color: tileNet.isPrimary ? "#ffffff" : "#161616"
+                                color: root.tileIconBg(tileNet.isPrimary)
                                 Image {
                                     id: netRawIcon
                                     anchors.centerIn: parent
@@ -433,7 +458,7 @@ PopupWindow {
                                     anchors.fill: netRawIcon
                                     source: netRawIcon
                                     colorization: 1.0
-                                    colorizationColor: tileNet.isPrimary ? "#000000" : "#ffffff"
+                                    colorizationColor: root.tileIconColor(tileNet.isPrimary)
                                 }
                             }
 
@@ -442,14 +467,14 @@ PopupWindow {
                                 spacing: 1
                                 Text {
                                     text: "Network"
-                                    color: tileNet.isPrimary ? "#000000" : "#ffffff"
+                                    color: root.tileTextColor(tileNet.isPrimary)
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 11
                                     font.weight: Font.DemiBold
                                 }
                                 Text {
                                     text: root.ethState.connected ? "Ethernet" : (root.wifiDevice ? (Networking.wifiEnabled ? (root.connectedWifi?.name ?? "Wi‑Fi On") : "Off") : (root.wifiEnabled ? "Wi‑Fi On" : "Off"))
-                                    color: tileNet.isPrimary ? "#333333" : "#777777"
+                                    color: root.tileSubColor(tileNet.isPrimary)
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 9
                                     elide: Text.ElideRight
@@ -459,7 +484,7 @@ PopupWindow {
 
                             Text {
                                 text: "›"
-                                color: tileNet.isPrimary ? "#000000" : "#777777"
+                                color: root.tileIconColor(tileNet.isPrimary)
                                 font.pixelSize: 13
                             }
                         }
@@ -482,9 +507,9 @@ PopupWindow {
                         Layout.fillWidth: true
                         implicitHeight: 56
                         radius: 14
-                        color: tileBt.isPrimary ? "#ffffff" : (btTileMouse.containsMouse ? "#141414" : "#0c0c0c")
+                        color: root.tileBg(tileBt.isPrimary, btTileMouse.containsMouse)
                         border.width: 1
-                        border.color: tileBt.isPrimary ? "#ffffff" : (btTileMouse.containsMouse ? "#282828" : "#1c1c1c")
+                        border.color: root.tileBorder(tileBt.isPrimary, btTileMouse.containsMouse)
 
                         RowLayout {
                             anchors.fill: parent
@@ -494,7 +519,7 @@ PopupWindow {
 
                             Rectangle {
                                 width: 32; height: 32; radius: 16
-                                color: tileBt.isPrimary ? "#ffffff" : "#161616"
+                                color: root.tileIconBg(tileBt.isPrimary)
                                 Image {
                                     id: btRawIcon
                                     anchors.centerIn: parent
@@ -506,7 +531,7 @@ PopupWindow {
                                     anchors.fill: btRawIcon
                                     source: btRawIcon
                                     colorization: 1.0
-                                    colorizationColor: tileBt.isPrimary ? "#000000" : "#ffffff"
+                                    colorizationColor: root.tileIconColor(tileBt.isPrimary)
                                 }
                             }
 
@@ -515,14 +540,14 @@ PopupWindow {
                                 spacing: 1
                                 Text {
                                     text: "Bluetooth"
-                                    color: tileBt.isPrimary ? "#000000" : "#ffffff"
+                                    color: root.tileTextColor(tileBt.isPrimary)
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 11
                                     font.weight: Font.DemiBold
                                 }
                                 Text {
                                     text: tileBt.isPrimary ? (root.connectedBtDevice?.name || "On") : "Off"
-                                    color: tileBt.isPrimary ? "#333333" : "#777777"
+                                    color: root.tileSubColor(tileBt.isPrimary)
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 9
                                     elide: Text.ElideRight
@@ -532,7 +557,7 @@ PopupWindow {
 
                             Text {
                                 text: "›"
-                                color: tileBt.isPrimary ? "#000000" : "#777777"
+                                color: root.tileIconColor(tileBt.isPrimary)
                                 font.pixelSize: 13
                             }
                         }
@@ -563,9 +588,9 @@ PopupWindow {
                         Layout.fillWidth: true
                         implicitHeight: 56
                         radius: 14
-                        color: tileDnd.isPrimary ? "#ffffff" : (dndTileMouse.containsMouse ? "#141414" : "#0c0c0c")
+                        color: root.tileBg(tileDnd.isPrimary, dndTileMouse.containsMouse)
                         border.width: 1
-                        border.color: tileDnd.isPrimary ? "#ffffff" : (dndTileMouse.containsMouse ? "#282828" : "#1c1c1c")
+                        border.color: root.tileBorder(tileDnd.isPrimary, dndTileMouse.containsMouse)
 
                         RowLayout {
                             anchors.fill: parent
@@ -575,7 +600,7 @@ PopupWindow {
 
                             Rectangle {
                                 width: 32; height: 32; radius: 16
-                                color: tileDnd.isPrimary ? "#ffffff" : "#161616"
+                                color: root.tileIconBg(tileDnd.isPrimary)
                                 Image {
                                     id: dndRawIcon
                                     anchors.centerIn: parent
@@ -587,7 +612,7 @@ PopupWindow {
                                     anchors.fill: dndRawIcon
                                     source: dndRawIcon
                                     colorization: 1.0
-                                    colorizationColor: tileDnd.isPrimary ? "#000000" : "#ffffff"
+                                    colorizationColor: root.tileIconColor(tileDnd.isPrimary)
                                 }
                             }
 
@@ -596,14 +621,14 @@ PopupWindow {
                                 spacing: 1
                                 Text {
                                     text: "Do Not Disturb"
-                                    color: tileDnd.isPrimary ? "#000000" : "#ffffff"
+                                    color: root.tileTextColor(tileDnd.isPrimary)
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 11
                                     font.weight: Font.DemiBold
                                 }
                                 Text {
                                     text: root.gamingDndActive && !SettingsService.dndEnabled ? "Gaming mode" : (root.dndActive ? "On" : "Off")
-                                    color: tileDnd.isPrimary ? "#333333" : "#777777"
+                                    color: root.tileSubColor(tileDnd.isPrimary)
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 9
                                 }
@@ -628,9 +653,9 @@ PopupWindow {
                         Layout.fillWidth: true
                         implicitHeight: 56
                         radius: 14
-                        color: tileVpn.isPrimary ? "#ffffff" : (vpnTileMouse.containsMouse ? "#141414" : "#0c0c0c")
+                        color: root.tileBg(tileVpn.isPrimary, vpnTileMouse.containsMouse)
                         border.width: 1
-                        border.color: tileVpn.isPrimary ? "#ffffff" : (vpnTileMouse.containsMouse ? "#282828" : "#1c1c1c")
+                        border.color: root.tileBorder(tileVpn.isPrimary, vpnTileMouse.containsMouse)
 
                         RowLayout {
                             anchors.fill: parent
@@ -640,7 +665,7 @@ PopupWindow {
 
                             Rectangle {
                                 width: 32; height: 32; radius: 16
-                                color: tileVpn.isPrimary ? "#ffffff" : "#161616"
+                                color: root.tileIconBg(tileVpn.isPrimary)
                                 Image {
                                     id: vpnRawIcon
                                     anchors.centerIn: parent
@@ -652,7 +677,7 @@ PopupWindow {
                                     anchors.fill: vpnRawIcon
                                     source: vpnRawIcon
                                     colorization: 1.0
-                                    colorizationColor: tileVpn.isPrimary ? "#000000" : "#ffffff"
+                                    colorizationColor: root.tileIconColor(tileVpn.isPrimary)
                                 }
                             }
 
@@ -661,14 +686,14 @@ PopupWindow {
                                 spacing: 1
                                 Text {
                                     text: "VPN"
-                                    color: tileVpn.isPrimary ? "#000000" : "#ffffff"
+                                    color: root.tileTextColor(tileVpn.isPrimary)
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 11
                                     font.weight: Font.DemiBold
                                 }
                                 Text {
                                     text: root.vpnActive ? "Connected" : "Off"
-                                    color: tileVpn.isPrimary ? "#333333" : "#777777"
+                                    color: root.tileSubColor(tileVpn.isPrimary)
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 9
                                 }
@@ -692,9 +717,9 @@ PopupWindow {
                         Layout.fillWidth: true
                         implicitHeight: 56
                         radius: 14
-                        color: shotTileMouse.containsMouse ? "#141414" : "#0c0c0c"
+                        color: root.tileBg(false, shotTileMouse.containsMouse)
                         border.width: 1
-                        border.color: shotTileMouse.containsMouse ? "#282828" : "#1c1c1c"
+                        border.color: root.tileBorder(false, shotTileMouse.containsMouse)
 
                         RowLayout {
                             anchors.fill: parent
@@ -704,7 +729,7 @@ PopupWindow {
 
                             Rectangle {
                                 width: 32; height: 32; radius: 16
-                                color: "#161616"
+                                color: root.tileIconBg(false)
                                 Image {
                                     id: shotRawIcon
                                     anchors.centerIn: parent
@@ -716,7 +741,7 @@ PopupWindow {
                                     anchors.fill: shotRawIcon
                                     source: shotRawIcon
                                     colorization: 1.0
-                                    colorizationColor: "#ffffff"
+                                    colorizationColor: root.tileIconColor(false)
                                 }
                             }
 
@@ -725,14 +750,14 @@ PopupWindow {
                                 spacing: 1
                                 Text {
                                     text: "Screenshot"
-                                    color: "#ffffff"
+                                    color: root.tileTextColor(false)
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 11
                                     font.weight: Font.DemiBold
                                 }
                                 Text {
                                     text: "Capture screen"
-                                    color: "#777777"
+                                    color: root.tileSubColor(false)
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 9
                                 }
@@ -760,9 +785,9 @@ PopupWindow {
                         Layout.fillWidth: true
                         implicitHeight: 56
                         radius: 14
-                        color: tileRec.isPrimary ? "#ffffff" : (recTileMouse.containsMouse ? "#141414" : "#0c0c0c")
+                        color: root.tileBg(tileRec.isPrimary, recTileMouse.containsMouse)
                         border.width: 1
-                        border.color: tileRec.isPrimary ? "#ffffff" : (recTileMouse.containsMouse ? "#282828" : "#1c1c1c")
+                        border.color: root.tileBorder(tileRec.isPrimary, recTileMouse.containsMouse)
 
                         RowLayout {
                             anchors.fill: parent
@@ -772,7 +797,7 @@ PopupWindow {
 
                             Rectangle {
                                 width: 32; height: 32; radius: 16
-                                color: tileRec.isPrimary ? "#ffffff" : "#161616"
+                                color: root.tileIconBg(tileRec.isPrimary)
                                 Image {
                                     id: recRawIcon
                                     anchors.centerIn: parent
@@ -784,7 +809,7 @@ PopupWindow {
                                     anchors.fill: recRawIcon
                                     source: recRawIcon
                                     colorization: 1.0
-                                    colorizationColor: tileRec.isPrimary ? "#000000" : "#ffffff"
+                                    colorizationColor: root.tileIconColor(tileRec.isPrimary)
                                 }
                             }
 
@@ -793,14 +818,14 @@ PopupWindow {
                                 spacing: 1
                                 Text {
                                     text: "Screen Record"
-                                    color: tileRec.isPrimary ? "#000000" : "#ffffff"
+                                    color: root.tileTextColor(tileRec.isPrimary)
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 11
                                     font.weight: Font.DemiBold
                                 }
                                 Text {
                                     text: root.recordingActive ? "Recording..." : "Record video"
-                                    color: tileRec.isPrimary ? "#333333" : "#777777"
+                                    color: root.tileSubColor(tileRec.isPrimary)
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 9
                                 }
@@ -825,9 +850,9 @@ PopupWindow {
                         Layout.fillWidth: true
                         implicitHeight: 56
                         radius: 14
-                        color: tileNight.isPrimary ? "#ffffff" : (nightTileMouse.containsMouse ? "#141414" : "#0c0c0c")
+                        color: root.tileBg(tileNight.isPrimary, nightTileMouse.containsMouse)
                         border.width: 1
-                        border.color: tileNight.isPrimary ? "#ffffff" : (nightTileMouse.containsMouse ? "#282828" : "#1c1c1c")
+                        border.color: root.tileBorder(tileNight.isPrimary, nightTileMouse.containsMouse)
 
                         RowLayout {
                             anchors.fill: parent
@@ -837,7 +862,7 @@ PopupWindow {
 
                             Rectangle {
                                 width: 32; height: 32; radius: 16
-                                color: tileNight.isPrimary ? "#ffffff" : "#161616"
+                                color: root.tileIconBg(tileNight.isPrimary)
                                 Image {
                                     id: nightRawIcon
                                     anchors.centerIn: parent
@@ -849,7 +874,7 @@ PopupWindow {
                                     anchors.fill: nightRawIcon
                                     source: nightRawIcon
                                     colorization: 1.0
-                                    colorizationColor: tileNight.isPrimary ? "#000000" : "#ffffff"
+                                    colorizationColor: root.tileIconColor(tileNight.isPrimary)
                                 }
                             }
 
@@ -858,14 +883,14 @@ PopupWindow {
                                 spacing: 1
                                 Text {
                                     text: "Night Light"
-                                    color: tileNight.isPrimary ? "#000000" : "#ffffff"
+                                    color: root.tileTextColor(tileNight.isPrimary)
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 11
                                     font.weight: Font.DemiBold
                                 }
                                 Text {
                                     text: NightLightService.active ? (NightLightService.temperature + "K") : "Off"
-                                    color: tileNight.isPrimary ? "#333333" : "#777777"
+                                    color: root.tileSubColor(tileNight.isPrimary)
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 9
                                 }
@@ -873,7 +898,7 @@ PopupWindow {
 
                             Text {
                                 text: "›"
-                                color: tileNight.isPrimary ? "#000000" : "#777777"
+                                color: root.tileIconColor(tileNight.isPrimary)
                                 font.pixelSize: 13
                             }
                         }
@@ -902,9 +927,9 @@ PopupWindow {
                         Layout.fillWidth: true
                         implicitHeight: 56
                         radius: 14
-                        color: tilePower.isPrimary ? "#ffffff" : (powerTileMouse.containsMouse ? "#141414" : "#0c0c0c")
+                        color: root.tileBg(tilePower.isPrimary, powerTileMouse.containsMouse)
                         border.width: 1
-                        border.color: tilePower.isPrimary ? "#ffffff" : (powerTileMouse.containsMouse ? "#282828" : "#1c1c1c")
+                        border.color: root.tileBorder(tilePower.isPrimary, powerTileMouse.containsMouse)
 
                         RowLayout {
                             anchors.fill: parent
@@ -914,7 +939,7 @@ PopupWindow {
 
                             Rectangle {
                                 width: 32; height: 32; radius: 16
-                                color: tilePower.isPrimary ? "#ffffff" : "#161616"
+                                color: root.tileIconBg(tilePower.isPrimary)
                                 Image {
                                     id: powerRawIcon
                                     anchors.centerIn: parent
@@ -926,7 +951,7 @@ PopupWindow {
                                     anchors.fill: powerRawIcon
                                     source: powerRawIcon
                                     colorization: 1.0
-                                    colorizationColor: tilePower.isPrimary ? "#000000" : "#ffffff"
+                                    colorizationColor: root.tileIconColor(tilePower.isPrimary)
                                 }
                             }
 
@@ -935,14 +960,14 @@ PopupWindow {
                                 spacing: 1
                                 Text {
                                     text: "Power Mode"
-                                    color: tilePower.isPrimary ? "#000000" : "#ffffff"
+                                    color: root.tileTextColor(tilePower.isPrimary)
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 11
                                     font.weight: Font.DemiBold
                                 }
                                 Text {
                                     text: root.powerModes[root.powerModeIndex]
-                                    color: tilePower.isPrimary ? "#333333" : "#777777"
+                                    color: root.tileSubColor(tilePower.isPrimary)
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 9
                                     elide: Text.ElideRight
@@ -970,9 +995,9 @@ PopupWindow {
                     Layout.fillWidth: true
                     implicitHeight: 90
                     radius: 18
-                    color: "#101010"
+                    color: Theme.card
                     border.width: 1
-                    border.color: "#1d1d1d"
+                    border.color: Theme.border
 
                     ColumnLayout {
                         anchors.fill: parent
@@ -987,7 +1012,7 @@ PopupWindow {
                             Item {
                                 width: 16; height: 16; Layout.preferredWidth: 16
                                 Image { id: sBright; anchors.fill: parent; source: "assets/sun.svg"; visible: false }
-                                MultiEffect { anchors.fill: sBright; source: sBright; colorization: 1.0; colorizationColor: "#e6e6e6" }
+                                MultiEffect { anchors.fill: sBright; source: sBright; colorization: 1.0; colorizationColor: Theme.text }
                             }
 
                             Slider {
@@ -1005,12 +1030,12 @@ PopupWindow {
                                     width: brightSlider.availableWidth
                                     height: 4
                                     radius: 2
-                                    color: "#2d2d2d"
+                                    color: Theme.isDark ? "#2d2d2d" : "#e0e0e0"
 
                                     Rectangle {
                                         width: brightSlider.visualPosition * parent.width
                                         height: parent.height
-                                        color: "#f2f2f2"
+                                        color: Theme.accent
                                         radius: 2
                                     }
                                 }
@@ -1021,13 +1046,13 @@ PopupWindow {
                                     implicitWidth: 16
                                     implicitHeight: 16
                                     radius: 8
-                                    color: "#f4f4f4"
+                                    color: Theme.accent
                                 }
                             }
 
                             Text {
                                 text: Math.round(ShellState.brightness * 100) + "%"
-                                color: "#dddddd"
+                                color: Theme.text
                                 font.family: Theme.fontFamily
                                 font.pixelSize: 11
                                 Layout.preferredWidth: 36
@@ -1052,7 +1077,7 @@ PopupWindow {
                                     anchors.fill: sVol
                                     source: sVol
                                     colorization: 1.0
-                                    colorizationColor: "#e6e6e6"
+                                    colorizationColor: Theme.text
                                 }
                                 MouseArea {
                                     anchors.fill: parent
@@ -1078,12 +1103,12 @@ PopupWindow {
                                     width: volSlider.availableWidth
                                     height: 4
                                     radius: 2
-                                    color: "#2d2d2d"
+                                    color: Theme.isDark ? "#2d2d2d" : "#e0e0e0"
 
                                     Rectangle {
                                         width: volSlider.visualPosition * parent.width
                                         height: parent.height
-                                        color: "#f2f2f2"
+                                        color: Theme.accent
                                         radius: 2
                                     }
                                 }
@@ -1094,13 +1119,13 @@ PopupWindow {
                                     implicitWidth: 16
                                     implicitHeight: 16
                                     radius: 8
-                                    color: "#f4f4f4"
+                                    color: Theme.accent
                                 }
                             }
 
                             Text {
                                 text: Math.round(((AudioService.defaultSink || Pipewire.defaultAudioSink)?.audio?.volume ?? 0) * 100) + "%"
-                                color: "#dddddd"
+                                color: Theme.text
                                 font.family: Theme.fontFamily
                                 font.pixelSize: 11
                                 Layout.preferredWidth: 36
@@ -1116,9 +1141,9 @@ PopupWindow {
                     Layout.fillWidth: true
                     implicitHeight: 76
                     radius: 18
-                    color: "#101010"
+                    color: Theme.card
                     border.width: 1
-                    border.color: "#1d1d1d"
+                    border.color: Theme.border
 
                     RowLayout {
                         anchors.fill: parent
@@ -1133,19 +1158,19 @@ PopupWindow {
                                 anchors.centerIn: parent
                                 spacing: 8
                                 Rectangle {
-                                    width: 36; height: 36; radius: 18; color: "#1a1a1a"; border.width: 2; border.color: "#333"
+                                    width: 36; height: 36; radius: 18; color: Theme.cardHover; border.width: 1; border.color: Theme.border
                                     Image { id: statCpu; anchors.centerIn: parent; width: 18; height: 18; source: "assets/cpu.svg"; visible: false }
-                                    MultiEffect { anchors.fill: statCpu; source: statCpu; colorization: 1.0; colorizationColor: "#eeeeee" }
+                                    MultiEffect { anchors.fill: statCpu; source: statCpu; colorization: 1.0; colorizationColor: Theme.text }
                                 }
                                 ColumnLayout {
                                     spacing: 0
-                                    Text { text: Math.round(SystemData.cpuUsage) + "%"; color: "#f5f5f5"; font.family: Theme.fontFamily; font.pixelSize: 13; font.weight: Font.DemiBold }
-                                    Text { text: "CPU"; color: "#a6a6a6"; font.family: Theme.fontFamily; font.pixelSize: 10 }
+                                    Text { text: Math.round(SystemData.cpuUsage) + "%"; color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 13; font.weight: Font.DemiBold }
+                                    Text { text: "CPU"; color: Theme.muted; font.family: Theme.fontFamily; font.pixelSize: 10 }
                                 }
                             }
                         }
 
-                        Rectangle { implicitWidth: 1; Layout.fillHeight: true; Layout.topMargin: 4; Layout.bottomMargin: 4; color: "#2a2a2a" }
+                        Rectangle { implicitWidth: 1; Layout.fillHeight: true; Layout.topMargin: 4; Layout.bottomMargin: 4; color: Theme.border }
 
                         // RAM
                         Item {
@@ -1155,19 +1180,19 @@ PopupWindow {
                                 anchors.centerIn: parent
                                 spacing: 8
                                 Rectangle {
-                                    width: 36; height: 36; radius: 18; color: "#1a1a1a"; border.width: 2; border.color: "#333"
+                                    width: 36; height: 36; radius: 18; color: Theme.cardHover; border.width: 1; border.color: Theme.border
                                     Image { id: statRam; anchors.centerIn: parent; width: 18; height: 18; source: "assets/ram.svg"; visible: false }
-                                    MultiEffect { anchors.fill: statRam; source: statRam; colorization: 1.0; colorizationColor: "#eeeeee" }
+                                    MultiEffect { anchors.fill: statRam; source: statRam; colorization: 1.0; colorizationColor: Theme.text }
                                 }
                                 ColumnLayout {
                                     spacing: 0
-                                    Text { text: Math.round(SystemData.memoryUsage) + "%"; color: "#f5f5f5"; font.family: Theme.fontFamily; font.pixelSize: 13; font.weight: Font.DemiBold }
-                                    Text { text: "RAM"; color: "#a6a6a6"; font.family: Theme.fontFamily; font.pixelSize: 10 }
+                                    Text { text: Math.round(SystemData.memoryUsage) + "%"; color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 13; font.weight: Font.DemiBold }
+                                    Text { text: "RAM"; color: Theme.muted; font.family: Theme.fontFamily; font.pixelSize: 10 }
                                 }
                             }
                         }
 
-                        Rectangle { implicitWidth: 1; Layout.fillHeight: true; Layout.topMargin: 4; Layout.bottomMargin: 4; color: "#2a2a2a" }
+                        Rectangle { implicitWidth: 1; Layout.fillHeight: true; Layout.topMargin: 4; Layout.bottomMargin: 4; color: Theme.border }
 
                         // Disk
                         Item {
@@ -1177,20 +1202,20 @@ PopupWindow {
                                 anchors.centerIn: parent
                                 spacing: 8
                                 Rectangle {
-                                    width: 36; height: 36; radius: 18; color: "#1a1a1a"; border.width: 2; border.color: "#333"
+                                    width: 36; height: 36; radius: 18; color: Theme.cardHover; border.width: 1; border.color: Theme.border
                                     Image { id: statDisk; anchors.centerIn: parent; width: 18; height: 18; source: "assets/disk.svg"; visible: false }
-                                    MultiEffect { anchors.fill: statDisk; source: statDisk; colorization: 1.0; colorizationColor: "#eeeeee" }
+                                    MultiEffect { anchors.fill: statDisk; source: statDisk; colorization: 1.0; colorizationColor: Theme.text }
                                 }
                                 ColumnLayout {
                                     spacing: 0
                                     Text {
                                         text: SystemData.drives.length > 0 ? SystemData.drives[0].usage + "%" : "—"
-                                        color: "#f5f5f5"
+                                        color: Theme.text
                                         font.family: Theme.fontFamily
                                         font.pixelSize: 13
                                         font.weight: Font.DemiBold
                                     }
-                                    Text { text: "Disk"; color: "#a6a6a6"; font.family: Theme.fontFamily; font.pixelSize: 10 }
+                                    Text { text: "Disk"; color: Theme.muted; font.family: Theme.fontFamily; font.pixelSize: 10 }
                                 }
                             }
                         }
@@ -1202,9 +1227,9 @@ PopupWindow {
                     Layout.fillWidth: true
                     implicitHeight: 96
                     radius: 18
-                    color: "#101010"
+                    color: Theme.card
                     border.width: 1
-                    border.color: "#1d1d1d"
+                    border.color: Theme.border
 
                     RowLayout {
                         anchors.fill: parent
@@ -1216,9 +1241,9 @@ PopupWindow {
                             Layout.preferredWidth: 64
                             Layout.preferredHeight: 64
                             radius: 10
-                            color: "#171717"
+                            color: Theme.cardHover
                             border.width: 1
-                            border.color: "#242424"
+                            border.color: Theme.border
                             clip: true
 
                             // Track Art Image
@@ -1235,15 +1260,15 @@ PopupWindow {
                                 visible: !trackArt.visible
                                 anchors.centerIn: parent
                                 width: 56; height: 56; radius: 28
-                                color: "#0d0d0d"
+                                color: Theme.isDark ? "#0d0d0d" : "#ebebeb"
                                 border.width: 2
-                                border.color: "#282828"
+                                border.color: Theme.border
 
                                 Rectangle {
                                     anchors.centerIn: parent
                                     width: 18; height: 18; radius: 9
-                                    color: "#f4f4f4"
-                                    Text { anchors.centerIn: parent; text: "♪"; color: "#111"; font.pixelSize: 10 }
+                                    color: Theme.accent
+                                    Text { anchors.centerIn: parent; text: "♪"; color: Theme.background; font.pixelSize: 10 }
                                 }
 
                                 RotationAnimation on rotation {
@@ -1263,7 +1288,7 @@ PopupWindow {
                             Text {
                                 Layout.fillWidth: true
                                 text: root.activePlayer?.trackTitle || "No media playing"
-                                color: "#f5f5f5"
+                                color: Theme.text
                                 font.family: Theme.fontFamily
                                 font.pixelSize: 11
                                 font.weight: Font.DemiBold
@@ -1272,7 +1297,7 @@ PopupWindow {
                             Text {
                                 Layout.fillWidth: true
                                 text: root.activePlayer?.trackArtist || "Open a player to begin"
-                                color: "#a6a6a6"
+                                color: Theme.muted
                                 font.family: Theme.fontFamily
                                 font.pixelSize: 10
                                 elide: Text.ElideRight
@@ -1283,7 +1308,7 @@ PopupWindow {
                                 Layout.fillWidth: true
                                 implicitHeight: 6
                                 radius: 3
-                                color: "#282828"
+                                color: Theme.isDark ? "#282828" : "#e0e0e0"
                                 Layout.topMargin: 3
                                 clip: false
 
@@ -1292,7 +1317,7 @@ PopupWindow {
                                     height: parent.height
                                     width: Math.max(0, Math.min(parent.width, parent.width * root.getTrackProgress()))
                                     radius: 3
-                                    color: progMouse.containsMouse ? "#ffffff" : "#f2f2f2"
+                                    color: Theme.accent
                                 }
 
                                 // Scrub handle on hover or drag
@@ -1301,7 +1326,7 @@ PopupWindow {
                                     x: Math.max(0, Math.min(parent.width - width, progFill.width - width / 2))
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: 10; height: 10; radius: 5
-                                    color: "#ffffff"
+                                    color: Theme.accent
                                 }
 
                                 MouseArea {
@@ -1339,16 +1364,16 @@ PopupWindow {
                         RowLayout {
                             spacing: 6
                             Rectangle {
-                                width: 28; height: 28; radius: 14; color: prevMouse.containsMouse ? "#333" : "#242424"
+                                width: 28; height: 28; radius: 14; color: prevMouse.containsMouse ? Theme.cardHover : (Theme.isDark ? "#242424" : "#e4e4e4")
                                 Image { id: pIcon; anchors.centerIn: parent; width: 14; height: 14; source: "assets/prev.svg"; visible: false }
-                                MultiEffect { anchors.fill: pIcon; source: pIcon; colorization: 1.0; colorizationColor: "#dddddd" }
+                                MultiEffect { anchors.fill: pIcon; source: pIcon; colorization: 1.0; colorizationColor: Theme.text }
                                 MouseArea {
                                     id: prevMouse; anchors.fill: parent; hoverEnabled: true; z: 10
                                     onClicked: root.triggerPrevious()
                                 }
                             }
                             Rectangle {
-                                width: 36; height: 36; radius: 18; color: playMouse.containsMouse ? "#ffffff" : "#f0f0f0"
+                                width: 36; height: 36; radius: 18; color: Theme.accent
                                 Image {
                                     id: ppIcon
                                     anchors.centerIn: parent
@@ -1356,16 +1381,16 @@ PopupWindow {
                                     source: root.isPlaying ? "assets/pause.svg" : "assets/play.svg"
                                     visible: false
                                 }
-                                MultiEffect { anchors.fill: ppIcon; source: ppIcon; colorization: 1.0; colorizationColor: "#060606" }
+                                MultiEffect { anchors.fill: ppIcon; source: ppIcon; colorization: 1.0; colorizationColor: Theme.background }
                                 MouseArea {
                                     id: playMouse; anchors.fill: parent; hoverEnabled: true; z: 10
                                     onClicked: root.triggerPlayPause()
                                 }
                             }
                             Rectangle {
-                                width: 28; height: 28; radius: 14; color: nextMouse.containsMouse ? "#333" : "#242424"
+                                width: 28; height: 28; radius: 14; color: nextMouse.containsMouse ? Theme.cardHover : (Theme.isDark ? "#242424" : "#e4e4e4")
                                 Image { id: nIcon; anchors.centerIn: parent; width: 14; height: 14; source: "assets/next.svg"; visible: false }
-                                MultiEffect { anchors.fill: nIcon; source: nIcon; colorization: 1.0; colorizationColor: "#dddddd" }
+                                MultiEffect { anchors.fill: nIcon; source: nIcon; colorization: 1.0; colorizationColor: Theme.text }
                                 MouseArea {
                                     id: nextMouse; anchors.fill: parent; hoverEnabled: true; z: 10
                                     onClicked: root.triggerNext()
@@ -1391,9 +1416,9 @@ PopupWindow {
                 Layout.fillWidth: true
                 implicitHeight: 64
                 radius: 12
-                color: "#111111"
+                color: Theme.card
                 border.width: 1
-                border.color: root.ethState.connected ? "#ffffff" : "#222222"
+                border.color: root.ethState.connected ? Theme.accent : Theme.border
 
                 RowLayout {
                     anchors.fill: parent
@@ -1402,9 +1427,10 @@ PopupWindow {
 
                     Rectangle {
                         width: 36; height: 36; radius: 18
-                        color: root.ethState.connected ? "#ffffff" : "#222222"
+                        color: root.ethState.connected ? Theme.accent : Theme.cardHover
+                        border.width: 1; border.color: Theme.border
                         Image { id: ethIcon; anchors.centerIn: parent; width: 18; height: 18; source: "assets/shield.svg"; visible: false }
-                        MultiEffect { anchors.fill: ethIcon; source: ethIcon; colorization: 1.0; colorizationColor: root.ethState.connected ? "#050505" : "#ffffff" }
+                        MultiEffect { anchors.fill: ethIcon; source: ethIcon; colorization: 1.0; colorizationColor: root.ethState.connected ? Theme.background : Theme.text }
                     }
 
                     ColumnLayout {
@@ -1412,7 +1438,7 @@ PopupWindow {
                         spacing: 1
                         Text {
                             text: root.ethState.name || "Wired Connection (Ethernet)"
-                            color: "#f5f5f5"
+                            color: Theme.text
                             font.family: Theme.fontFamily
                             font.pixelSize: 12
                             font.weight: Font.DemiBold
@@ -1420,7 +1446,7 @@ PopupWindow {
                         }
                         Text {
                             text: root.ethState.connected ? ("Connected • " + (root.ethState.device || "Ethernet")) : "Cable Unplugged"
-                            color: root.ethState.connected ? "#ffffff" : "#888888"
+                            color: root.ethState.connected ? Theme.text : Theme.muted
                             font.family: Theme.fontFamily
                             font.pixelSize: 10
                         }
@@ -1428,11 +1454,12 @@ PopupWindow {
 
                     Rectangle {
                         width: 76; height: 24; radius: 12
-                        color: root.ethState.connected ? "#ffffff" : "#1e1e1e"
+                        color: root.ethState.connected ? Theme.accent : Theme.cardHover
+                        border.width: 1; border.color: Theme.border
                         Text {
                             anchors.centerIn: parent
                             text: root.ethState.connected ? "Connected" : "Inactive"
-                            color: root.ethState.connected ? "#080808" : "#888888"
+                            color: root.ethState.connected ? Theme.background : Theme.muted
                             font.family: Theme.fontFamily
                             font.pixelSize: 9
                             font.weight: Font.DemiBold
@@ -1445,29 +1472,33 @@ PopupWindow {
                 Layout.fillWidth: true
                 implicitHeight: 44
                 radius: 10
-                color: "#111111"
+                color: Theme.card
                 border.width: 1
-                border.color: SystemService.activeVpn ? "#ffffff" : "#222222"
+                border.color: SystemService.activeVpn ? Theme.accent : Theme.border
                 RowLayout {
                     anchors.fill: parent
                     anchors.margins: 8
                     spacing: 8
-                    Image { Layout.preferredWidth: 16; Layout.preferredHeight: 16; source: "assets/shield.svg" }
+                    Item {
+                        Layout.preferredWidth: 16; Layout.preferredHeight: 16
+                        Image { id: vpnSubI; anchors.fill: parent; source: "assets/shield.svg"; visible: false }
+                        MultiEffect { anchors.fill: vpnSubI; source: vpnSubI; colorization: 1.0; colorizationColor: Theme.text }
+                    }
                     ColumnLayout {
                         Layout.fillWidth: true
                         spacing: 0
-                        Text { text: SystemService.activeVpn?.name || "VPN"; color: "#f5f5f5"; font.family: Theme.fontFamily; font.pixelSize: 10; font.weight: Font.DemiBold }
+                        Text { text: SystemService.activeVpn?.name || "VPN"; color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 10; font.weight: Font.DemiBold }
                         Text {
                             text: SystemService.activeVpn ? "Connected" : (SystemService.vpns.length ? SystemService.vpns.length + " saved profile" + (SystemService.vpns.length === 1 ? "" : "s") : "No saved NetworkManager profile")
-                            color: "#777777"; font.family: Theme.fontFamily; font.pixelSize: 8
+                            color: Theme.muted; font.family: Theme.fontFamily; font.pixelSize: 8
                         }
                     }
                     Rectangle {
                         implicitWidth: vpnPageText.implicitWidth + 18
                         height: 25; radius: 7
-                        color: SystemService.activeVpn ? "#ffffff" : "#191919"
-                        border.width: 1; border.color: SystemService.activeVpn ? "#ffffff" : "#333333"
-                        Text { id: vpnPageText; anchors.centerIn: parent; text: SystemService.activeVpn ? "Disconnect" : "Connect"; color: SystemService.activeVpn ? "#080808" : "#ffffff"; font.family: Theme.fontFamily; font.pixelSize: 8; font.weight: Font.DemiBold }
+                        color: SystemService.activeVpn ? Theme.accent : Theme.cardHover
+                        border.width: 1; border.color: SystemService.activeVpn ? Theme.accent : Theme.border
+                        Text { id: vpnPageText; anchors.centerIn: parent; text: SystemService.activeVpn ? "Disconnect" : "Connect"; color: SystemService.activeVpn ? Theme.background : Theme.text; font.family: Theme.fontFamily; font.pixelSize: 8; font.weight: Font.DemiBold }
                         MouseArea { anchors.fill: parent; enabled: SystemService.activeVpn !== null || SystemService.vpns.length > 0; onClicked: SystemService.toggleVpn() }
                     }
                 }
@@ -1477,7 +1508,7 @@ PopupWindow {
                 visible: SystemService.networkAddresses.length > 0
                 Layout.fillWidth: true
                 text: SystemService.networkAddresses.join("  •  ") + (SystemService.networkGateway ? "  •  Gateway " + SystemService.networkGateway : "")
-                color: "#616161"
+                color: Theme.muted
                 font.family: Theme.fontFamily
                 font.pixelSize: 8
                 elide: Text.ElideRight
@@ -1491,14 +1522,14 @@ PopupWindow {
                 ColumnLayout {
                     Layout.fillWidth: true
                     spacing: 1
-                    Text { text: "Wi‑Fi Networks"; color: "#f5f5f5"; font.family: Theme.fontFamily; font.pixelSize: 12; font.weight: Font.DemiBold }
-                    Text { text: root.wifiEnabled ? "Available Access Points" : "Wi‑Fi is Disabled"; color: "#888888"; font.family: Theme.fontFamily; font.pixelSize: 10 }
+                    Text { text: "Wi‑Fi Networks"; color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 12; font.weight: Font.DemiBold }
+                    Text { text: root.wifiEnabled ? "Available Access Points" : "Wi‑Fi is Disabled"; color: Theme.muted; font.family: Theme.fontFamily; font.pixelSize: 10 }
                 }
 
                 Rectangle {
-                    width: 28; height: 28; radius: 14; color: refreshWifiMouse.containsMouse ? "#25ffffff" : "#181818"
-                    border.width: 1; border.color: "#282828"
-                    Text { anchors.centerIn: parent; text: "⟳"; color: "#ffffff"; font.pixelSize: 14 }
+                    width: 28; height: 28; radius: 14; color: refreshWifiMouse.containsMouse ? Theme.cardHover : Theme.card
+                    border.width: 1; border.color: Theme.border
+                    Text { anchors.centerIn: parent; text: "⟳"; color: Theme.text; font.pixelSize: 14 }
                     MouseArea {
                         id: refreshWifiMouse; anchors.fill: parent; hoverEnabled: true
                         onClicked: {
@@ -1507,18 +1538,18 @@ PopupWindow {
                     }
                 }
 
-                // Amoled White Accent Switch
+                // Accent Switch
                 Rectangle {
                     width: 44; height: 24; radius: 12
-                    color: root.wifiEnabled ? "#ffffff" : "#222222"
-                    border.width: 1; border.color: root.wifiEnabled ? "#ffffff" : "#383838"
+                    color: root.wifiEnabled ? Theme.accent : (Theme.isDark ? "#222222" : "#e0e0e0")
+                    border.width: 1; border.color: root.wifiEnabled ? Theme.accent : Theme.border
                     Behavior on color { ColorAnimation { duration: SettingsService.reducedMotion ? 0 : 120 } }
 
                     Rectangle {
                         width: 18; height: 18; radius: 9
                         anchors.verticalCenter: parent.verticalCenter
                         x: root.wifiEnabled ? (parent.width - width - 3) : 3
-                        color: root.wifiEnabled ? "#080808" : "#8e8e8e"
+                        color: root.wifiEnabled ? Theme.background : Theme.muted
                         Behavior on x { NumberAnimation { duration: SettingsService.reducedMotion ? 0 : 120 } }
                     }
 
@@ -1539,9 +1570,9 @@ PopupWindow {
                 Layout.fillWidth: true
                 implicitHeight: 74
                 radius: 10
-                color: "#161616"
+                color: Theme.card
                 border.width: 1
-                border.color: "#ffffff"
+                border.color: Theme.accent
 
                 ColumnLayout {
                     anchors.fill: parent
@@ -1550,7 +1581,7 @@ PopupWindow {
 
                     Text {
                         text: "Password for \"" + root.wifiPasswordPromptSsid + "\":"
-                        color: "#ffffff"
+                        color: Theme.text
                         font.family: Theme.fontFamily
                         font.pixelSize: 10
                         font.weight: Font.DemiBold
@@ -1564,15 +1595,15 @@ PopupWindow {
                             Layout.fillWidth: true
                             implicitHeight: 26
                             radius: 6
-                            color: "#0c0c0c"
+                            color: Theme.background
                             border.width: 1
-                            border.color: "#333333"
+                            border.color: Theme.border
 
                             TextInput {
                                 anchors.fill: parent
                                 anchors.leftMargin: 8; anchors.rightMargin: 8
                                 verticalAlignment: TextInput.AlignVCenter
-                                color: "#ffffff"
+                                color: Theme.text
                                 echoMode: TextInput.Password
                                 font.family: Theme.fontFamily
                                 font.pixelSize: 11
@@ -1582,8 +1613,8 @@ PopupWindow {
                         }
 
                         Rectangle {
-                            width: 60; height: 26; radius: 6; color: "#ffffff"
-                            Text { anchors.centerIn: parent; text: "Connect"; color: "#000000"; font.family: Theme.fontFamily; font.pixelSize: 10; font.weight: Font.DemiBold }
+                            width: 60; height: 26; radius: 6; color: Theme.accent
+                            Text { anchors.centerIn: parent; text: "Connect"; color: Theme.background; font.family: Theme.fontFamily; font.pixelSize: 10; font.weight: Font.DemiBold }
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
@@ -1595,8 +1626,9 @@ PopupWindow {
                         }
 
                         Rectangle {
-                            width: 26; height: 26; radius: 6; color: "#222222"
-                            Text { anchors.centerIn: parent; text: "✕"; color: "#ffffff"; font.pixelSize: 10 }
+                            width: 26; height: 26; radius: 6; color: Theme.cardHover
+                            border.width: 1; border.color: Theme.border
+                            Text { anchors.centerIn: parent; text: "✕"; color: Theme.text; font.pixelSize: 10 }
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: { root.wifiPasswordPromptSsid = ""; root.wifiPasswordInput = ""; }
@@ -1622,9 +1654,9 @@ PopupWindow {
                         width: wifiList.width
                         implicitHeight: 48
                         radius: 10
-                        color: cardWifiMouse.containsMouse ? "#1c1c1c" : "#111111"
+                        color: cardWifiMouse.containsMouse ? Theme.cardHover : Theme.card
                         border.width: 1
-                        border.color: (modelData.inUse || modelData.connected) ? "#ffffff" : "#202020"
+                        border.color: (modelData.inUse || modelData.connected) ? Theme.accent : Theme.border
 
                         MouseArea {
                             id: cardWifiMouse
@@ -1640,9 +1672,10 @@ PopupWindow {
 
                             Rectangle {
                                 width: 28; height: 28; radius: 14
-                                color: (modelData.inUse || modelData.connected) ? "#ffffff" : "#222222"
+                                color: (modelData.inUse || modelData.connected) ? Theme.accent : Theme.cardHover
+                                border.width: 1; border.color: Theme.border
                                 Image { id: wSubIcon; anchors.centerIn: parent; width: 14; height: 14; source: "assets/wifi.svg"; visible: false }
-                                MultiEffect { anchors.fill: wSubIcon; source: wSubIcon; colorization: 1.0; colorizationColor: (modelData.inUse || modelData.connected) ? "#050505" : "#ffffff" }
+                                MultiEffect { anchors.fill: wSubIcon; source: wSubIcon; colorization: 1.0; colorizationColor: (modelData.inUse || modelData.connected) ? Theme.background : Theme.text }
                             }
 
                             ColumnLayout {
@@ -1650,7 +1683,7 @@ PopupWindow {
                                 spacing: 0
                                 Text {
                                     text: modelData.ssid || modelData.name || "Access Point"
-                                    color: "#f5f5f5"
+                                    color: Theme.text
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 11
                                     font.weight: Font.DemiBold
@@ -1659,7 +1692,7 @@ PopupWindow {
                                 }
                                 Text {
                                     text: (modelData.inUse || modelData.connected) ? "Connected" : (modelData.saved ? "Saved" : (modelData.locked ? ("Secured • " + (modelData.signal ?? 0) + "%") : "Open Network"))
-                                    color: (modelData.inUse || modelData.connected) ? "#ffffff" : "#888888"
+                                    color: (modelData.inUse || modelData.connected) ? Theme.text : Theme.muted
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 9
                                 }
@@ -1670,13 +1703,13 @@ PopupWindow {
                                 z: 10
                                 visible: (modelData.saved || modelData.inUse || modelData.connected || modelData.known)
                                 width: 50; height: 24; radius: 6
-                                color: forgetWifiMouse.containsMouse ? "#2b2b2b" : "#191919"
-                                border.width: 1; border.color: "#303030"
+                                color: forgetWifiMouse.containsMouse ? Theme.cardHover : Theme.card
+                                border.width: 1; border.color: Theme.border
 
                                 Text {
                                     anchors.centerIn: parent
                                     text: root.pendingForgetSsid === (modelData.ssid || modelData.name) ? "Sure?" : "Forget"
-                                    color: "#a6a6a6"
+                                    color: Theme.muted
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 8
                                     font.weight: Font.DemiBold
@@ -1704,13 +1737,13 @@ PopupWindow {
                                 z: 10
                                 width: (modelData.inUse || modelData.connected) ? 68 : 60
                                 height: 24; radius: 6
-                                color: (modelData.inUse || modelData.connected) ? "#ffffff" : (actionWifiMouse.containsMouse ? "#2a2a2a" : "#1a1a1a")
-                                border.width: 1; border.color: (modelData.inUse || modelData.connected) ? "#ffffff" : "#333333"
+                                color: (modelData.inUse || modelData.connected) ? Theme.accent : (actionWifiMouse.containsMouse ? Theme.cardHover : Theme.card)
+                                border.width: 1; border.color: (modelData.inUse || modelData.connected) ? Theme.accent : Theme.border
 
                                 Text {
                                     anchors.centerIn: parent
                                     text: (modelData.inUse || modelData.connected) ? "Connected" : "Connect"
-                                    color: (modelData.inUse || modelData.connected) ? "#080808" : "#ffffff"
+                                    color: (modelData.inUse || modelData.connected) ? Theme.background : Theme.text
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 9
                                     font.weight: Font.DemiBold
@@ -1737,7 +1770,7 @@ PopupWindow {
         ColumnLayout {
             spacing: 10
 
-            // Header Toggle (Pure White Accent)
+            // Header Toggle
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 8
@@ -1745,27 +1778,27 @@ PopupWindow {
                 ColumnLayout {
                     Layout.fillWidth: true
                     spacing: 1
-                    Text { text: "Bluetooth"; color: "#f5f5f5"; font.family: Theme.fontFamily; font.pixelSize: 13; font.weight: Font.DemiBold }
+                    Text { text: "Bluetooth"; color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 13; font.weight: Font.DemiBold }
                     Text {
                         text: root.btPowered ? (root.btScanning ? "Searching for devices..." : (root.connectedBtDevice ? "Connected to " + root.connectedBtDevice.name : "Enabled • Discoverable")) : "Bluetooth Disabled"
-                        color: root.btPowered ? "#ffffff" : "#888888"
+                        color: root.btPowered ? Theme.text : Theme.muted
                         font.family: Theme.fontFamily
                         font.pixelSize: 10
                     }
                 }
 
-                // Custom White Switch (No Blue)
+                // Accent Switch
                 Rectangle {
                     width: 44; height: 24; radius: 12
-                    color: root.btPowered ? "#ffffff" : "#222222"
-                    border.width: 1; border.color: root.btPowered ? "#ffffff" : "#383838"
+                    color: root.btPowered ? Theme.accent : (Theme.isDark ? "#222222" : "#e0e0e0")
+                    border.width: 1; border.color: root.btPowered ? Theme.accent : Theme.border
                     Behavior on color { ColorAnimation { duration: SettingsService.reducedMotion ? 0 : 120 } }
 
                     Rectangle {
                         width: 18; height: 18; radius: 9
                         anchors.verticalCenter: parent.verticalCenter
                         x: root.btPowered ? (parent.width - width - 3) : 3
-                        color: root.btPowered ? "#080808" : "#8e8e8e"
+                        color: root.btPowered ? Theme.background : Theme.muted
                         Behavior on x { NumberAnimation { duration: SettingsService.reducedMotion ? 0 : 120 } }
                     }
 
@@ -1789,15 +1822,15 @@ PopupWindow {
                     Layout.fillWidth: true
                     implicitHeight: 32
                     radius: 8
-                    color: addBtMouse.containsMouse ? "#202020" : "#141414"
+                    color: addBtMouse.containsMouse ? Theme.cardHover : Theme.card
                     border.width: 1
-                    border.color: "#303030"
+                    border.color: Theme.border
 
                     RowLayout {
                         anchors.centerIn: parent
                         spacing: 6
-                        Text { text: "+"; color: "#ffffff"; font.pixelSize: 14; font.weight: Font.DemiBold }
-                        Text { text: "Add Device"; color: "#ffffff"; font.family: Theme.fontFamily; font.pixelSize: 11; font.weight: Font.DemiBold }
+                        Text { text: "+"; color: Theme.text; font.pixelSize: 14; font.weight: Font.DemiBold }
+                        Text { text: "Add Device"; color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 11; font.weight: Font.DemiBold }
                     }
 
                     MouseArea {
@@ -1815,10 +1848,10 @@ PopupWindow {
 
                 Rectangle {
                     width: 32; height: 32; radius: 8
-                    color: refreshBtMouse.containsMouse ? "#202020" : "#141414"
+                    color: refreshBtMouse.containsMouse ? Theme.cardHover : Theme.card
                     border.width: 1
-                    border.color: "#303030"
-                    Text { anchors.centerIn: parent; text: "⟳"; color: "#ffffff"; font.pixelSize: 14 }
+                    border.color: Theme.border
+                    Text { anchors.centerIn: parent; text: "⟳"; color: Theme.text; font.pixelSize: 14 }
                     MouseArea {
                         id: refreshBtMouse
                         anchors.fill: parent
@@ -1831,14 +1864,14 @@ PopupWindow {
             // Section Label
             Text {
                 text: "Paired & Available Devices"
-                color: "#a6a6a6"
+                color: Theme.muted
                 font.family: Theme.fontFamily
                 font.pixelSize: 10
                 font.weight: Font.DemiBold
                 Layout.topMargin: 2
             }
 
-            // Devices List (White Accent + Forget Option)
+            // Devices List
             ScrollView {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -1855,9 +1888,9 @@ PopupWindow {
                         width: btList.width
                         implicitHeight: 52
                         radius: 12
-                        color: cardBtMouse.containsMouse ? "#1c1c1c" : "#111111"
+                        color: cardBtMouse.containsMouse ? Theme.cardHover : Theme.card
                         border.width: 1
-                        border.color: modelData.connected ? "#ffffff" : "#222222"
+                        border.color: modelData.connected ? Theme.accent : Theme.border
 
                         MouseArea {
                             id: cardBtMouse
@@ -1882,7 +1915,8 @@ PopupWindow {
                             // Device Icon (Gamepad, Audio, or Bluetooth in circle)
                             Rectangle {
                                 width: 32; height: 32; radius: 16
-                                color: modelData.connected ? "#ffffff" : "#222222"
+                                color: modelData.connected ? Theme.accent : Theme.cardHover
+                                border.width: 1; border.color: Theme.border
                                 Image {
                                     id: btSubIcon
                                     anchors.centerIn: parent
@@ -1894,7 +1928,7 @@ PopupWindow {
                                     anchors.fill: btSubIcon
                                     source: btSubIcon
                                     colorization: 1.0
-                                    colorizationColor: modelData.connected ? "#050505" : "#ffffff"
+                                    colorizationColor: modelData.connected ? Theme.background : Theme.text
                                 }
                             }
 
@@ -1904,7 +1938,7 @@ PopupWindow {
                                 spacing: 1
                                 Text {
                                     text: modelData.name || modelData.mac
-                                    color: "#f5f5f5"
+                                    color: Theme.text
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 11
                                     font.weight: Font.DemiBold
@@ -1915,7 +1949,7 @@ PopupWindow {
                                     text: modelData.pairing ? "Pairing…" : modelData.connected
                                         ? (modelData.batteryAvailable ? "Connected • " + Math.round(modelData.battery * 100) + "%" : "Connected")
                                         : (modelData.paired ? (modelData.trusted ? "Paired • Trusted" : "Paired • Tap to connect") : "Available to pair")
-                                    color: modelData.connected ? "#ffffff" : "#888888"
+                                    color: modelData.connected ? Theme.text : Theme.muted
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 9
                                 }
@@ -1925,14 +1959,14 @@ PopupWindow {
                             Rectangle {
                                 z: 10
                                 width: 50; height: 26; radius: 6
-                                color: forgetBtMouse.containsMouse ? "#2b2b2b" : "#181818"
+                                color: forgetBtMouse.containsMouse ? Theme.cardHover : Theme.card
                                 border.width: 1
-                                border.color: "#303030"
+                                border.color: Theme.border
 
                                 Text {
                                     anchors.centerIn: parent
                                     text: "Forget"
-                                    color: "#a6a6a6"
+                                    color: Theme.muted
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 8
                                     font.weight: Font.DemiBold
@@ -1949,19 +1983,19 @@ PopupWindow {
                                 }
                             }
 
-                            // Connect / Disconnect Action Pill (Pure White Accent)
+                            // Connect / Disconnect Action Pill
                             Rectangle {
                                 z: 10
                                 width: modelData.connected ? 74 : 64
                                 height: 26; radius: 6
-                                color: modelData.connected ? "#ffffff" : (actionBtMouse.containsMouse ? "#282828" : "#181818")
+                                color: modelData.connected ? Theme.accent : (actionBtMouse.containsMouse ? Theme.cardHover : Theme.card)
                                 border.width: 1
-                                border.color: modelData.connected ? "#ffffff" : "#383838"
+                                border.color: modelData.connected ? Theme.accent : Theme.border
 
                                 Text {
                                     anchors.centerIn: parent
                                     text: modelData.pairing ? "Pairing…" : modelData.connected ? "Connected" : (modelData.paired ? "Connect" : "Pair")
-                                    color: modelData.connected ? "#050505" : "#ffffff"
+                                    color: modelData.connected ? Theme.background : Theme.text
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 9
                                     font.weight: Font.DemiBold
@@ -2002,10 +2036,10 @@ PopupWindow {
                 Layout.fillWidth: true
                 ColumnLayout {
                     spacing: 1
-                    Text { text: "Night Light"; color: "#f5f5f5"; font.family: Theme.fontFamily; font.pixelSize: 13; font.weight: Font.DemiBold }
+                    Text { text: "Night Light"; color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 13; font.weight: Font.DemiBold }
                     Text {
                         text: NightLightService.active ? (NightLightService.enabled ? "Currently Active (Manual)" : "Currently Active (Scheduled)") : "Disabled"
-                        color: NightLightService.active ? "#ffffff" : "#888888"
+                        color: NightLightService.active ? Theme.text : Theme.muted
                         font.family: Theme.fontFamily
                         font.pixelSize: 10
                     }
@@ -2022,9 +2056,9 @@ PopupWindow {
                 Layout.fillWidth: true
                 implicitHeight: 124
                 radius: 12
-                color: "#111111"
+                color: Theme.card
                 border.width: 1
-                border.color: "#222222"
+                border.color: Theme.border
 
                 ColumnLayout {
                     anchors.fill: parent
@@ -2033,7 +2067,7 @@ PopupWindow {
 
                     RowLayout {
                         Layout.fillWidth: true
-                        Text { text: "Color Temperature"; color: "#f5f5f5"; font.family: Theme.fontFamily; font.pixelSize: 11; font.weight: Font.DemiBold }
+                        Text { text: "Color Temperature"; color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 11; font.weight: Font.DemiBold }
                         Item { Layout.fillWidth: true }
                         Text {
                             text: {
@@ -2041,7 +2075,7 @@ PopupWindow {
                                 const desc = k >= 6000 ? "Neutral D65" : k >= 4500 ? "Natural Warm" : k >= 3500 ? "Sunset Warm" : "Deep Candlelight";
                                 return k + "K • " + desc;
                             }
-                            color: "#ffffff"
+                            color: Theme.text
                             font.family: Theme.fontFamily
                             font.pixelSize: 10
                         }
@@ -2079,9 +2113,9 @@ PopupWindow {
                             implicitWidth: 16
                             implicitHeight: 16
                             radius: 8
-                            color: "#ffffff"
+                            color: Theme.accent
                             border.width: 1
-                            border.color: "#333333"
+                            border.color: Theme.border
                         }
                     }
 
@@ -2103,14 +2137,14 @@ PopupWindow {
                                 Layout.fillWidth: true
                                 implicitHeight: 24
                                 radius: 6
-                                color: NightLightService.temperature === modelData.k ? "#ffffff" : (presetMouse.containsMouse ? "#222222" : "#181818")
+                                color: NightLightService.temperature === modelData.k ? Theme.accent : (presetMouse.containsMouse ? Theme.cardHover : Theme.card)
                                 border.width: 1
-                                border.color: NightLightService.temperature === modelData.k ? "#ffffff" : "#2a2a2a"
+                                border.color: NightLightService.temperature === modelData.k ? Theme.accent : Theme.border
 
                                 Text {
                                     anchors.centerIn: parent
                                     text: parent.modelData.label
-                                    color: NightLightService.temperature === parent.modelData.k ? "#000000" : "#cccccc"
+                                    color: NightLightService.temperature === parent.modelData.k ? Theme.background : Theme.muted
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 9
                                     font.weight: Font.DemiBold
@@ -2133,9 +2167,9 @@ PopupWindow {
                 Layout.fillWidth: true
                 implicitHeight: scheduleCol.implicitHeight + 20
                 radius: 12
-                color: "#111111"
+                color: Theme.card
                 border.width: 1
-                border.color: NightLightService.autoSchedule && NightLightService.inScheduleWindow ? "#ffffff" : "#222222"
+                border.color: NightLightService.autoSchedule && NightLightService.inScheduleWindow ? Theme.accent : Theme.border
 
                 ColumnLayout {
                     id: scheduleCol
@@ -2155,7 +2189,7 @@ PopupWindow {
                             spacing: 2
                             Text {
                                 text: "Automatic Schedule"
-                                color: "#f5f5f5"
+                                color: Theme.text
                                 font.family: Theme.fontFamily
                                 font.pixelSize: 11
                                 font.weight: Font.DemiBold
@@ -2167,7 +2201,7 @@ PopupWindow {
                                     const e = NightLightService.formatTime(NightLightService.endHour, NightLightService.endMinute);
                                     return s + " → " + e + (NightLightService.inScheduleWindow ? " • Active now" : " • Scheduled");
                                 }
-                                color: NightLightService.autoSchedule && NightLightService.inScheduleWindow ? "#ffffff" : "#888888"
+                                color: NightLightService.autoSchedule && NightLightService.inScheduleWindow ? Theme.text : Theme.muted
                                 font.family: Theme.fontFamily
                                 font.pixelSize: 10
                             }
@@ -2201,14 +2235,14 @@ PopupWindow {
                                                                    NightLightService.startMinute === modelData.sM &&
                                                                    NightLightService.endHour === modelData.eH &&
                                                                    NightLightService.endMinute === modelData.eM
-                                color: isCurrent ? "#ffffff" : (schedPresetMouse.containsMouse ? "#222222" : "#181818")
+                                color: isCurrent ? Theme.accent : (schedPresetMouse.containsMouse ? Theme.cardHover : Theme.card)
                                 border.width: 1
-                                border.color: isCurrent ? "#ffffff" : "#2a2a2a"
+                                border.color: isCurrent ? Theme.accent : Theme.border
 
                                 Text {
                                     anchors.centerIn: parent
                                     text: parent.modelData.label
-                                    color: parent.isCurrent ? "#000000" : "#cccccc"
+                                    color: parent.isCurrent ? Theme.background : Theme.muted
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 9
                                     font.weight: Font.DemiBold
@@ -2244,7 +2278,7 @@ PopupWindow {
 
                             Text {
                                 text: "Turn on"
-                                color: "#aaaaaa"
+                                color: Theme.muted
                                 font.family: Theme.fontFamily
                                 font.pixelSize: 9
                                 font.weight: Font.DemiBold
@@ -2254,9 +2288,9 @@ PopupWindow {
                                 Layout.fillWidth: true
                                 implicitHeight: 32
                                 radius: 8
-                                color: "#161616"
+                                color: Theme.cardHover
                                 border.width: 1
-                                border.color: "#282828"
+                                border.color: Theme.border
 
                                 RowLayout {
                                     anchors.fill: parent
@@ -2267,7 +2301,7 @@ PopupWindow {
                                     TextInput {
                                         id: startHourField
                                         text: NightLightService.startHour < 10 ? "0" + NightLightService.startHour : "" + NightLightService.startHour
-                                        color: "#f5f5f5"
+                                        color: Theme.text
                                         font.family: Theme.fontFamily
                                         font.pixelSize: 11
                                         font.weight: Font.DemiBold
@@ -2293,8 +2327,8 @@ PopupWindow {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: true
                                             radius: 3
-                                            color: startUpHMouse.containsMouse ? "#282828" : "#181818"
-                                            Text { anchors.centerIn: parent; text: "▲"; color: startUpHMouse.containsMouse ? "#ffffff" : "#888888"; font.pixelSize: 6 }
+                                            color: startUpHMouse.containsMouse ? Theme.cardHover : Theme.card
+                                            Text { anchors.centerIn: parent; text: "▲"; color: startUpHMouse.containsMouse ? Theme.text : Theme.muted; font.pixelSize: 6 }
                                             MouseArea {
                                                 id: startUpHMouse; anchors.fill: parent; hoverEnabled: true
                                                 onClicked: NightLightService.setStartTime((NightLightService.startHour + 1) % 24, NightLightService.startMinute)
@@ -2305,8 +2339,8 @@ PopupWindow {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: true
                                             radius: 3
-                                            color: startDownHMouse.containsMouse ? "#282828" : "#181818"
-                                            Text { anchors.centerIn: parent; text: "▼"; color: startDownHMouse.containsMouse ? "#ffffff" : "#888888"; font.pixelSize: 6 }
+                                            color: startDownHMouse.containsMouse ? Theme.cardHover : Theme.card
+                                            Text { anchors.centerIn: parent; text: "▼"; color: startDownHMouse.containsMouse ? Theme.text : Theme.muted; font.pixelSize: 6 }
                                             MouseArea {
                                                 id: startDownHMouse; anchors.fill: parent; hoverEnabled: true
                                                 onClicked: NightLightService.setStartTime((NightLightService.startHour + 23) % 24, NightLightService.startMinute)
@@ -2316,7 +2350,7 @@ PopupWindow {
 
                                     Text {
                                         text: ":"
-                                        color: "#666666"
+                                        color: Theme.muted
                                         font.family: Theme.fontFamily
                                         font.pixelSize: 11
                                         font.weight: Font.Bold
@@ -2325,7 +2359,7 @@ PopupWindow {
                                     TextInput {
                                         id: startMinField
                                         text: NightLightService.startMinute < 10 ? "0" + NightLightService.startMinute : "" + NightLightService.startMinute
-                                        color: "#f5f5f5"
+                                        color: Theme.text
                                         font.family: Theme.fontFamily
                                         font.pixelSize: 11
                                         font.weight: Font.DemiBold
@@ -2351,8 +2385,8 @@ PopupWindow {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: true
                                             radius: 3
-                                            color: startUpMMouse.containsMouse ? "#282828" : "#181818"
-                                            Text { anchors.centerIn: parent; text: "▲"; color: startUpMMouse.containsMouse ? "#ffffff" : "#888888"; font.pixelSize: 6 }
+                                            color: startUpMMouse.containsMouse ? Theme.cardHover : Theme.card
+                                            Text { anchors.centerIn: parent; text: "▲"; color: startUpMMouse.containsMouse ? Theme.text : Theme.muted; font.pixelSize: 6 }
                                             MouseArea {
                                                 id: startUpMMouse; anchors.fill: parent; hoverEnabled: true
                                                 onClicked: {
@@ -2366,8 +2400,8 @@ PopupWindow {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: true
                                             radius: 3
-                                            color: startDownMMouse.containsMouse ? "#282828" : "#181818"
-                                            Text { anchors.centerIn: parent; text: "▼"; color: startDownMMouse.containsMouse ? "#ffffff" : "#888888"; font.pixelSize: 6 }
+                                            color: startDownMMouse.containsMouse ? Theme.cardHover : Theme.card
+                                            Text { anchors.centerIn: parent; text: "▼"; color: startDownMMouse.containsMouse ? Theme.text : Theme.muted; font.pixelSize: 6 }
                                             MouseArea {
                                                 id: startDownMMouse; anchors.fill: parent; hoverEnabled: true
                                                 onClicked: {
@@ -2388,7 +2422,7 @@ PopupWindow {
 
                             Text {
                                 text: "Turn off"
-                                color: "#aaaaaa"
+                                color: Theme.muted
                                 font.family: Theme.fontFamily
                                 font.pixelSize: 9
                                 font.weight: Font.DemiBold
@@ -2398,9 +2432,9 @@ PopupWindow {
                                 Layout.fillWidth: true
                                 implicitHeight: 32
                                 radius: 8
-                                color: "#161616"
+                                color: Theme.cardHover
                                 border.width: 1
-                                border.color: "#282828"
+                                border.color: Theme.border
 
                                 RowLayout {
                                     anchors.fill: parent
@@ -2411,7 +2445,7 @@ PopupWindow {
                                     TextInput {
                                         id: endHourField
                                         text: NightLightService.endHour < 10 ? "0" + NightLightService.endHour : "" + NightLightService.endHour
-                                        color: "#f5f5f5"
+                                        color: Theme.text
                                         font.family: Theme.fontFamily
                                         font.pixelSize: 11
                                         font.weight: Font.DemiBold
@@ -2437,8 +2471,8 @@ PopupWindow {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: true
                                             radius: 3
-                                            color: endUpHMouse.containsMouse ? "#282828" : "#181818"
-                                            Text { anchors.centerIn: parent; text: "▲"; color: endUpHMouse.containsMouse ? "#ffffff" : "#888888"; font.pixelSize: 6 }
+                                            color: endUpHMouse.containsMouse ? Theme.cardHover : Theme.card
+                                            Text { anchors.centerIn: parent; text: "▲"; color: endUpHMouse.containsMouse ? Theme.text : Theme.muted; font.pixelSize: 6 }
                                             MouseArea {
                                                 id: endUpHMouse; anchors.fill: parent; hoverEnabled: true
                                                 onClicked: NightLightService.setEndTime((NightLightService.endHour + 1) % 24, NightLightService.endMinute)
@@ -2449,8 +2483,8 @@ PopupWindow {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: true
                                             radius: 3
-                                            color: endDownHMouse.containsMouse ? "#282828" : "#181818"
-                                            Text { anchors.centerIn: parent; text: "▼"; color: endDownHMouse.containsMouse ? "#ffffff" : "#888888"; font.pixelSize: 6 }
+                                            color: endDownHMouse.containsMouse ? Theme.cardHover : Theme.card
+                                            Text { anchors.centerIn: parent; text: "▼"; color: endDownHMouse.containsMouse ? Theme.text : Theme.muted; font.pixelSize: 6 }
                                             MouseArea {
                                                 id: endDownHMouse; anchors.fill: parent; hoverEnabled: true
                                                 onClicked: NightLightService.setEndTime((NightLightService.endHour + 23) % 24, NightLightService.endMinute)
@@ -2460,7 +2494,7 @@ PopupWindow {
 
                                     Text {
                                         text: ":"
-                                        color: "#666666"
+                                        color: Theme.muted
                                         font.family: Theme.fontFamily
                                         font.pixelSize: 11
                                         font.weight: Font.Bold
@@ -2469,7 +2503,7 @@ PopupWindow {
                                     TextInput {
                                         id: endMinField
                                         text: NightLightService.endMinute < 10 ? "0" + NightLightService.endMinute : "" + NightLightService.endMinute
-                                        color: "#f5f5f5"
+                                        color: Theme.text
                                         font.family: Theme.fontFamily
                                         font.pixelSize: 11
                                         font.weight: Font.DemiBold
@@ -2495,8 +2529,8 @@ PopupWindow {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: true
                                             radius: 3
-                                            color: endUpMMouse.containsMouse ? "#282828" : "#181818"
-                                            Text { anchors.centerIn: parent; text: "▲"; color: endUpMMouse.containsMouse ? "#ffffff" : "#888888"; font.pixelSize: 6 }
+                                            color: endUpMMouse.containsMouse ? Theme.cardHover : Theme.card
+                                            Text { anchors.centerIn: parent; text: "▲"; color: endUpMMouse.containsMouse ? Theme.text : Theme.muted; font.pixelSize: 6 }
                                             MouseArea {
                                                 id: endUpMMouse; anchors.fill: parent; hoverEnabled: true
                                                 onClicked: {
@@ -2510,8 +2544,8 @@ PopupWindow {
                                             Layout.fillWidth: true
                                             Layout.fillHeight: true
                                             radius: 3
-                                            color: endDownMMouse.containsMouse ? "#282828" : "#181818"
-                                            Text { anchors.centerIn: parent; text: "▼"; color: endDownMMouse.containsMouse ? "#ffffff" : "#888888"; font.pixelSize: 6 }
+                                            color: endDownMMouse.containsMouse ? Theme.cardHover : Theme.card
+                                            Text { anchors.centerIn: parent; text: "▼"; color: endDownMMouse.containsMouse ? Theme.text : Theme.muted; font.pixelSize: 6 }
                                             MouseArea {
                                                 id: endDownMMouse; anchors.fill: parent; hoverEnabled: true
                                                 onClicked: {
@@ -2557,7 +2591,7 @@ PopupWindow {
             Text {
                 Layout.fillWidth: true
                 text: "Reduces short-wavelength blue light to help prevent eye strain and support natural sleep cycles."
-                color: "#727272"
+                color: Theme.muted
                 font.family: Theme.fontFamily
                 font.pixelSize: 10
                 wrapMode: Text.WordWrap
@@ -2572,7 +2606,7 @@ PopupWindow {
         id: audioPage
         ColumnLayout {
             spacing: 8
-            Text { text: "Audio Output Streams"; color: "#f5f5f5"; font.family: Theme.fontFamily; font.pixelSize: 12; font.weight: Font.DemiBold }
+            Text { text: "Audio Output Streams"; color: Theme.text; font.family: Theme.fontFamily; font.pixelSize: 12; font.weight: Font.DemiBold }
 
             ScrollView {
                 Layout.fillWidth: true
@@ -2587,9 +2621,9 @@ PopupWindow {
                         width: audioList.width
                         height: 56
                         radius: 10
-                        color: "#111111"
+                        color: Theme.card
                         border.width: 1
-                        border.color: "#222222"
+                        border.color: Theme.border
 
                         ColumnLayout {
                             anchors.fill: parent
@@ -2600,7 +2634,7 @@ PopupWindow {
                                 Layout.fillWidth: true
                                 Text {
                                     text: modelData.properties?.["application.name"] || modelData.name || "Audio Stream"
-                                    color: "#f5f5f5"
+                                    color: Theme.text
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 11
                                     font.weight: Font.DemiBold
@@ -2609,7 +2643,7 @@ PopupWindow {
                                 }
                                 Text {
                                     text: Math.round((modelData.audio?.volume ?? 1) * 100) + "%"
-                                    color: "#a6a6a6"
+                                    color: Theme.muted
                                     font.family: Theme.fontFamily
                                     font.pixelSize: 10
                                 }
@@ -2630,7 +2664,7 @@ PopupWindow {
                                         anchors.fill: stVol
                                         source: stVol
                                         colorization: 1.0
-                                        colorizationColor: "#e6e6e6"
+                                        colorizationColor: Theme.text
                                     }
                                     MouseArea {
                                         anchors.fill: parent
