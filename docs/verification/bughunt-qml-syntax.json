@@ -1,0 +1,6 @@
+{
+  "tool": "qmllint 6.4.2",
+  "mode": "Syntax only; Quickshell modules unavailable, semantic warnings disabled.",
+  "passed": 39,
+  "exit_code": 0
+}

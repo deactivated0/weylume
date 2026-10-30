@@ -1,0 +1,115 @@
+{
+  "passed": 19,
+  "checks": [
+    "clipboard payload 0",
+    "clipboard payload 1",
+    "clipboard payload 2",
+    "clipboard payload 3",
+    "clipboard payload 4",
+    "clipboard payload 5",
+    "clipboard payload 6",
+    "clipboard payload 7",
+    "clipboard payload 8",
+    "clipboard payload 9",
+    "clipboard payload 10",
+    "clipboard payload 11",
+    "clipboard payload 12",
+    "clipboard payload 13",
+    "clipboard payload 14",
+    "clipboard payload 15",
+    "same 101-file eviction and non-regular/hidden retention",
+    "executable directory cached during state validation",
+    "backend first metric fields unchanged and idle metrics continue"
+  ],
+  "clipboard_80_images_calls": {
+    "old": {
+      "stat_family_calls": 85,
+      "readlink_calls": 0
+    },
+    "new": {
+      "stat_family_calls": 2,
+      "readlink_calls": 0
+    }
+  },
+  "state_validate_calls": {
+    "old": {
+      "stat_family_calls": 12,
+      "readlink_calls": 12
+    },
+    "new": {
+      "stat_family_calls": 12,
+      "readlink_calls": 1
+    }
+  },
+  "rejected_8_mib_text_peak_rss": {
+    "old": {
+      "median_peak_rss_kib": 11140,
+      "runs": 7,
+      "values_kib": [
+        11140,
+        11140,
+        11140,
+        11268,
+        11128,
+        11140,
+        11140
+      ]
+    },
+    "new": {
+      "median_peak_rss_kib": 3080,
+      "runs": 7,
+      "values_kib": [
+        3008,
+        3136,
+        3008,
+        3084,
+        3024,
+        3080,
+        3136
+      ]
+    }
+  },
+  "backend_isolated_sample": {
+    "old": {
+      "time_to_first_metrics_ms": 3.525,
+      "metric_keys": [
+        "cpu",
+        "drives",
+        "gpu",
+        "memory",
+        "network",
+        "uptime"
+      ],
+      "sample_seconds": 6.0,
+      "peak_rss_kib": 3460,
+      "user_seconds": 0.004576,
+      "system_seconds": 0.0,
+      "voluntary_context_switches": 9,
+      "involuntary_context_switches": 0,
+      "additional_metrics": 5
+    },
+    "new": {
+      "time_to_first_metrics_ms": 4.057,
+      "metric_keys": [
+        "cpu",
+        "drives",
+        "gpu",
+        "memory",
+        "network",
+        "uptime"
+      ],
+      "sample_seconds": 6.0,
+      "peak_rss_kib": 3396,
+      "user_seconds": 0.005037,
+      "system_seconds": 0.0,
+      "voluntary_context_switches": 9,
+      "involuntary_context_switches": 0,
+      "additional_metrics": 5
+    }
+  },
+  "limitations": [
+    "Call counts use test-only LD_PRELOAD wrappers around libc stat/readlink, not a kernel syscall trace.",
+    "wait4 peak RSS is for native helper processes in this container, not the desktop.",
+    "Backend startup is one sample; total CPU/context switches include startup and exit. No live session bus/udev/compositor; not desktop wakeups, steady idle RAM/CPU, or full startup."
+  ]
+}

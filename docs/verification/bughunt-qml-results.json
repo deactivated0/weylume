@@ -1,0 +1,14 @@
+{
+  "passed": 8,
+  "checks": [
+    "clearAll releases a transient toast absent from history, exactly once",
+    "clearAll drops QML ownership before native dismissal and avoids double dismissal",
+    "removing the displayed history entry clears the toast reference before dismissal",
+    "rapid clipboard failures back off 2/4/8 seconds and a stable run resets retry",
+    "recording elapsed timer stops while paused and resumes only while recorder runs",
+    "QML preview filenames match native UTF-8 sanitization and fit 255 bytes",
+    "closing a preview cancels its queued follow-up capture",
+    "notification and preview rendered trees are unchanged"
+  ],
+  "limitation": "Extracted QML logic and source comparison, not live Quickshell execution."
+}

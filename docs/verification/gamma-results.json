@@ -1,0 +1,26 @@
+{
+  "passed": 7,
+  "checks": [
+    "native Properties.Set double and reply",
+    "native Properties.Set uint16 and reply",
+    "service error acknowledgement",
+    "delayed gamma reply does not block metrics",
+    "disconnect failure and lazy reconnect",
+    "35 consecutive acknowledged writes with connection reuse",
+    "default D-Bus timeout fires without blocking backend"
+  ],
+  "benchmark": {
+    "old": {
+      "median_ms": 3.362,
+      "measured_runs": 30,
+      "warmup_runs": 5
+    },
+    "new": {
+      "median_ms": 0.335,
+      "measured_runs": 30,
+      "warmup_runs": 5
+    }
+  },
+  "timeout_seconds": 25.001,
+  "limitation": "Real libsystemd and D-Bus wire protocol against a local TCP fixture; not the user gamma service or compositor."
+}

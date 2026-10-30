@@ -1,0 +1,28 @@
+{
+  "before": {
+    "capabilities_median_ms": 2.752,
+    "capabilities_measured_runs": 20,
+    "backend_first_metrics_ms": 3.25,
+    "sample_seconds": 20.0,
+    "backend_peak_rss_KiB": 3496,
+    "cpu_user_seconds": 0.001583,
+    "cpu_system_seconds": 0.001583,
+    "voluntary_context_switches": 4,
+    "involuntary_context_switches": 0,
+    "metric_messages_total": 2,
+    "scope": "wait4 accounting of isolated native backend, including startup, shutdown and reaped-child usage; empty temporary Desktop, unavailable buses. Context switches are not wakeups. One startup sample. Not steady desktop RAM/CPU."
+  },
+  "after": {
+    "capabilities_median_ms": 2.862,
+    "capabilities_measured_runs": 20,
+    "backend_first_metrics_ms": 3.415,
+    "sample_seconds": 20.0,
+    "backend_peak_rss_KiB": 3540,
+    "cpu_user_seconds": 0.003204,
+    "cpu_system_seconds": 0.002108,
+    "voluntary_context_switches": 8,
+    "involuntary_context_switches": 0,
+    "metric_messages_total": 2,
+    "scope": "wait4 accounting of isolated native backend, including startup, shutdown and reaped-child usage; empty temporary Desktop, unavailable buses. Context switches are not wakeups. One startup sample. Not steady desktop RAM/CPU."
+  }
+}

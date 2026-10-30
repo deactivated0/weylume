@@ -1,0 +1,86 @@
+[
+  {
+    "command": "network-data",
+    "mode": "network",
+    "calls": 9,
+    "exit": 0
+  },
+  {
+    "command": "wifi-power",
+    "mode": "network",
+    "calls": 2,
+    "exit": 0
+  },
+  {
+    "command": "session",
+    "mode": "network",
+    "calls": 8,
+    "exit": 0
+  },
+  {
+    "command": "power-profile",
+    "mode": "network",
+    "calls": 5,
+    "exit": 0
+  },
+  {
+    "command": "network-activate",
+    "mode": "agent",
+    "calls": 17,
+    "exit": 0
+  },
+  {
+    "command": "session",
+    "mode": "lock-refuse",
+    "calls": 6,
+    "exit": 1
+  },
+  {
+    "command": "calendar-notify",
+    "mode": "network",
+    "calls": 2,
+    "exit": 0
+  },
+  {
+    "command": "calendar-notify",
+    "mode": "notify-reject",
+    "calls": 2,
+    "exit": 1
+  },
+  {
+    "command": "network-activate",
+    "mode": "agent-cancel",
+    "calls": 17,
+    "exit": 1
+  },
+  {
+    "command": "bluetooth-pair",
+    "mode": "bluetooth-pin",
+    "calls": 6,
+    "exit": 0
+  },
+  {
+    "command": "bluetooth-pair",
+    "mode": "bluetooth-passkey",
+    "calls": 6,
+    "exit": 0
+  },
+  {
+    "command": "bluetooth-pair",
+    "mode": "bluetooth-confirm",
+    "calls": 6,
+    "exit": 0
+  },
+  {
+    "command": "bluetooth-pair",
+    "mode": "bluetooth-authorization",
+    "calls": 6,
+    "exit": 0
+  },
+  {
+    "command": "bluetooth-pair",
+    "mode": "bluetooth-cancel",
+    "calls": 7,
+    "exit": 1
+  }
+]

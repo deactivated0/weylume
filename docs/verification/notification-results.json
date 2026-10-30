@@ -1,0 +1,5 @@
+{
+  "exit_code": 0,
+  "output": "qml: PASS: 10 notification lifecycle checks\n",
+  "scope": "Actual Qt QML 6.4.2 engine, extracted production lifecycle functions with mock notifications; no Quickshell signals or rendering."
+}

@@ -1,0 +1,43 @@
+{
+  "unchanged_qml_files": [
+    "AudioMixer.qml",
+    "CalendarService.qml",
+    "ClipboardPanel.qml",
+    "MetricBar.qml",
+    "NotificationCenter.qml",
+    "Osd.qml",
+    "OsdService.qml",
+    "PinnedApps.qml",
+    "PolkitDialog.qml",
+    "QuickSettings.qml",
+    "SessionDialog.qml",
+    "SettingsButton.qml",
+    "SettingsCenter.qml",
+    "SettingsField.qml",
+    "SettingsService.qml",
+    "SettingsToggle.qml",
+    "StartFavorites.qml",
+    "StartMenu.qml",
+    "SystemMonitor.qml",
+    "TaskContextMenu.qml",
+    "Taskbar.qml",
+    "Theme.qml",
+    "TrayConfig.qml",
+    "TrayOverflow.qml",
+    "WinButton.qml"
+  ],
+  "checks": [
+    "Desktop.qml: only helper executable/argument substitutions",
+    "DesktopContextMenu.qml: only helper executable/argument substitutions",
+    "NewItemDialog.qml: only helper executable/argument substitutions",
+    "RecorderService.qml: only helper executable/argument substitutions",
+    "TaskPreview.qml: only helper executable/argument substitutions",
+    "NotificationService.qml: rendered subtree byte-identical",
+    "TrayItemMenu.qml: rendered subtree byte-identical",
+    "shell.qml: only separate device-monitor Process removed"
+  ],
+  "assets": "31 files byte-identical",
+  "stored_json": "11 files byte-identical",
+  "remaining_changed_files": "AudioService, ClipboardService, NightLightService, ShellState, SystemData and SystemService contain non-rendering service logic changes. Tray popup window geometry/style properties retained; unused menu anchor and poller removed.",
+  "limitation": "Source preservation is not a screenshot or interaction-equivalence test."
+}

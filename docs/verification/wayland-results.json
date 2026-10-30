@@ -1,0 +1,51 @@
+[
+  {
+    "mode": "snapshot",
+    "exit": 0,
+    "configurationRequests": 0,
+    "wireRequests": 4,
+    "stderr": ""
+  },
+  {
+    "mode": "keep",
+    "exit": 0,
+    "configurationRequests": 2,
+    "wireRequests": 21,
+    "stderr": ""
+  },
+  {
+    "mode": "revert",
+    "exit": 0,
+    "configurationRequests": 4,
+    "wireRequests": 40,
+    "stderr": ""
+  },
+  {
+    "mode": "reject",
+    "exit": 1,
+    "configurationRequests": 1,
+    "wireRequests": 12,
+    "stderr": "weylume-native: Display configuration rejected\n"
+  },
+  {
+    "mode": "apply-failure",
+    "exit": 1,
+    "configurationRequests": 3,
+    "wireRequests": 30,
+    "stderr": "weylume-native: Display configuration rejected\n"
+  },
+  {
+    "mode": "eof",
+    "exit": 0,
+    "configurationRequests": 4,
+    "wireRequests": 40,
+    "stderr": ""
+  },
+  {
+    "mode": "timeout",
+    "exit": 0,
+    "configurationRequests": 4,
+    "wireRequests": 40,
+    "stderr": ""
+  }
+]

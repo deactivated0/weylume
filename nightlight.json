@@ -1,0 +1,9 @@
+{
+  "enabled": false,
+  "temperature": 4950,
+  "autoSchedule": true,
+  "startHour": 21,
+  "startMinute": 0,
+  "endHour": 6,
+  "endMinute": 0
+}

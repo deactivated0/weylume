@@ -1,0 +1,44 @@
+{
+  "environment": "Ubuntu 24.04 container; no compositor/session services and socket creation unavailable. Warm helper-only runs; not full-desktop measurements.",
+  "one_shot": {
+    "original_capabilities": {
+      "median_ms": 41.91,
+      "runs": 15
+    },
+    "rust_capabilities": {
+      "median_ms": 3.031,
+      "runs": 15
+    },
+    "original_text_capture": {
+      "median_ms": 23.132,
+      "runs": 15
+    },
+    "rust_text_capture": {
+      "median_ms": 2.296,
+      "runs": 15
+    }
+  },
+  "backend": {
+    "original_C_metrics": {
+      "duration_s": 30.0,
+      "interval_ms": 1000,
+      "peak_rss_kib": 12544,
+      "user_cpu_seconds": 0.0,
+      "system_cpu_seconds": 0.01184,
+      "cpu_percent_including_startup": 0.0395,
+      "voluntary_context_switches": 33,
+      "involuntary_context_switches": 0
+    },
+    "rust_combined_backend": {
+      "duration_s": 30.0,
+      "interval_ms": 1000,
+      "peak_rss_kib": 12544,
+      "user_cpu_seconds": 0.01627,
+      "system_cpu_seconds": 0.0,
+      "cpu_percent_including_startup": 0.0542,
+      "voluntary_context_switches": 32,
+      "involuntary_context_switches": 0
+    }
+  },
+  "limitations": "rusage peak RSS is not idle RSS. CPU includes startup. Context switches are not hardware CPU wakeups. The C backend does fewer jobs than the merged Rust backend; removed Python/udevadm/nmcli monitors cannot be measured as a real desktop process tree here."
+}

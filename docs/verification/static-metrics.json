@@ -1,0 +1,50 @@
+{
+  "baseline": "delivered version 3 before the approved 33-item roadmap",
+  "before": {
+    "qml_files": 39,
+    "qml_lines": 13895,
+    "rust_implementation_files": 11,
+    "rust_implementation_lines": 3325,
+    "rust_test_files": 1,
+    "rust_test_lines": 382,
+    "production_lines": 17220,
+    "non_qml_rust_implementation_files": 0,
+    "qml_object_declarations": 1484,
+    "qml_timer_declarations": 20,
+    "qml_process_declarations": 15,
+    "qml_connections_declarations": 10,
+    "qml_initialized_property_declarations": 425,
+    "qml_import_statements": 160,
+    "qml_detached_call_sites": 56,
+    "direct_rust_crates": 5,
+    "rust_binary_count": 1,
+    "rust_binary_bytes": 992192
+  },
+  "after": {
+    "qml_files": 51,
+    "qml_lines": 14730,
+    "rust_implementation_files": 24,
+    "rust_implementation_lines": 7382,
+    "rust_test_files": 1,
+    "rust_test_lines": 449,
+    "production_lines": 22112,
+    "non_qml_rust_implementation_files": 0,
+    "qml_object_declarations": 1644,
+    "qml_timer_declarations": 22,
+    "qml_process_declarations": 23,
+    "qml_connections_declarations": 19,
+    "qml_initialized_property_declarations": 497,
+    "qml_import_statements": 211,
+    "qml_detached_call_sites": 54,
+    "direct_rust_crates": 5,
+    "rust_binary_count": 1,
+    "rust_binary_bytes": 1307704
+  },
+  "unchanged_asset_and_theme_files": 32,
+  "changed_asset_and_theme_files": [],
+  "limits": [
+    "Static declarations are not live object/process/binding counts.",
+    "Line counts include comments, blank lines and generated Wayland protocol metadata.",
+    "Feature expansion increases source and executable size; not a pure optimization delta."
+  ]
+}

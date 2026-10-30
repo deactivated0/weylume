@@ -1,0 +1,20 @@
+{
+  "pinned": [
+    "easyeffects",
+    "sys-language",
+    "sys-notifications",
+    "sys-audio",
+    "sys-brightness",
+    "sys-bluetooth",
+    "sys-ethernet",
+    "AyuGramDesktop",
+    "steam",
+    "discord-ptb_status_icon_1"
+  ],
+  "hidden": [
+    "1",
+    "sys-wifi",
+    "discord-development_status_icon_1",
+    "discord_status_icon_1"
+  ]
+}

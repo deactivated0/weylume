@@ -1,0 +1,25 @@
+[package]
+name = "weylume-native"
+version = "1.0.0"
+edition = "2021"
+rust-version = "1.82"
+publish = false
+
+[[bin]]
+name = "weylume-native"
+path = "src/main.rs"
+
+[dependencies]
+libc = "0.2"
+serde_json = "1"
+xmltree = "0.11"
+sha2 = "0.10"
+base64 = "0.22"
+md5 = "0.8"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

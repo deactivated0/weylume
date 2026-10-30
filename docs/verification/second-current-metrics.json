@@ -1,0 +1,50 @@
+{
+  "baseline": "saved bug-fix release version 2",
+  "before": {
+    "qml_files": 39,
+    "qml_lines": 13844,
+    "rust_implementation_files": 11,
+    "rust_implementation_lines": 3086,
+    "rust_test_files": 1,
+    "rust_test_lines": 318,
+    "non_qml_rust_source_files": 0,
+    "qml_object_declarations": 1484,
+    "qml_timer_declarations": 20,
+    "qml_process_declarations": 15,
+    "qml_connections_declarations": 10,
+    "qml_initialized_property_declarations": 418,
+    "qml_import_statements": 161,
+    "qml_detached_call_sites": 56,
+    "direct_rust_crates": 5,
+    "rust_binary_count": 1,
+    "rust_binary_bytes": 976392,
+    "production_lines": 16930,
+    "lines_with_tests": 17248
+  },
+  "after": {
+    "qml_files": 39,
+    "qml_lines": 13895,
+    "rust_implementation_files": 11,
+    "rust_implementation_lines": 3325,
+    "rust_test_files": 1,
+    "rust_test_lines": 382,
+    "non_qml_rust_source_files": 0,
+    "qml_object_declarations": 1484,
+    "qml_timer_declarations": 20,
+    "qml_process_declarations": 15,
+    "qml_connections_declarations": 10,
+    "qml_initialized_property_declarations": 425,
+    "qml_import_statements": 160,
+    "qml_detached_call_sites": 56,
+    "direct_rust_crates": 5,
+    "rust_binary_count": 1,
+    "rust_binary_bytes": 992192,
+    "production_lines": 17220,
+    "lines_with_tests": 17602
+  },
+  "limitations": [
+    "Line totals include blanks/comments; production source excludes Rust tests.",
+    "QML declarations are static counts; active binding counts, object instances and actual IPC/wakeups depend on runtime.",
+    "No new daemon or QML timer; healthy gamma writes avoid the former one-shot helper. Existing fallback declarations remain."
+  ]
+}

@@ -1,0 +1,56 @@
+module qs
+singleton StateStore 1.0 StateStore.qml
+singleton Theme 1.0 Theme.qml
+singleton ShellState 1.0 ShellState.qml
+singleton SettingsService 1.0 SettingsService.qml
+singleton SystemService 1.0 SystemService.qml
+singleton OsdService 1.0 OsdService.qml
+singleton RecorderService 1.0 RecorderService.qml
+singleton ClipboardService 1.0 ClipboardService.qml
+singleton SystemData 1.0 SystemData.qml
+singleton PinnedApps 1.0 PinnedApps.qml
+singleton StartFavorites 1.0 StartFavorites.qml
+singleton TrayConfig 1.0 TrayConfig.qml
+singleton NotificationService 1.0 NotificationService.qml
+singleton NightLightService 1.0 NightLightService.qml
+singleton CalendarService 1.0 CalendarService.qml
+singleton AudioService 1.0 AudioService.qml
+Desktop 1.0 Desktop.qml
+DesktopContextMenu 1.0 DesktopContextMenu.qml
+DragOverlay 1.0 DragOverlay.qml
+MetricBar 1.0 MetricBar.qml
+NewItemDialog 1.0 NewItemDialog.qml
+NotificationCenter 1.0 NotificationCenter.qml
+PolkitDialog 1.0 PolkitDialog.qml
+QuickSettings 1.0 QuickSettings.qml
+StartMenu 1.0 StartMenu.qml
+SystemMonitor 1.0 SystemMonitor.qml
+Taskbar 1.0 Taskbar.qml
+TaskContextMenu 1.0 TaskContextMenu.qml
+TrayOverflow 1.0 TrayOverflow.qml
+TrayItemMenu 1.0 TrayItemMenu.qml
+WinButton 1.0 WinButton.qml
+TaskPreview 1.0 TaskPreview.qml
+AudioMixer 1.0 AudioMixer.qml
+SettingsCenter 1.0 SettingsCenter.qml
+ClipboardPanel 1.0 ClipboardPanel.qml
+EmojiPicker 1.0 EmojiPicker.qml
+SessionDialog 1.0 SessionDialog.qml
+Osd 1.0 Osd.qml
+SettingsToggle 1.0 SettingsToggle.qml
+SettingsButton 1.0 SettingsButton.qml
+SettingsField 1.0 SettingsField.qml
+SettingsGroup 1.0 SettingsGroup.qml
+singleton WorkspaceService 1.0 WorkspaceService.qml
+singleton BluetoothService 1.0 BluetoothService.qml
+BluetoothPairDialog 1.0 BluetoothPairDialog.qml
+singleton IntegrationService 1.0 IntegrationService.qml
+singleton GamingService 1.0 GamingService.qml
+WindowPicker 1.0 WindowPicker.qml
+NetworkAuthDialog 1.0 NetworkAuthDialog.qml
+singleton OutputService 1.0 OutputService.qml
+SettingsChoice 1.0 SettingsChoice.qml
+IntegrationsPage 1.0 IntegrationsPage.qml
+AutostartPage 1.0 AutostartPage.qml
+singleton AutostartService 1.0 AutostartService.qml
+singleton NetworkService 1.0 NetworkService.qml

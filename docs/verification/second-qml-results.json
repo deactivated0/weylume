@@ -1,0 +1,33 @@
+{
+  "algorithm_comparisons": 6348,
+  "queue_comparisons": 29400,
+  "prototype_key_bug_fixed": true,
+  "request_lifecycle_checks": "passed",
+  "benchmark": [
+    {
+      "screens": 1,
+      "old_ms": 35.85331199999996,
+      "new_ms": 16.765103999999837,
+      "reduction_percent": 53.23973417016576,
+      "iterations": 700,
+      "repeats": 5
+    },
+    {
+      "screens": 2,
+      "old_ms": 69.62971400000015,
+      "new_ms": 25.39086099999986,
+      "reduction_percent": 63.53444594070887,
+      "iterations": 700,
+      "repeats": 5
+    },
+    {
+      "screens": 4,
+      "old_ms": 143.47487899999987,
+      "new_ms": 43.144250000000284,
+      "reduction_percent": 69.92905636114854,
+      "iterations": 700,
+      "repeats": 5
+    }
+  ],
+  "limitation": "Extracted production function bodies in Node; verifies data/queue behavior and algorithm cost, not Qt binding tracking or live UI."
+}

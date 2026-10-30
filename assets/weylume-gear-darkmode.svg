@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Weylume settings gear icon">
+  <title>Weylume settings gear icon</title>
+  <defs>
+    <mask id="gear-cutout">
+      <rect width="256" height="256" fill="white"/>
+      <circle cx="128" cy="128" r="34" fill="black"/>
+    </mask>
+  </defs>
+  <g mask="url(#gear-cutout)">
+    <polygon points="110.98,31.49 145.02,31.49 143.15,59.66 184.21,47.72 208.28,71.79 187.04,90.39 224.51,110.98 224.51,145.02 196.34,143.15 208.28,184.21 184.21,208.28 165.61,187.04 145.02,224.51 110.98,224.51 112.85,196.34 71.79,208.28 47.72,184.21 68.96,165.61 31.49,145.02 31.49,110.98 59.66,112.85 47.72,71.79 71.79,47.72 90.39,68.96" fill="#F5F5F5" stroke="none"/>
+    <circle cx="128" cy="128" r="70" fill="#F5F5F5"/>
+  </g>
+</svg>

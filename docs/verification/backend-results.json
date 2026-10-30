@@ -1,0 +1,11 @@
+{
+  "passed": 6,
+  "checks": [
+    "desktop payload equality including Unicode and symlink",
+    "initial metric schema",
+    "stable metric field equality",
+    "desktop create event equality",
+    "Desktop directory replacement and subsequent events",
+    "stdin EOF exit"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "qml_changed": [
+    "ClipboardService.qml",
+    "NotificationService.qml",
+    "RecorderService.qml",
+    "TaskPreview.qml"
+  ],
+  "qml_byte_identical": 35,
+  "svg_byte_identical": 31,
+  "json_byte_identical": 11,
+  "binary_bytes": 976392,
+  "non_qml_rust_implementation_sources": 0
+}

@@ -1,0 +1,8 @@
+{
+  "steady_wait_seconds": 6.0,
+  "cpu_seconds_including_startup_call_and_exit": 0.005713,
+  "peak_rss_kib": 3652,
+  "voluntary_context_switches_including_startup_call_and_exit": 10,
+  "metrics_received": 6,
+  "limitation": "Isolated backend plus native sd-bus against a TCP fixture. Not whole-shell idle RAM/CPU or power wakeups."
+}

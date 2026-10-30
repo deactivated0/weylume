@@ -1,0 +1,10 @@
+{
+  "passed": 4,
+  "checks": [
+    "two pending properties complete; excess request rejected without mutation",
+    "invalid property rejected",
+    "100 repeated requests release completed slots and reuse the connection",
+    "stdin close cancels pending calls and exits without waiting for D-Bus timeout"
+  ],
+  "limitation": "Native sd-bus against test-only TCP fixture; no target compositor."
+}

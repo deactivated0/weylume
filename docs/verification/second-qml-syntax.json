@@ -1,0 +1,7 @@
+{
+  "tool": "qmllint 6.4.2",
+  "mode": "Syntax only; Quickshell imports are unavailable. Semantic warnings disabled.",
+  "files": 39,
+  "exit_code": 0,
+  "output": ""
+}

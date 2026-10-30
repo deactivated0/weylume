@@ -1,0 +1,117 @@
+{
+  "passed": 17,
+  "processes": [
+    {
+      "kind": "Audio/Sink",
+      "selected": true,
+      "effects": true,
+      "old": 16,
+      "new": 0
+    },
+    {
+      "kind": "Audio/Sink",
+      "selected": true,
+      "effects": false,
+      "old": 16,
+      "new": 0
+    },
+    {
+      "kind": "Audio/Sink",
+      "selected": false,
+      "effects": true,
+      "old": 12,
+      "new": 0
+    },
+    {
+      "kind": "Audio/Sink",
+      "selected": false,
+      "effects": false,
+      "old": 4,
+      "new": 0
+    },
+    {
+      "kind": "Audio/Source",
+      "selected": true,
+      "effects": true,
+      "old": 16,
+      "new": 0
+    },
+    {
+      "kind": "Audio/Source",
+      "selected": true,
+      "effects": false,
+      "old": 16,
+      "new": 0
+    },
+    {
+      "kind": "Audio/Source",
+      "selected": false,
+      "effects": true,
+      "old": 12,
+      "new": 0
+    },
+    {
+      "kind": "Audio/Source",
+      "selected": false,
+      "effects": false,
+      "old": 4,
+      "new": 0
+    },
+    {
+      "kind": "Stream/Output/Audio",
+      "selected": true,
+      "effects": true,
+      "old": 4,
+      "new": 0
+    },
+    {
+      "kind": "Stream/Output/Audio",
+      "selected": true,
+      "effects": false,
+      "old": 4,
+      "new": 0
+    },
+    {
+      "kind": "Stream/Output/Audio",
+      "selected": false,
+      "effects": true,
+      "old": 4,
+      "new": 0
+    },
+    {
+      "kind": "Stream/Output/Audio",
+      "selected": false,
+      "effects": false,
+      "old": 4,
+      "new": 0
+    },
+    {
+      "kind": "Stream/Input/Audio",
+      "selected": true,
+      "effects": true,
+      "old": 4,
+      "new": 0
+    },
+    {
+      "kind": "Stream/Input/Audio",
+      "selected": true,
+      "effects": false,
+      "old": 4,
+      "new": 0
+    },
+    {
+      "kind": "Stream/Input/Audio",
+      "selected": false,
+      "effects": true,
+      "old": 4,
+      "new": 0
+    },
+    {
+      "kind": "Stream/Input/Audio",
+      "selected": false,
+      "effects": false,
+      "old": 4,
+      "new": 0
+    }
+  ]
+}

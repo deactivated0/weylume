@@ -1,0 +1,6 @@
+{
+  "exit_code": 0,
+  "output": "qml: PASS: Qt QML reactive model dependencies, 6 phases; cross-object request callbacks and cancellation\n",
+  "engine": "Qt QML 6.4.2",
+  "limitation": "Production functions and reactive bindings with mock QtObject nodes; imports and node id are adapted for the fixture. Does not verify Quickshell native types or live rendering."
+}
