@@ -1308,16 +1308,10 @@ PopupWindow {
                         Behavior on border.color { ColorAnimation { duration: 100 } }
 
                         RowLayout {
-                            anchors.centerIn: parent
-                            spacing: 7
-
-                            Image {
-                                source: Theme.moonIcon
-                                Layout.preferredWidth: 13
-                                Layout.preferredHeight: 13
-                                Layout.alignment: Qt.AlignVCenter
-                                opacity: (powerMouse.containsMouse || powerFlyout.visible) ? 1.0 : 0.85
-                            }
+                            anchors.fill: parent
+                            anchors.leftMargin: 10
+                            anchors.rightMargin: 8
+                            spacing: 6
 
                             Text {
                                 text: "Sleep"
@@ -1325,6 +1319,24 @@ PopupWindow {
                                 font.family: Theme.fontFamily
                                 font.pixelSize: 12
                                 font.weight: Font.Medium
+                                Layout.alignment: Qt.AlignVCenter
+                            }
+
+                            Item {
+                                Layout.fillWidth: true
+                            }
+
+                            Rectangle {
+                                Layout.preferredWidth: 1
+                                Layout.preferredHeight: 14
+                                color: Theme.isDark ? "#282834" : "#D4D4DC"
+                                Layout.alignment: Qt.AlignVCenter
+                            }
+
+                            Text {
+                                text: "▾"
+                                color: Theme.muted
+                                font.pixelSize: 9
                                 Layout.alignment: Qt.AlignVCenter
                             }
                         }
