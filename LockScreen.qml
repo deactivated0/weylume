@@ -113,25 +113,13 @@ Scope {
                         }
                     }
 
-                    // CENTER: Username and Password Pill Form
+                    // CENTER: Password Pill Form
                     Column {
                         id: loginCol
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: Math.max(105, Math.min(170, lockRoot.height * 0.144))
                         spacing: 0
-
-                        // Username
-                        Text {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            bottomPadding: 16
-                            text: SettingsService.lockscreenUserName ? SettingsService.lockscreenUserName : (Quickshell.env("USER") || "pc")
-                            color: "#FFFFFF"
-                            font.family: Theme.fontFamily
-                            font.pixelSize: 21
-                            font.weight: Font.DemiBold
-                            font.letterSpacing: -0.35
-                        }
 
                         // Password / PIN Form Pill (Pure AMOLED)
                         Item {
@@ -303,32 +291,36 @@ Scope {
                     Row {
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.bottom: parent.bottom
-                        anchors.bottomMargin: Math.max(28, 32)
-                        spacing: Math.max(30, Math.min(44, lockRoot.width * 0.03))
+                        anchors.bottomMargin: Math.max(28, 34)
+                        spacing: Math.max(34, Math.min(52, lockRoot.width * 0.038))
 
                         // Sleep
                         Column {
-                            spacing: 7
-                            width: 50
+                            spacing: 8
+                            width: 56
 
                             Rectangle {
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                width: 35
-                                height: 35
-                                radius: 17.5
-                                color: sleepMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.25) : Qt.rgba(1, 1, 1, 0.12)
+                                width: 40
+                                height: 40
+                                radius: 20
+                                color: sleepMouse.pressed ? Qt.rgba(1, 1, 1, 0.22) : (sleepMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(1, 1, 1, 0.06))
                                 border.width: 1
-                                border.color: Qt.rgba(1, 1, 1, 0.16)
+                                border.color: sleepMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.35) : Qt.rgba(1, 1, 1, 0.14)
                                 y: sleepMouse.containsMouse ? -2 : 0
+                                scale: sleepMouse.pressed ? 0.94 : 1.0
 
                                 Behavior on y { NumberAnimation { duration: 120 } }
+                                Behavior on scale { NumberAnimation { duration: 100 } }
                                 Behavior on color { ColorAnimation { duration: 120 } }
+                                Behavior on border.color { ColorAnimation { duration: 120 } }
 
                                 Image {
                                     anchors.centerIn: parent
-                                    width: 16
-                                    height: 16
+                                    width: 17
+                                    height: 17
                                     source: "assets/moon.svg"
+                                    opacity: sleepMouse.containsMouse ? 1.0 : 0.8
                                 }
 
                                 MouseArea {
@@ -343,36 +335,41 @@ Scope {
                             Text {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: "Sleep"
-                                color: Qt.rgba(1, 1, 1, 0.92)
+                                color: sleepMouse.containsMouse ? "#FFFFFF" : Qt.rgba(1, 1, 1, 0.75)
                                 font.family: Theme.fontFamily
-                                font.pixelSize: 10
+                                font.pixelSize: 11
                                 font.weight: Font.Medium
+                                font.letterSpacing: -0.2
                             }
                         }
 
                         // Restart
                         Column {
-                            spacing: 7
-                            width: 50
+                            spacing: 8
+                            width: 56
 
                             Rectangle {
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                width: 35
-                                height: 35
-                                radius: 17.5
-                                color: restartMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.25) : Qt.rgba(1, 1, 1, 0.12)
+                                width: 40
+                                height: 40
+                                radius: 20
+                                color: restartMouse.pressed ? Qt.rgba(1, 1, 1, 0.22) : (restartMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(1, 1, 1, 0.06))
                                 border.width: 1
-                                border.color: Qt.rgba(1, 1, 1, 0.16)
+                                border.color: restartMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.35) : Qt.rgba(1, 1, 1, 0.14)
                                 y: restartMouse.containsMouse ? -2 : 0
+                                scale: restartMouse.pressed ? 0.94 : 1.0
 
                                 Behavior on y { NumberAnimation { duration: 120 } }
+                                Behavior on scale { NumberAnimation { duration: 100 } }
                                 Behavior on color { ColorAnimation { duration: 120 } }
+                                Behavior on border.color { ColorAnimation { duration: 120 } }
 
                                 Image {
                                     anchors.centerIn: parent
-                                    width: 15
-                                    height: 15
-                                    source: "assets/flask.svg"
+                                    width: 17
+                                    height: 17
+                                    source: "assets/restart.svg"
+                                    opacity: restartMouse.containsMouse ? 1.0 : 0.8
                                 }
 
                                 MouseArea {
@@ -387,36 +384,41 @@ Scope {
                             Text {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: "Restart"
-                                color: Qt.rgba(1, 1, 1, 0.92)
+                                color: restartMouse.containsMouse ? "#FFFFFF" : Qt.rgba(1, 1, 1, 0.75)
                                 font.family: Theme.fontFamily
-                                font.pixelSize: 10
+                                font.pixelSize: 11
                                 font.weight: Font.Medium
+                                font.letterSpacing: -0.2
                             }
                         }
 
                         // Shut Down
                         Column {
-                            spacing: 7
-                            width: 50
+                            spacing: 8
+                            width: 56
 
                             Rectangle {
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                width: 35
-                                height: 35
-                                radius: 17.5
-                                color: shutMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.25) : Qt.rgba(1, 1, 1, 0.12)
+                                width: 40
+                                height: 40
+                                radius: 20
+                                color: shutMouse.pressed ? Qt.rgba(1, 1, 1, 0.22) : (shutMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.14) : Qt.rgba(1, 1, 1, 0.06))
                                 border.width: 1
-                                border.color: Qt.rgba(1, 1, 1, 0.16)
+                                border.color: shutMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.35) : Qt.rgba(1, 1, 1, 0.14)
                                 y: shutMouse.containsMouse ? -2 : 0
+                                scale: shutMouse.pressed ? 0.94 : 1.0
 
                                 Behavior on y { NumberAnimation { duration: 120 } }
+                                Behavior on scale { NumberAnimation { duration: 100 } }
                                 Behavior on color { ColorAnimation { duration: 120 } }
+                                Behavior on border.color { ColorAnimation { duration: 120 } }
 
                                 Image {
                                     anchors.centerIn: parent
-                                    width: 15
-                                    height: 15
-                                    source: "assets/power.svg"
+                                    width: 17
+                                    height: 17
+                                    source: "assets/shutdown.svg"
+                                    opacity: shutMouse.containsMouse ? 1.0 : 0.8
                                 }
 
                                 MouseArea {
@@ -431,10 +433,11 @@ Scope {
                             Text {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: "Shut Down"
-                                color: Qt.rgba(1, 1, 1, 0.92)
+                                color: shutMouse.containsMouse ? "#FFFFFF" : Qt.rgba(1, 1, 1, 0.75)
                                 font.family: Theme.fontFamily
-                                font.pixelSize: 10
+                                font.pixelSize: 11
                                 font.weight: Font.Medium
+                                font.letterSpacing: -0.2
                             }
                         }
                     }

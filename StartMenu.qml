@@ -1291,13 +1291,21 @@ PopupWindow {
                         Layout.fillWidth: true
                     }
 
-                    // Sleep Power Button (Transparent on idle)
+                    // Sleep Power Button (Elegant pill button)
                     Rectangle {
-                        implicitWidth: 98
-                        implicitHeight: 28
-                        radius: 5
-                        color: (powerMouse.containsMouse || powerFlyout.visible) ? "#1affffff" : "transparent"
-                        border.width: 0
+                        implicitWidth: 102
+                        implicitHeight: 30
+                        radius: 6
+                        color: (powerMouse.containsMouse || powerFlyout.visible)
+                            ? (Theme.isDark ? "#282834" : "#E2E2E8")
+                            : (Theme.isDark ? "#14141A" : "#F0F0F4")
+                        border.width: 1
+                        border.color: (powerMouse.containsMouse || powerFlyout.visible)
+                            ? (Theme.isDark ? "#444456" : "#D0D0DA")
+                            : (Theme.isDark ? "#22222C" : "#E2E2E6")
+
+                        Behavior on color { ColorAnimation { duration: 100 } }
+                        Behavior on border.color { ColorAnimation { duration: 100 } }
 
                         RowLayout {
                             anchors.fill: parent
@@ -1305,18 +1313,21 @@ PopupWindow {
                             anchors.rightMargin: 8
                             spacing: 6
 
-                            Text {
-                                text: "⏾"
-                                color: "#f5f5f5"
-                                font.pixelSize: 11
+                            Image {
+                                source: Theme.moonIcon
+                                Layout.preferredWidth: 13
+                                Layout.preferredHeight: 13
+                                Layout.alignment: Qt.AlignVCenter
+                                opacity: (powerMouse.containsMouse || powerFlyout.visible) ? 1.0 : 0.85
                             }
 
                             Text {
                                 text: "Sleep"
-                                color: "#f5f5f5"
+                                color: Theme.text
                                 font.family: Theme.fontFamily
                                 font.pixelSize: 12
                                 font.weight: Font.Medium
+                                Layout.alignment: Qt.AlignVCenter
                             }
 
                             Item {
@@ -1326,13 +1337,15 @@ PopupWindow {
                             Rectangle {
                                 Layout.preferredWidth: 1
                                 Layout.preferredHeight: 14
-                                color: "#24ffffff"
+                                color: Theme.isDark ? "#2C2C38" : "#D4D4DC"
+                                Layout.alignment: Qt.AlignVCenter
                             }
 
                             Text {
                                 text: "▾"
-                                color: "#bbbbbb"
+                                color: Theme.muted
                                 font.pixelSize: 9
+                                Layout.alignment: Qt.AlignVCenter
                             }
                         }
 

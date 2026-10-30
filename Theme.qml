@@ -16,4 +16,5 @@ QtObject {
     readonly property int taskbarHeight: 44
     readonly property int sidebarWidth: 240
     readonly property string settingsIcon: isDark ? Quickshell.shellPath("assets/weylume-gear-darkmode.svg") : Quickshell.shellPath("assets/weylume-gear-lightmode.svg")
+    readonly property string moonIcon: isDark ? Quickshell.shellPath("assets/moon.svg") : Quickshell.shellPath("assets/moon-dark.svg")
 }

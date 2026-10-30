@@ -554,16 +554,6 @@ PanelWindow {
         radius: 2
         color: showDesktopMouse.containsMouse ? (Theme.isDark ? "#40ffffff" : "#30000000") : "transparent"
 
-        Rectangle {
-            anchors.left: parent.left
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.topMargin: 4
-            anchors.bottomMargin: 4
-            width: 1
-            color: Theme.isDark ? "#28ffffff" : "#18000000"
-        }
-
         MouseArea {
             id: showDesktopMouse
             anchors.fill: parent
