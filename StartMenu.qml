@@ -1188,14 +1188,14 @@ PopupWindow {
                     anchors.rightMargin: 12
                     spacing: 10
 
-                    // Search input (Shorter, compact width)
+                    // Search input (Shorter, compact width, Pure AMOLED Black)
                     Rectangle {
                         Layout.preferredWidth: 210
                         implicitHeight: 28
                         radius: 6
-                        color: Theme.isDark ? "#0A0A0E" : Theme.background
+                        color: Theme.isDark ? "#000000" : Theme.background
                         border.width: 1
-                        border.color: search.activeFocus ? (Theme.isDark ? "#FFFFFF" : Theme.accent) : (Theme.isDark ? "#242430" : Theme.border)
+                        border.color: search.activeFocus ? (Theme.isDark ? "#FFFFFF" : Theme.accent) : (Theme.isDark ? "#1C1C22" : Theme.border)
 
                         MouseArea {
                             anchors.fill: parent
