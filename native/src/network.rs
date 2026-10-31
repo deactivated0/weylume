@@ -181,7 +181,7 @@ pub fn snapshot_with_bus(b: &Bus) -> Result<Value> {
             .cmp(&a["inUse"].as_bool())
             .then(b["signal"].as_u64().cmp(&a["signal"].as_u64()))
     });
-    let mut seen = HashSet::new();
+    let mut seen = HashSet::with_capacity(networks.len());
     networks.retain(|n| seen.insert(text(n, "ssid").to_string()));
     for (name, profile) in saved {
         if !seen.contains(&name) {

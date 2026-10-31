@@ -309,6 +309,7 @@ PopupWindow {
                                     anchors.centerIn: parent
                                     width: parent.width - 6
                                     height: parent.height - 6
+                                    sourceSize: Qt.size(80, 80)
                                     source: row.modelData.path ? ("file://" + row.modelData.path) : ""
                                     fillMode: Image.PreserveAspectFit
                                     smooth: true

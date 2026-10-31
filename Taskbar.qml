@@ -11,7 +11,8 @@ PanelWindow {
     property int pendingWindowActionAttempts: 0
 
     function allMatchingToplevels(appIds, label) {
-        const targets = (Array.isArray(appIds) ? appIds : (appIds ? [appIds] : [])).concat(label || "");
+        if (!appIds && !label) return [];
+        const targets = Array.isArray(appIds) ? (label && !appIds.includes(label) ? appIds.concat(label) : appIds) : (appIds ? [appIds, label].filter(Boolean) : [label].filter(Boolean));
         if (targets.length === 0) return [];
         const windows = ToplevelManager.toplevels.values;
         let matches = [];
@@ -377,9 +378,9 @@ PanelWindow {
                 accessibleName: modelData.label || "Pinned application"
                 required property var modelData
                 required property int index
-                readonly property var matches: root.allMatchingToplevels(modelData.appIds || (modelData.appId ? [modelData.appId] : [modelData.label]), modelData.label)
+                readonly property var matches: root.allMatchingToplevels(modelData._targets || modelData.appIds || (modelData.appId ? [modelData.appId] : [modelData.label]), modelData.label)
                 readonly property var runningWindow: root.primaryToplevel(matches)
-                readonly property var audioNodes: AudioService.nodesForApp(modelData.appIds || (modelData.appId ? [modelData.appId] : [modelData.label]), modelData.label)
+                readonly property var audioNodes: AudioService.nodesForApp(modelData._targets || modelData.appIds || (modelData.appId ? [modelData.appId] : [modelData.label]), modelData.label)
                 implicitWidth: 36
                 implicitHeight: 36
                 iconSize: 22
@@ -463,14 +464,7 @@ PanelWindow {
                     return desktopEntry?.name || modelData.title || modelData.appId;
                 }
                 required property var modelData
-                property var desktopEntry: {
-                    const lowId = String(modelData.appId || "").toLowerCase();
-                    const lowTitle = String(modelData.title || "").toLowerCase();
-                    if (lowId === "weylume-settings" || lowTitle === "settings" || (lowId === "org.quickshell" && lowTitle === "settings")) {
-                        return DesktopEntries.heuristicLookup("weylume-settings") || DesktopEntries.heuristicLookup("preferences-system");
-                    }
-                    return DesktopEntries.heuristicLookup(modelData.appId) || DesktopEntries.heuristicLookup(modelData.title);
-                }
+                readonly property var desktopEntry: modelData.desktopEntry !== undefined ? modelData.desktopEntry : (DesktopEntries.heuristicLookup(modelData.appId) || DesktopEntries.heuristicLookup(modelData.title))
                 readonly property var audioNodes: AudioService.nodesForApp([modelData.appId, modelData.title], desktopEntry?.name || modelData.title)
                 implicitWidth: 36
                 implicitHeight: 36

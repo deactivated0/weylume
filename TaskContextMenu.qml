@@ -355,6 +355,7 @@ PopupWindow {
                 visible: actionRoot.iconSource !== "" && status === Image.Ready
                 Layout.preferredWidth: 13
                 Layout.preferredHeight: 13
+                sourceSize: Qt.size(26, 26)
                 source: actionRoot.iconSource
                 fillMode: Image.PreserveAspectFit
             }

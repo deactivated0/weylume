@@ -27,6 +27,17 @@ fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let first = args.first().map_or("", String::as_str);
     let result = match first {
+        "launch" if args.len() >= 2 => {
+            unsafe {
+                libc::prctl(libc::PR_SET_THP_DISABLE, 1, 0, 0, 0);
+            }
+            use std::os::unix::process::CommandExt;
+            let err = std::process::Command::new(&args[1])
+                .args(&args[2..])
+                .exec();
+            eprintln!("weylume-native: exec failed: {err}");
+            std::process::exit(1);
+        }
         "network-activate" if args.len() == 3 => network_agent::activate(&args[1], &args[2]),
         "backend" => backend::main(),
         "bluetooth-pair" if args.len() >= 2 => {

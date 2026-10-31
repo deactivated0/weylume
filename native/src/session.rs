@@ -10,6 +10,27 @@ fn permission(b: &Bus, method: &str) -> String {
         .and_then(|v| v[0].as_str().map(str::to_string))
         .unwrap_or("unavailable".into())
 }
+fn get_permissions(b: &Bus) -> [(&'static str, String, bool); 4] {
+    static PERMS: std::sync::OnceLock<[(&'static str, String, bool); 4]> = std::sync::OnceLock::new();
+    if let Some(cached) = PERMS.get() {
+        return cached.clone();
+    }
+    let methods = [
+        ("Suspend", "CanSuspend"),
+        ("Hibernate", "CanHibernate"),
+        ("PowerOff", "CanPowerOff"),
+        ("Reboot", "CanReboot"),
+    ];
+    let computed = methods.map(|(key, method)| {
+        let p = permission(b, method);
+        let can = ["yes", "challenge"].contains(&p.as_str());
+        (key, p, can)
+    });
+    if computed.iter().any(|(_, p, _)| p != "unavailable") {
+        let _ = PERMS.set(computed.clone());
+    }
+    computed
+}
 pub fn status() -> Value {
     let Ok(b) = Bus::system() else {
         return json!({"canSuspend":false,"canHibernate":false,"inhibitors":[],"powerAvailable":false,"error":"System bus unavailable"});
@@ -18,14 +39,8 @@ pub fn status() -> Value {
 }
 pub fn status_with_bus(b: &Bus) -> Value {
     let mut value = json!({"inhibitors":[],"powerAvailable":true});
-    for (key, method) in [
-        ("Suspend", "CanSuspend"),
-        ("Hibernate", "CanHibernate"),
-        ("PowerOff", "CanPowerOff"),
-        ("Reboot", "CanReboot"),
-    ] {
-        let p = permission(b, method);
-        value[format!("can{key}")] = json!(["yes", "challenge"].contains(&p.as_str()));
+    for (key, p, can) in get_permissions(b) {
+        value[format!("can{key}")] = json!(can);
         value[format!("permission{key}")] = json!(p);
     }
     if let Ok(v) = b.call(LOGIN, PATH, MANAGER, "ListInhibitors", "", &[]) {

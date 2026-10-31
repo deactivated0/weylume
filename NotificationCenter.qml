@@ -20,6 +20,7 @@ PopupWindow {
     anchor.gravity: Edges.Top | Edges.Left
 
     property string currentTab: ShellState.notifCenterTab // calendar, tasks, schedule, notifications
+    property date todayDate: new Date()
     property date selectedDate: new Date()
     property date currentMonth: new Date()
     property string taskFilter: "all" // all, open, done
@@ -43,6 +44,7 @@ PopupWindow {
     onVisibleChanged: {
         if (visible) {
             currentTab = ShellState.notifCenterTab;
+            todayDate = new Date();
             selectedDate = new Date();
             currentMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
             activeModal = "";
@@ -101,13 +103,25 @@ PopupWindow {
         const _rev = calRev;
         const m = currentMonth.getMonth();
         const y = currentMonth.getFullYear();
-        const mEvs = CalendarService.events.filter(e => {
+        const evs = CalendarService.events || [];
+        let mEvsCount = 0;
+        let mEvsDone = 0;
+        for (let i = 0; i < evs.length; ++i) {
+            const e = evs[i];
+            if (!e || !e.date) continue;
             const p = parseKey(e.date);
-            return p && p.year === y && p.month === m;
-        });
-        const tasks = CalendarService.tasks;
-        const total = mEvs.length + tasks.length;
-        const done = mEvs.filter(e => e.completed).length + tasks.filter(t => t.done).length;
+            if (p && p.year === y && p.month === m) {
+                mEvsCount++;
+                if (e.completed) mEvsDone++;
+            }
+        }
+        const tasks = CalendarService.tasks || [];
+        let tasksDone = 0;
+        for (let i = 0; i < tasks.length; ++i) {
+            if (tasks[i]?.done) tasksDone++;
+        }
+        const total = mEvsCount + tasks.length;
+        const done = mEvsDone + tasksDone;
         const pct = total > 0 ? Math.round(done / total * 100) : 0;
         return { total: total, done: done, pct: pct };
     }
@@ -126,9 +140,9 @@ PopupWindow {
             const d = new Date(weekStart);
             d.setDate(weekStart.getDate() + i);
             const k = keyFor(d);
-            const evs = CalendarService.events.filter(e => e.date === k);
+            const evs = CalendarService.eventsByDate[k] || [];
             const done = evs.filter(e => e.completed).length;
-            const isToday = isSameDay(d, new Date());
+            const isToday = isSameDay(d, root.todayDate);
             const isSelected = isSameDay(d, selectedDate);
             result.push({
                 label: labels[i],
@@ -210,7 +224,7 @@ PopupWindow {
                         color: sBtnM.containsMouse ? Theme.cardHover : "transparent"
                         border.width: 1
                         border.color: sBtnM.containsMouse ? Theme.border : "transparent"
-                        Image { id: sI; anchors.centerIn: parent; width: 14; height: 14; source: "assets/search.svg"; visible: false }
+                        Image { id: sI; anchors.centerIn: parent; width: 14; height: 14; sourceSize: Qt.size(28, 28); source: "assets/search.svg"; visible: false }
                         MultiEffect { anchors.fill: sI; source: sI; colorization: 1.0; colorizationColor: Theme.text }
                         MouseArea { id: sBtnM; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.activeModal = "search" }
                     }
@@ -219,7 +233,7 @@ PopupWindow {
                         color: addBtnM.containsMouse ? Theme.cardHover : "transparent"
                         border.width: 1
                         border.color: addBtnM.containsMouse ? Theme.border : "transparent"
-                        Image { id: aI; anchors.centerIn: parent; width: 14; height: 14; source: "assets/plus.svg"; visible: false }
+                        Image { id: aI; anchors.centerIn: parent; width: 14; height: 14; sourceSize: Qt.size(28, 28); source: "assets/plus.svg"; visible: false }
                         MultiEffect { anchors.fill: aI; source: aI; colorization: 1.0; colorizationColor: Theme.text }
                         MouseArea {
                             id: addBtnM; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
@@ -236,7 +250,7 @@ PopupWindow {
                         color: cfgBtnM.containsMouse ? Theme.cardHover : "transparent"
                         border.width: 1
                         border.color: cfgBtnM.containsMouse ? Theme.border : "transparent"
-                        Image { id: cI; anchors.centerIn: parent; width: 14; height: 14; source: "assets/settings.svg"; visible: false }
+                        Image { id: cI; anchors.centerIn: parent; width: 14; height: 14; sourceSize: Qt.size(28, 28); source: "assets/settings.svg"; visible: false }
                         MultiEffect { anchors.fill: cI; source: cI; colorization: 1.0; colorizationColor: Theme.accent }
                         MouseArea { id: cfgBtnM; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: root.activeModal = "settings" }
                     }
@@ -317,9 +331,9 @@ PopupWindow {
                                         Layout.fillHeight: true
                                         radius: 10
                                         readonly property bool isSelected: root.isSameDay(modelData, root.selectedDate)
-                                        readonly property bool isToday: root.isSameDay(modelData, new Date())
+                                        readonly property bool isToday: root.isSameDay(modelData, root.todayDate)
                                         readonly property bool isOutside: modelData.getMonth() !== root.currentMonth.getMonth()
-                                        readonly property var dayEvents: CalendarService.events.filter(e => e.date === root.keyFor(modelData))
+                                        readonly property var dayEvents: CalendarService.eventsByDate[root.keyFor(modelData)] || []
 
                                         color: isSelected ? Theme.accent : (cellMouse.containsMouse ? Theme.cardHover : "transparent")
                                         border.width: (isToday && !isSelected) ? 1 : 0
@@ -404,7 +418,7 @@ PopupWindow {
                                     }
                                 }
 
-                                readonly property var selEvents: CalendarService.events.filter(e => e.date === root.keyFor(root.selectedDate))
+                                readonly property var selEvents: CalendarService.eventsByDate[root.keyFor(root.selectedDate)] || []
 
                                 Text {
                                     visible: parent.selEvents.length === 0
@@ -443,6 +457,7 @@ PopupWindow {
                                                     id: evI
                                                     anchors.centerIn: parent
                                                     width: 14; height: 14
+                                                    sourceSize: Qt.size(28, 28)
                                                     source: "assets/" + root.typeIcon(evRow.modelData.type) + ".svg"
                                                     visible: false
                                                 }
@@ -782,11 +797,14 @@ PopupWindow {
                                     required property int index
                                     readonly property int hour: index + 7
                                     readonly property string hourStr: (hour < 10 ? "0" + hour : "" + hour) + ":00"
-                                    readonly property var hourEvs: CalendarService.events.filter(e => {
-                                        if (e.date !== root.keyFor(root.selectedDate) || !e.start) return false;
-                                        const h = parseInt(e.start.split(":")[0]);
-                                        return h === hour;
-                                    })
+                                    readonly property var hourEvs: {
+                                        const dayEvs = CalendarService.eventsByDate[root.keyFor(root.selectedDate)];
+                                        if (!dayEvs || dayEvs.length === 0) return [];
+                                        return dayEvs.filter(e => {
+                                            if (!e || !e.start) return false;
+                                            return parseInt(e.start) === hour;
+                                        });
+                                    }
 
                                     Layout.fillWidth: true
                                     implicitHeight: Math.max(38, hourEvs.length * 36 + 6)
@@ -920,6 +938,7 @@ PopupWindow {
                                         Image {
                                             anchors.centerIn: parent
                                             width: 16; height: 16
+                                            sourceSize: Qt.size(32, 32)
                                             source: {
                                                 const img = notifCenterCard.modelData.image;
                                                 if (img && !img.startsWith("image://qsimage/")) return img;
@@ -1256,6 +1275,7 @@ PopupWindow {
                                     Image {
                                         id: bNavI
                                         anchors.fill: parent
+                                        sourceSize: Qt.size(26, 26)
                                         source: "assets/" + parent.parent.parent.modelData.icon + ".svg"
                                         visible: false
                                     }

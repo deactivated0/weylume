@@ -58,6 +58,7 @@ Rectangle {
             Image {
                 anchors.centerIn: parent
                 width: 14; height: 14
+                sourceSize: Qt.size(28, 28)
                 source: root.iconSource
             }
         }

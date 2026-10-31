@@ -112,6 +112,7 @@ FloatingWindow {
 
                             Image {
                                 width: 14; height: 14
+                                sourceSize: Qt.size(28, 28)
                                 source: "assets/settings.svg"
                                 opacity: 0.9
                             }
@@ -148,6 +149,7 @@ FloatingWindow {
 
                             Image {
                                 width: 12; height: 12
+                                sourceSize: Qt.size(24, 24)
                                 source: "assets/search.svg"
                                 opacity: 0.55
                             }
@@ -239,6 +241,7 @@ FloatingWindow {
                                             Image {
                                                 anchors.centerIn: parent
                                                 width: 13; height: 13
+                                                sourceSize: Qt.size(26, 26)
                                                 source: navRow.modelData.icon
                                                 opacity: root.page === navRow.modelData.id ? 1.0 : 0.6
                                             }
@@ -1146,6 +1149,7 @@ FloatingWindow {
                                             Image {
                                                 anchors.centerIn: parent
                                                 width: 14; height: 14
+                                                sourceSize: Qt.size(28, 28)
                                                 source: "assets/settings.svg"
                                                 opacity: 0.8
                                             }

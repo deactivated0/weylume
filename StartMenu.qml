@@ -465,8 +465,12 @@ PopupWindow {
 
             seenNames.add(nameKey);
             if (idKey) seenIds.add(idKey);
+            app._lcName = nameKey;
+            app._lcId = idKey;
+            app._lcComment = (app.comment || "").toLowerCase();
             unique.push(app);
         }
+        unique.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
         _internalCache.deduplicated = unique;
         return unique;
     }
@@ -478,12 +482,10 @@ PopupWindow {
         readonly property var values: {
             const query = search.text.trim().toLowerCase();
             if (!query) return [];
-            let apps = root.deduplicatedApps.filter(entry => {
+            return root.deduplicatedApps.filter(entry => {
                 if (!entry || !entry.name) return false;
-                return commandMode || entry.name.toLowerCase().includes(query);
+                return commandMode || (entry._lcName || entry.name.toLowerCase()).includes(query);
             });
-            apps.sort((a, b) => a.name.localeCompare(b.name));
-            return apps;
         }
     }
 

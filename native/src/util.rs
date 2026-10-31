@@ -189,7 +189,7 @@ pub fn nonblock(fd: i32) {
 }
 pub fn emit(v: &Value) -> io::Result<()> {
     let out = io::stdout();
-    let mut out = out.lock();
+    let mut out = io::BufWriter::with_capacity(4096, out.lock());
     serde_json::to_writer(&mut out, v)?;
     out.write_all(b"\n")?;
     out.flush()

@@ -356,19 +356,19 @@ PopupWindow {
                         spacing: 4
                         Rectangle {
                             width: 32; height: 32; radius: 16; color: searchBtnMouse.containsMouse ? Theme.cardHover : "transparent"
-                            Image { id: sIcon; anchors.centerIn: parent; width: 14; height: 14; source: "assets/search.svg"; visible: false }
+                            Image { id: sIcon; anchors.centerIn: parent; width: 14; height: 14; sourceSize: Qt.size(28, 28); source: "assets/search.svg"; visible: false }
                             MultiEffect { anchors.fill: sIcon; source: sIcon; colorization: 1.0; colorizationColor: Theme.accent }
                             MouseArea { id: searchBtnMouse; anchors.fill: parent; hoverEnabled: true; onClicked: root.searchOpen = !root.searchOpen }
                         }
                         Rectangle {
                             width: 32; height: 32; radius: 16; color: setBtnMouse.containsMouse ? Theme.cardHover : "transparent"
-                            Image { id: setIcon; anchors.centerIn: parent; width: 15; height: 15; source: "assets/settings.svg"; visible: false }
+                            Image { id: setIcon; anchors.centerIn: parent; width: 15; height: 15; sourceSize: Qt.size(30, 30); source: "assets/settings.svg"; visible: false }
                             MultiEffect { anchors.fill: setIcon; source: setIcon; colorization: 1.0; colorizationColor: Theme.accent }
                             MouseArea { id: setBtnMouse; anchors.fill: parent; hoverEnabled: true; onClicked: ShellState.toggleSettings(ShellState.popupScreenName) }
                         }
                         Rectangle {
                             width: 32; height: 32; radius: 16; color: layBtnMouse.containsMouse ? Theme.cardHover : "transparent"
-                            Image { id: eIcon; anchors.centerIn: parent; width: 14; height: 14; source: "assets/edit.svg"; visible: false }
+                            Image { id: eIcon; anchors.centerIn: parent; width: 14; height: 14; sourceSize: Qt.size(28, 28); source: "assets/edit.svg"; visible: false }
                             MultiEffect { anchors.fill: eIcon; source: eIcon; colorization: 1.0; colorizationColor: Theme.accent }
                             MouseArea { id: layBtnMouse; anchors.fill: parent; hoverEnabled: true; onClicked: ShellState.toggleLayout() }
                         }
@@ -398,7 +398,7 @@ PopupWindow {
                             Layout.preferredWidth: 12
                             Layout.preferredHeight: 12
                             Layout.alignment: Qt.AlignVCenter
-                            Image { id: searchInputIcon; anchors.fill: parent; source: "assets/search.svg"; visible: false }
+                            Image { id: searchInputIcon; anchors.fill: parent; sourceSize: Qt.size(24, 24); source: "assets/search.svg"; visible: false }
                             MultiEffect { anchors.fill: parent; source: searchInputIcon; colorization: 1.0; colorizationColor: Theme.muted }
                         }
                         TextInput {
@@ -451,6 +451,7 @@ PopupWindow {
                                     id: netRawIcon
                                     anchors.centerIn: parent
                                     width: 16; height: 16
+                                    sourceSize: Qt.size(32, 32)
                                     source: "assets/wifi.svg"
                                     visible: false
                                 }
@@ -524,6 +525,7 @@ PopupWindow {
                                     id: btRawIcon
                                     anchors.centerIn: parent
                                     width: 16; height: 16
+                                    sourceSize: Qt.size(32, 32)
                                     source: "assets/bluetooth.svg"
                                     visible: false
                                 }
@@ -605,6 +607,7 @@ PopupWindow {
                                     id: dndRawIcon
                                     anchors.centerIn: parent
                                     width: 16; height: 16
+                                    sourceSize: Qt.size(32, 32)
                                     source: "assets/moon.svg"
                                     visible: false
                                 }
@@ -670,6 +673,7 @@ PopupWindow {
                                     id: vpnRawIcon
                                     anchors.centerIn: parent
                                     width: 16; height: 16
+                                    sourceSize: Qt.size(32, 32)
                                     source: "assets/shield.svg"
                                     visible: false
                                 }
@@ -734,6 +738,7 @@ PopupWindow {
                                     id: shotRawIcon
                                     anchors.centerIn: parent
                                     width: 16; height: 16
+                                    sourceSize: Qt.size(32, 32)
                                     source: "assets/screenshot.svg"
                                     visible: false
                                 }
@@ -802,6 +807,7 @@ PopupWindow {
                                     id: recRawIcon
                                     anchors.centerIn: parent
                                     width: 16; height: 16
+                                    sourceSize: Qt.size(32, 32)
                                     source: "assets/record.svg"
                                     visible: false
                                 }
@@ -867,6 +873,7 @@ PopupWindow {
                                     id: nightRawIcon
                                     anchors.centerIn: parent
                                     width: 16; height: 16
+                                    sourceSize: Qt.size(32, 32)
                                     source: "assets/sun.svg"
                                     visible: false
                                 }
@@ -944,6 +951,7 @@ PopupWindow {
                                     id: powerRawIcon
                                     anchors.centerIn: parent
                                     width: 16; height: 16
+                                    sourceSize: Qt.size(32, 32)
                                     source: "assets/power.svg"
                                     visible: false
                                 }
@@ -1011,7 +1019,7 @@ PopupWindow {
 
                             Item {
                                 width: 16; height: 16; Layout.preferredWidth: 16
-                                Image { id: sBright; anchors.fill: parent; source: "assets/sun.svg"; visible: false }
+                                Image { id: sBright; anchors.fill: parent; sourceSize: Qt.size(32, 32); source: "assets/sun.svg"; visible: false }
                                 MultiEffect { anchors.fill: sBright; source: sBright; colorization: 1.0; colorizationColor: Theme.text }
                             }
 
@@ -1070,6 +1078,7 @@ PopupWindow {
                                 Image {
                                     id: sVol
                                     anchors.fill: parent
+                                    sourceSize: Qt.size(32, 32)
                                     source: (AudioService.defaultSink || Pipewire.defaultAudioSink)?.audio?.muted ? "assets/speaker-muted-mono.svg" : "assets/volume.svg"
                                     visible: false
                                 }
@@ -1159,7 +1168,7 @@ PopupWindow {
                                 spacing: 8
                                 Rectangle {
                                     width: 36; height: 36; radius: 18; color: Theme.cardHover; border.width: 1; border.color: Theme.border
-                                    Image { id: statCpu; anchors.centerIn: parent; width: 18; height: 18; source: "assets/cpu.svg"; visible: false }
+                                    Image { id: statCpu; anchors.centerIn: parent; width: 18; height: 18; sourceSize: Qt.size(36, 36); source: "assets/cpu.svg"; visible: false }
                                     MultiEffect { anchors.fill: statCpu; source: statCpu; colorization: 1.0; colorizationColor: Theme.text }
                                 }
                                 ColumnLayout {
@@ -1181,7 +1190,7 @@ PopupWindow {
                                 spacing: 8
                                 Rectangle {
                                     width: 36; height: 36; radius: 18; color: Theme.cardHover; border.width: 1; border.color: Theme.border
-                                    Image { id: statRam; anchors.centerIn: parent; width: 18; height: 18; source: "assets/ram.svg"; visible: false }
+                                    Image { id: statRam; anchors.centerIn: parent; width: 18; height: 18; sourceSize: Qt.size(36, 36); source: "assets/ram.svg"; visible: false }
                                     MultiEffect { anchors.fill: statRam; source: statRam; colorization: 1.0; colorizationColor: Theme.text }
                                 }
                                 ColumnLayout {
@@ -1203,7 +1212,7 @@ PopupWindow {
                                 spacing: 8
                                 Rectangle {
                                     width: 36; height: 36; radius: 18; color: Theme.cardHover; border.width: 1; border.color: Theme.border
-                                    Image { id: statDisk; anchors.centerIn: parent; width: 18; height: 18; source: "assets/disk.svg"; visible: false }
+                                    Image { id: statDisk; anchors.centerIn: parent; width: 18; height: 18; sourceSize: Qt.size(36, 36); source: "assets/disk.svg"; visible: false }
                                     MultiEffect { anchors.fill: statDisk; source: statDisk; colorization: 1.0; colorizationColor: Theme.text }
                                 }
                                 ColumnLayout {
@@ -1250,6 +1259,7 @@ PopupWindow {
                             Image {
                                 id: trackArt
                                 anchors.fill: parent
+                                sourceSize: Qt.size(128, 128)
                                 source: root.activePlayer?.trackArtUrl || ""
                                 fillMode: Image.PreserveAspectCrop
                                 visible: status === Image.Ready
@@ -1365,7 +1375,7 @@ PopupWindow {
                             spacing: 6
                             Rectangle {
                                 width: 28; height: 28; radius: 14; color: prevMouse.containsMouse ? Theme.cardHover : (Theme.isDark ? "#242424" : "#e4e4e4")
-                                Image { id: pIcon; anchors.centerIn: parent; width: 14; height: 14; source: "assets/prev.svg"; visible: false }
+                                Image { id: pIcon; anchors.centerIn: parent; width: 14; height: 14; sourceSize: Qt.size(28, 28); source: "assets/prev.svg"; visible: false }
                                 MultiEffect { anchors.fill: pIcon; source: pIcon; colorization: 1.0; colorizationColor: Theme.text }
                                 MouseArea {
                                     id: prevMouse; anchors.fill: parent; hoverEnabled: true; z: 10
@@ -1378,6 +1388,7 @@ PopupWindow {
                                     id: ppIcon
                                     anchors.centerIn: parent
                                     width: 16; height: 16
+                                    sourceSize: Qt.size(32, 32)
                                     source: root.isPlaying ? "assets/pause.svg" : "assets/play.svg"
                                     visible: false
                                 }
@@ -1389,7 +1400,7 @@ PopupWindow {
                             }
                             Rectangle {
                                 width: 28; height: 28; radius: 14; color: nextMouse.containsMouse ? Theme.cardHover : (Theme.isDark ? "#242424" : "#e4e4e4")
-                                Image { id: nIcon; anchors.centerIn: parent; width: 14; height: 14; source: "assets/next.svg"; visible: false }
+                                Image { id: nIcon; anchors.centerIn: parent; width: 14; height: 14; sourceSize: Qt.size(28, 28); source: "assets/next.svg"; visible: false }
                                 MultiEffect { anchors.fill: nIcon; source: nIcon; colorization: 1.0; colorizationColor: Theme.text }
                                 MouseArea {
                                     id: nextMouse; anchors.fill: parent; hoverEnabled: true; z: 10
@@ -1429,7 +1440,7 @@ PopupWindow {
                         width: 36; height: 36; radius: 18
                         color: root.ethState.connected ? Theme.accent : Theme.cardHover
                         border.width: 1; border.color: Theme.border
-                        Image { id: ethIcon; anchors.centerIn: parent; width: 18; height: 18; source: "assets/shield.svg"; visible: false }
+                        Image { id: ethIcon; anchors.centerIn: parent; width: 18; height: 18; sourceSize: Qt.size(36, 36); source: "assets/shield.svg"; visible: false }
                         MultiEffect { anchors.fill: ethIcon; source: ethIcon; colorization: 1.0; colorizationColor: root.ethState.connected ? Theme.background : Theme.text }
                     }
 
@@ -1481,7 +1492,7 @@ PopupWindow {
                     spacing: 8
                     Item {
                         Layout.preferredWidth: 16; Layout.preferredHeight: 16
-                        Image { id: vpnSubI; anchors.fill: parent; source: "assets/shield.svg"; visible: false }
+                        Image { id: vpnSubI; anchors.fill: parent; sourceSize: Qt.size(32, 32); source: "assets/shield.svg"; visible: false }
                         MultiEffect { anchors.fill: vpnSubI; source: vpnSubI; colorization: 1.0; colorizationColor: Theme.text }
                     }
                     ColumnLayout {
@@ -1674,7 +1685,7 @@ PopupWindow {
                                 width: 28; height: 28; radius: 14
                                 color: (modelData.inUse || modelData.connected) ? Theme.accent : Theme.cardHover
                                 border.width: 1; border.color: Theme.border
-                                Image { id: wSubIcon; anchors.centerIn: parent; width: 14; height: 14; source: "assets/wifi.svg"; visible: false }
+                                Image { id: wSubIcon; anchors.centerIn: parent; width: 14; height: 14; sourceSize: Qt.size(28, 28); source: "assets/wifi.svg"; visible: false }
                                 MultiEffect { anchors.fill: wSubIcon; source: wSubIcon; colorization: 1.0; colorizationColor: (modelData.inUse || modelData.connected) ? Theme.background : Theme.text }
                             }
 
@@ -1921,6 +1932,7 @@ PopupWindow {
                                     id: btSubIcon
                                     anchors.centerIn: parent
                                     width: 16; height: 16
+                                    sourceSize: Qt.size(32, 32)
                                     source: modelData.icon ? Quickshell.iconPath(modelData.icon) : "assets/bluetooth.svg"
                                     visible: false
                                 }
@@ -2657,6 +2669,7 @@ PopupWindow {
                                     Image {
                                         id: stVol
                                         anchors.fill: parent
+                                        sourceSize: Qt.size(28, 28)
                                         source: modelData.audio?.muted ? "assets/speaker-muted-mono.svg" : "assets/volume.svg"
                                         visible: false
                                     }

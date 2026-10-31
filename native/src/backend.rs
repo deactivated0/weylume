@@ -20,19 +20,25 @@ fn paths(path: impl AsRef<Path>) -> Vec<PathBuf> {
     v.sort();
     v
 }
-pub fn human(n: u64) -> String {
+pub fn write_human(out: &mut String, n: u64) {
+    use std::fmt::Write;
     let mut v = n as f64;
     let mut u = 0;
     while v >= 1024. && u < 4 {
         v /= 1024.;
-        u += 1
+        u += 1;
     }
     let s = ["B", "KiB", "MiB", "GiB", "TiB"][u];
     if u == 0 {
-        format!("{v:.0} {s}")
+        let _ = write!(out, "{v:.0} {s}");
     } else {
-        format!("{v:.1} {s}")
+        let _ = write!(out, "{v:.1} {s}");
     }
+}
+pub fn human(n: u64) -> String {
+    let mut s = String::with_capacity(16);
+    write_human(&mut s, n);
+    s
 }
 struct Sensors {
     cpu: Vec<PathBuf>,
@@ -131,20 +137,23 @@ fn read_file_u64(file_opt: &mut Option<fs::File>, path: impl AsRef<Path>) -> u64
     read_proc_buf(file_opt, path, &mut buf).map_or(0, parse_ascii_u64)
 }
 
-fn temperature(file_opt: &mut Option<fs::File>, paths: &[PathBuf]) -> String {
+fn write_temperature(out: &mut String, file_opt: &mut Option<fs::File>, paths: &[PathBuf]) {
+    use std::fmt::Write;
     if let Some(first) = paths.first() {
         let v = read_file_u64(file_opt, first);
         if v > 0 && v < 200000 {
-            return format!("{}°C", v / 1000);
+            let _ = write!(out, "{}°C", v / 1000);
+            return;
         }
     }
-    paths
-        .iter()
-        .skip(1)
-        .map(read_u64)
-        .find(|v| *v > 0 && *v < 200000)
-        .map(|v| format!("{}°C", v / 1000))
-        .unwrap_or_else(|| "—".into())
+    for p in paths.iter().skip(1) {
+        let v = read_u64(p);
+        if v > 0 && v < 200000 {
+            let _ = write!(out, "{}°C", v / 1000);
+            return;
+        }
+    }
+    out.push('—');
 }
 #[derive(Default)]
 struct Previous {
@@ -299,11 +308,7 @@ fn emit_metrics(
     let mut uptime_buf = [0u8; 64];
     let mins = if let Some(data) = read_proc_buf(&mut files.uptime, "/proc/uptime", &mut uptime_buf) {
         let first = data.split(|&b| b.is_ascii_whitespace()).next().unwrap_or(&[]);
-        std::str::from_utf8(first)
-            .ok()
-            .and_then(|s| s.parse::<f64>().ok())
-            .unwrap_or(0.) as u64
-            / 60
+        parse_ascii_u64(first) / 60
     } else {
         0
     };
@@ -311,10 +316,6 @@ fn emit_metrics(
     let freq = read_file_u64(&mut files.cpufreq, "/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq");
     let gpu = sensors.gpu.as_ref().map(|p| read_file_u64(&mut files.gpu_busy, p)).unwrap_or(0);
     let used = mt.saturating_sub(ma);
-    let cpu_temp = temperature(&mut files.cpu_temp, &sensors.cpu);
-    let gpu_temp = temperature(&mut files.gpu_temp, &sensors.gpu_temp);
-    let mem_used = human(used * 1024);
-    let mem_total = human(mt * 1024);
     let mem_usage = (used * 100).checked_div(mt).unwrap_or(0);
     let gpu_usage = if gpu <= 100 { gpu } else { 0 };
 
@@ -332,7 +333,15 @@ fn emit_metrics(
     } else {
         let _ = write!(out_buf, "—");
     }
-    let _ = write!(out_buf, "\",\"temperature\":\"{cpu_temp}\",\"usage\":{cpu}}},\"gpu\":{{\"model\":\"{}\",\"temperature\":\"{gpu_temp}\",\"usage\":{gpu_usage}}},\"memory\":{{\"used\":\"{mem_used}\",\"total\":\"{mem_total}\",\"usage\":{mem_usage}}},\"network\":{{\"interface\":\"{interface}\",\"receive\":\"{:.1} MB/s\",\"send\":\"{:.1} MB/s\"}}}}}}\n", sensors.gpu_label, rr / 1048576., tr / 1048576.);
+    let _ = write!(out_buf, "\",\"temperature\":\"");
+    write_temperature(out_buf, &mut files.cpu_temp, &sensors.cpu);
+    let _ = write!(out_buf, "\",\"usage\":{cpu}}},\"gpu\":{{\"model\":\"{}\",\"temperature\":\"", sensors.gpu_label);
+    write_temperature(out_buf, &mut files.gpu_temp, &sensors.gpu_temp);
+    let _ = write!(out_buf, "\",\"usage\":{gpu_usage}}},\"memory\":{{\"used\":\"");
+    write_human(out_buf, used * 1024);
+    let _ = write!(out_buf, "\",\"total\":\"");
+    write_human(out_buf, mt * 1024);
+    let _ = write!(out_buf, "\",\"usage\":{mem_usage}}},\"network\":{{\"interface\":\"{interface}\",\"receive\":\"{:.1} MB/s\",\"send\":\"{:.1} MB/s\"}}}}}}\n", rr / 1048576., tr / 1048576.);
 
     use std::io::Write as IoWrite;
     let out = io::stdout();
@@ -417,25 +426,26 @@ fn is_video_path(p: &Path) -> bool {
 fn freedesktop_hash(p: &Path) -> Option<String> {
     let path_str = p.to_str()?;
     const HEX: &[u8; 16] = b"0123456789ABCDEF";
-    let mut uri = String::with_capacity(7 + path_str.len() * 3);
-    uri.push_str("file://");
+    let mut ctx = md5::Context::new();
+    ctx.consume(b"file://");
+    let mut enc = [b'%', 0, 0];
     for &b in path_str.as_bytes() {
         if b.is_ascii_alphanumeric() || b == b'-' || b == b'_' || b == b'.' || b == b'~' || b == b'/' {
-            uri.push(b as char);
+            ctx.consume(&[b]);
         } else {
-            uri.push('%');
-            uri.push(HEX[(b >> 4) as usize] as char);
-            uri.push(HEX[(b & 0x0F) as usize] as char);
+            enc[1] = HEX[(b >> 4) as usize];
+            enc[2] = HEX[(b & 0x0F) as usize];
+            ctx.consume(&enc);
         }
     }
-    let digest = md5::compute(uri.as_bytes());
+    let digest = ctx.finalize();
     const LOWER_HEX: &[u8; 16] = b"0123456789abcdef";
     let mut hash_bytes = [0u8; 32];
     for (i, &b) in digest.0.iter().enumerate() {
         hash_bytes[i * 2] = LOWER_HEX[(b >> 4) as usize];
         hash_bytes[i * 2 + 1] = LOWER_HEX[(b & 0x0f) as usize];
     }
-    Some(String::from_utf8(hash_bytes.to_vec()).unwrap())
+    Some(std::str::from_utf8(&hash_bytes).unwrap().to_string())
 }
 
 fn find_cached_thumbnail(p: &Path) -> Option<PathBuf> {
@@ -668,6 +678,7 @@ pub fn main() -> Result<()> {
     let mut metric_files = MetricFiles::default();
     let mut metrics_out_buf = String::with_capacity(1024);
     let mut interval = 1000u64;
+    let mut trim_ticks = 0u32;
     let mut next = Instant::now();
     let mut sleep_inhibitor = None;
     let mut disk = crate::disk_worker::Worker::new().ok();
@@ -867,6 +878,9 @@ pub fn main() -> Result<()> {
             if d != last_desktop {
                 emit(&d)?;
                 last_desktop = d;
+                unsafe {
+                    libc::malloc_trim(0);
+                }
             }
         }
         if fds[2].revents & (libc::POLLERR | libc::POLLHUP | libc::POLLNVAL) != 0 {
@@ -912,6 +926,13 @@ pub fn main() -> Result<()> {
             }
             emit_metrics(&mut metrics_out_buf, &mut metric_files, &mut prev, &sensors, &cpu_name)?;
             next = Instant::now() + Duration::from_millis(interval);
+            trim_ticks = trim_ticks.saturating_add(1);
+            if trim_ticks >= 60 {
+                trim_ticks = 0;
+                unsafe {
+                    libc::malloc_trim(0);
+                }
+            }
         }
     }
     Ok(())

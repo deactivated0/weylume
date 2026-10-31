@@ -142,6 +142,13 @@ Scope {
         brightnessWriter.running = true;
     }
 
+    Timer {
+        id: flyoutGcTimer
+        interval: 1500
+        repeat: false
+        onTriggered: gc()
+    }
+
     function closeFlyouts(restoreFocus = true) {
         startOpen = false;
         quickOpen = false;
@@ -151,6 +158,7 @@ Scope {
         clipboardOpen = false;
         emojiOpen = false;
         taskMenusCloseRequested();
+        flyoutGcTimer.restart();
         if (restoreFocus && root.returnWindow) {
             try { root.returnWindow.activate(); } catch (error) {}
             root.returnWindow = null;

@@ -85,6 +85,7 @@ ScrollView {
                             Image {
                                 anchors.centerIn: parent
                                 width: 16; height: 16
+                                sourceSize: Qt.size(32, 32)
                                 source: (root.activeSink?.audio?.muted ?? false) ? "assets/speaker-muted-mono.svg" : "assets/volume.svg"
                             }
 
@@ -215,6 +216,7 @@ ScrollView {
                             Image {
                                 anchors.centerIn: parent
                                 width: 16; height: 16
+                                sourceSize: Qt.size(32, 32)
                                 source: "assets/mic.svg"
                                 opacity: (root.activeSource?.audio?.muted ?? false) ? 0.3 : 1.0
                             }
@@ -334,6 +336,7 @@ ScrollView {
                                 Image {
                                     anchors.centerIn: parent
                                     width: 18; height: 18
+                                    sourceSize: Qt.size(36, 36)
                                     source: AudioService.getAppIconPath(appStreamRow.modelData)
                                 }
                             }
@@ -409,6 +412,7 @@ ScrollView {
                                 Image {
                                     anchors.centerIn: parent
                                     width: 14; height: 14
+                                    sourceSize: Qt.size(28, 28)
                                     source: (appStreamRow.modelData?.audio?.muted ?? false) ? "assets/speaker-muted-mono.svg" : "assets/volume.svg"
                                 }
 

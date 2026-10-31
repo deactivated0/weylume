@@ -4,42 +4,53 @@ use serde_json::{json, Value};
 use std::fs;
 const COMMANDS:&str="nmcli bluetoothctl wpctl pactl playerctl powerprofilesctl busctl wl-gammarelay-rs brightnessctl grim slurp swappy wl-copy wl-paste gpu-screen-recorder gpu-screen-recorder-gtk kitty pcmanfm-qt featherpad pavucontrol easyeffects missioncenter btop qdirstat btrfs-assistant cachyos-kernel-manager cachyos-packageinstaller cachyos-pi cachy-update lact goverlay piper scx-manager amdgpu_top fwupdmgr ufw waydroid-helper wlr-randr labwc systemctl systemd-inhibit loginctl checkupdates wtype xdg-open riseup-vpn waydroid haruna spotify-launcher discord-development discord-canary discord-ptb nmtui heroic bitwarden bitwarden-desktop steam canberra-gtk-play";
 fn available_commands() -> serde_json::Map<String, Value> {
-    use std::os::unix::fs::PermissionsExt;
-    let mut remaining: std::collections::HashSet<&'static str> = COMMANDS.split_whitespace().collect();
+    use std::ffi::CString;
+    use std::os::unix::ffi::OsStrExt;
+    use std::sync::OnceLock;
+
+    static CMDS: OnceLock<serde_json::Map<String, Value>> = OnceLock::new();
+    if let Some(cached) = CMDS.get() {
+        return cached.clone();
+    }
+
+    let mut remaining: Vec<(&'static str, CString)> = COMMANDS
+        .split_whitespace()
+        .map(|cmd| (cmd, CString::new(cmd).unwrap()))
+        .collect();
     let mut map = serde_json::Map::with_capacity(remaining.len());
-    for &cmd in &remaining {
+    for &(cmd, _) in &remaining {
         map.insert(cmd.into(), json!(false));
     }
+
     let paths = std::env::var_os("PATH").unwrap_or_default();
-    let split_paths: Vec<_> = std::env::split_paths(&paths).collect();
-    for dir in split_paths {
+    let split_paths: Vec<_> = std::env::split_paths(&paths).filter(|d| d.is_dir()).collect();
+    for dir in &split_paths {
         if remaining.is_empty() {
             break;
         }
-        if !dir.is_dir() {
-            continue;
-        }
-        let mut p = dir;
-        remaining.retain(|&cmd| {
-            p.push(cmd);
-            let found = if let Ok(m) = fs::metadata(&p) {
-                if m.is_file() && m.permissions().mode() & 0o111 != 0 {
-                    map.insert(cmd.to_string(), json!(true));
-                    true
-                } else {
-                    false
-                }
-            } else {
+        let Ok(c_dir) = CString::new(dir.as_os_str().as_bytes()) else { continue };
+        let dir_fd = unsafe { libc::open(c_dir.as_ptr(), libc::O_DIRECTORY | libc::O_PATH | libc::O_CLOEXEC) };
+        if dir_fd < 0 { continue };
+        remaining.retain(|&(cmd, ref c_cmd)| {
+            let res = unsafe { libc::faccessat(dir_fd, c_cmd.as_ptr(), libc::X_OK, 0) };
+            if res == 0 {
+                map.insert(cmd.to_string(), json!(true));
                 false
-            };
-            p.pop();
-            !found
+            } else {
+                true
+            }
         });
+        unsafe { libc::close(dir_fd) };
     }
+
+    let _ = CMDS.set(map.clone());
     map
 }
 fn capabilities() -> Value {
-    json!({"commands":available_commands(),"wayland":!std::env::var("WAYLAND_DISPLAY").unwrap_or_default().is_empty(),"labwc":!std::env::var("LABWC_PID").unwrap_or_default().is_empty()||has("labwc"),"labwcConfig":config().join("labwc/rc.xml"),"previewHelper":shell().join("weylume-native"),"previewSource":shell().join("native/src/preview.rs"),"screenshots":home().join("Pictures/Screenshots"),"recordings":home().join("Videos")})
+    let commands = available_commands();
+    let has_labwc = !std::env::var("LABWC_PID").unwrap_or_default().is_empty()
+        || commands.get("labwc").and_then(Value::as_bool).unwrap_or(false);
+    json!({"commands":commands,"wayland":!std::env::var("WAYLAND_DISPLAY").unwrap_or_default().is_empty(),"labwc":has_labwc,"labwcConfig":config().join("labwc/rc.xml"),"previewHelper":shell().join("weylume-native"),"previewSource":shell().join("native/src/preview.rs"),"screenshots":home().join("Pictures/Screenshots"),"recordings":home().join("Videos")})
 }
 fn state() -> Result<Value> {
     let _lock = Lock::new(&shell().join(".state.lock"))?;

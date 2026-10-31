@@ -247,10 +247,15 @@ pub(crate) unsafe fn read_value(m: *mut c_void, depth: usize) -> Result<Option<V
             if kind as u8 == b'v' {
                 values.into_iter().next().unwrap_or(Value::Null)
             } else if dict {
-                let mut map = Map::new();
+                let mut map = Map::with_capacity(values.len());
                 for pair in values {
-                    if let Some(k) = pair[0].as_str() {
-                        map.insert(k.into(), pair[1].clone());
+                    if let Value::Array(mut arr) = pair {
+                        if arr.len() == 2 {
+                            let val = arr.pop().unwrap();
+                            if let Value::String(k) = arr.pop().unwrap() {
+                                map.insert(k, val);
+                            }
+                        }
                     }
                 }
                 Value::Object(map)

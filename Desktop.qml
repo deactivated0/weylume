@@ -831,6 +831,7 @@ PanelWindow {
     Image {
         anchors.fill: parent
         fillMode: Image.PreserveAspectCrop
+        asynchronous: true
         source: root.effectiveWallpaper ? (root.effectiveWallpaper.startsWith("file://") ? root.effectiveWallpaper : "file://" + root.effectiveWallpaper) : ""
         sourceSize: Qt.size(root.width > 0 ? root.width : 1920, root.height > 0 ? root.height : 1080)
         visible: Boolean(root.effectiveWallpaper && root.effectiveWallpaper !== "")

@@ -8,6 +8,18 @@ Scope {
 
     property var events: []
     property var tasks: []
+    readonly property var eventsByDate: {
+        const _rev = root.revision;
+        const evs = root.events || [];
+        const map = Object.create(null);
+        for (let i = 0; i < evs.length; ++i) {
+            const e = evs[i];
+            if (!e || !e.date) continue;
+            if (!map[e.date]) map[e.date] = [e];
+            else map[e.date].push(e);
+        }
+        return map;
+    }
     property bool weekStartsMonday: true
     property bool compact: false
     property bool motion: true

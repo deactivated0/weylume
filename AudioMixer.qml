@@ -37,21 +37,8 @@ PopupWindow {
         }
     }
 
-    readonly property var currentActiveSink: {
-        const sinks = AudioService.sinks;
-        for (let i = 0; i < sinks.length; i++) {
-            if (AudioService.isSinkDefault(sinks[i])) return sinks[i];
-        }
-        return AudioService.defaultSink;
-    }
-
-    readonly property var currentActiveSource: {
-        const sources = AudioService.sources;
-        for (let i = 0; i < sources.length; i++) {
-            if (AudioService.isSourceDefault(sources[i])) return sources[i];
-        }
-        return AudioService.defaultSource;
-    }
+    readonly property var currentActiveSink: AudioService.defaultSink
+    readonly property var currentActiveSource: AudioService.defaultSource
 
     function getSinkDisplayName(sinkNode) {
         if (!sinkNode) return "Default Output";
@@ -114,6 +101,7 @@ PopupWindow {
                                 id: devHeaderIcon
                                 anchors.centerIn: parent
                                 width: 12; height: 12
+                                sourceSize: Qt.size(24, 24)
                                 source: root.activeTab === "inputs"
                                     ? "assets/mic.svg"
                                     : (AudioService.getDeviceKind(root.currentActiveSink) === "headphones" ? "assets/headphones.svg" : "assets/volume.svg")
@@ -439,6 +427,7 @@ PopupWindow {
                                 id: masterMuteIcon
                                 anchors.centerIn: parent
                                 width: 14; height: 14
+                                sourceSize: Qt.size(28, 28)
                                 source: parent.isMuted
                                     ? "assets/speaker-muted-mono.svg"
                                     : (root.activeTab === "inputs" ? "assets/mic.svg" : "assets/volume.svg")
@@ -648,6 +637,7 @@ PopupWindow {
                                             id: aIcon
                                             anchors.centerIn: parent
                                             width: 14; height: 14
+                                            sourceSize: Qt.size(28, 28)
                                             source: appCard.appIcon
                                             fillMode: Image.PreserveAspectFit
                                             visible: status === Image.Ready
@@ -722,6 +712,7 @@ PopupWindow {
                                             id: appSpeakerIcon
                                             anchors.centerIn: parent
                                             width: 11; height: 11
+                                            sourceSize: Qt.size(22, 22)
                                             source: appCard.isMuted ? "assets/speaker-muted-mono.svg" : "assets/volume.svg"
                                             visible: false
                                         }
@@ -966,6 +957,7 @@ PopupWindow {
                             id: footSetIcon
                             anchors.centerIn: parent
                             width: 11; height: 11
+                            sourceSize: Qt.size(22, 22)
                             source: "assets/settings.svg"
                             visible: false
                         }

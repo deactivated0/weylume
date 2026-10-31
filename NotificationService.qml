@@ -374,6 +374,7 @@ Scope {
                                 anchors.centerIn: parent
                                 width: 34
                                 height: 34
+                                sourceSize: Qt.size(68, 68)
                                 source: {
                                     const notif = root.currentNotification;
                                     if (notif?.image) return notif.image;

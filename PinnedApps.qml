@@ -32,12 +32,21 @@ Scope {
             if (PinnedApps.isPinned(w.appId, w.title)) continue;
             const key = PinnedApps.appGroupKey(w, i);
             if (!map[key]) {
+                const lowId = String(w.appId || "").toLowerCase();
+                const lowTitle = String(w.title || "").toLowerCase();
+                let entry = null;
+                if (lowId === "weylume-settings" || lowTitle === "settings" || (lowId === "org.quickshell" && lowTitle === "settings")) {
+                    entry = DesktopEntries.heuristicLookup("weylume-settings") || DesktopEntries.heuristicLookup("preferences-system");
+                } else {
+                    entry = DesktopEntries.heuristicLookup(w.appId) || DesktopEntries.heuristicLookup(w.title);
+                }
                 map[key] = {
                     key: key,
                     appId: w.appId,
                     title: w.title,
                     primaryWindow: w,
-                    windows: [w]
+                    windows: [w],
+                    desktopEntry: entry
                 };
                 groups.push(map[key]);
             } else {
@@ -145,6 +154,7 @@ Scope {
             pin._lcLabel = String(pin.label || "").trim().toLowerCase();
             pin._targets = pin._lcIds.concat(pin._lcLabel ? [pin._lcLabel] : []);
             pin._flavor = discordFlavor(pin._targets);
+            pin._targetSet = new Set(pin._targets);
         }
     }
 
@@ -163,11 +173,13 @@ Scope {
                 pin._lcLabel = String(pin.label || "").trim().toLowerCase();
                 pin._targets = pin._lcIds.concat(pin._lcLabel ? [pin._lcLabel] : []);
                 pin._flavor = discordFlavor(pin._targets);
+                pin._targetSet = new Set(pin._targets);
             }
             if (labelLower && pin._lcLabel && labelLower === pin._lcLabel) return true;
             if (candFlavor || pin._flavor) {
                 if (candFlavor !== null && candFlavor === pin._flavor) return true;
             } else {
+                if (pin._targetSet && candList.some(c => pin._targetSet.has(c))) return true;
                 for (let c = 0; c < candList.length; c++) {
                     const cand = candList[c];
                     for (let t = 0; t < pin._targets.length; t++) {

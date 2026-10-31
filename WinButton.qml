@@ -145,6 +145,7 @@ Item {
                 anchors.centerIn: parent
                 width: 9
                 height: 9
+                sourceSize: Qt.size(18, 18)
                 source: root.audioMuted ? "assets/speaker-muted-mono.svg" : "assets/volume.svg"
                 fillMode: Image.PreserveAspectFit
                 opacity: 0.95

@@ -269,6 +269,7 @@ Scope {
                                             anchors.centerIn: parent
                                             width: 16
                                             height: 16
+                                            sourceSize: Qt.size(32, 32)
                                             source: lockRoot.revealPassword ? "assets/eye-off.svg" : "assets/eye.svg"
                                             opacity: eyeMouse.containsMouse ? 1.0 : 0.65
                                             Behavior on opacity { NumberAnimation { duration: 100 } }
@@ -299,6 +300,7 @@ Scope {
                                             anchors.centerIn: parent
                                             width: 14
                                             height: 14
+                                            sourceSize: Qt.size(28, 28)
                                             source: "assets/arrow-right.svg"
                                         }
                                     }
@@ -370,6 +372,7 @@ Scope {
                                     anchors.centerIn: parent
                                     width: 17
                                     height: 17
+                                    sourceSize: Qt.size(34, 34)
                                     source: "assets/moon.svg"
                                     opacity: sleepMouse.containsMouse ? 1.0 : 0.8
                                 }
@@ -419,6 +422,7 @@ Scope {
                                     anchors.centerIn: parent
                                     width: 17
                                     height: 17
+                                    sourceSize: Qt.size(34, 34)
                                     source: "assets/restart.svg"
                                     opacity: restartMouse.containsMouse ? 1.0 : 0.8
                                 }
@@ -468,6 +472,7 @@ Scope {
                                     anchors.centerIn: parent
                                     width: 17
                                     height: 17
+                                    sourceSize: Qt.size(34, 34)
                                     source: "assets/shutdown.svg"
                                     opacity: shutMouse.containsMouse ? 1.0 : 0.8
                                 }
@@ -506,6 +511,7 @@ Scope {
                             anchors.verticalCenter: parent.verticalCenter
                             width: 18
                             height: 18
+                            sourceSize: Qt.size(36, 36)
                             source: "assets/wifi.svg"
                             opacity: SystemService.wifiEnabled ? 0.9 : 0.4
                         }

@@ -194,6 +194,7 @@ Item {
 
                         Image {
                             width: 14; height: 14
+                            sourceSize: Qt.size(28, 28)
                             source: "assets/search.svg"
                             opacity: 0.5
                         }
@@ -274,7 +275,7 @@ Item {
                     RowLayout {
                         anchors.centerIn: parent
                         spacing: 6
-                        Image { width: 13; height: 13; source: "assets/edit.svg"; opacity: 0.8 }
+                        Image { width: 13; height: 13; sourceSize: Qt.size(26, 26); source: "assets/edit.svg"; opacity: 0.8 }
                         Text { text: "Labwc Script"; color: root.showScriptEditor ? root.colAccent : root.colTextPrimary; font.family: Theme.fontFamily; font.pixelSize: 11; font.weight: Font.Medium }
                     }
 
@@ -304,6 +305,7 @@ Item {
                     Image {
                         anchors.centerIn: parent
                         width: 14; height: 14
+                        sourceSize: Qt.size(28, 28)
                         source: "assets/book.svg"
                         opacity: 0.8
                     }
@@ -563,6 +565,7 @@ Item {
                                     id: appIcon
                                     anchors.centerIn: parent
                                     width: 24; height: 24
+                                    sourceSize: Qt.size(48, 48)
                                     source: appCard.modelData.icon ? (appCard.modelData.icon.startsWith("/") ? ("file://" + appCard.modelData.icon) : Quickshell.iconPath(appCard.modelData.icon)) : ""
                                     visible: status === Image.Ready
                                     fillMode: Image.PreserveAspectFit
@@ -732,6 +735,7 @@ Item {
                                     Image {
                                         anchors.centerIn: parent
                                         width: 10; height: 10
+                                        sourceSize: Qt.size(20, 20)
                                         source: "assets/play.svg"
                                         opacity: 0.85
                                     }
@@ -752,6 +756,7 @@ Item {
                                     Image {
                                         anchors.centerIn: parent
                                         width: 10; height: 10
+                                        sourceSize: Qt.size(20, 20)
                                         source: "assets/edit.svg"
                                         opacity: 0.85
                                     }
@@ -950,6 +955,7 @@ Item {
 
                                     Image {
                                         width: 22; height: 22
+                                        sourceSize: Qt.size(44, 44)
                                         source: modelData.icon ? Quickshell.iconPath(modelData.icon) : ""
                                         fillMode: Image.PreserveAspectFit
                                         visible: status === Image.Ready
