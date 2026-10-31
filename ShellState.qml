@@ -34,6 +34,16 @@ Scope {
     property string popupScreenName: Quickshell.screens && Quickshell.screens.length > 0 ? Quickshell.screens[0].name : ""
     property var returnWindow: null
     readonly property var popupScreen: Quickshell.screens.find(s => s.name === root.popupScreenName) || Quickshell.screens[0] || null
+    property bool desktopFocused: true
+    Connections {
+        target: ToplevelManager
+        function onActiveToplevelChanged() {
+            if (ToplevelManager.activeToplevel && ToplevelManager.activeToplevel.activated) {
+                root.desktopFocused = false;
+            }
+        }
+    }
+
     Connections {
         target: Quickshell
         function onScreensChanged() {

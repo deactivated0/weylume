@@ -97,14 +97,15 @@ PanelWindow {
     Shortcut {
         sequences: ["Ctrl+Shift+N", "Ctrl+Shift+n"]
         context: Qt.ApplicationShortcut
-        enabled: !ToplevelManager.activeToplevel
+        enabled: !ToplevelManager.activeToplevel || ShellState.desktopFocused
         onActivated: root.createNewFolder()
     }
 
     Connections {
         target: ShellState
         function onCreateFolderRequested() {
-            if (!root.screen || root.screen === Quickshell.screens[0]) {
+            const firstScreen = Quickshell.screens && Quickshell.screens.length > 0 ? Quickshell.screens[0] : null;
+            if (!root.screen || !firstScreen || root.screen === firstScreen || (root.screen.name && root.screen.name === firstScreen.name)) {
                 root.createNewFolder();
             }
         }
@@ -968,6 +969,8 @@ PanelWindow {
         property string lastSelectionSig: ""
 
         onPressed: mouse => {
+            ShellState.desktopFocused = true;
+            Quickshell.execDetached(["wtype", "-M", "logo", "-k", "F24", "-m", "logo"]);
             keyHandler.forceActiveFocus();
             if (mouse.button === Qt.RightButton) {
                 bgMenuAnchor.x = mouse.x;
@@ -1504,6 +1507,8 @@ PanelWindow {
                         if (root.renamingIndex !== itemWrapper.index) {
                             root.renamingIndex = -1;
                         }
+                        ShellState.desktopFocused = true;
+                        Quickshell.execDetached(["wtype", "-M", "logo", "-k", "F24", "-m", "logo"]);
                         keyHandler.forceActiveFocus();
                     }
 

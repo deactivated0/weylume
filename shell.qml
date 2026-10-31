@@ -103,10 +103,8 @@ ShellRoot {
         }
         function createFolderIfDesktop(): void {
             const act = ToplevelManager.activeToplevel;
-            if (!act || !act.activated) {
+            if (!act || !act.activated || ShellState.desktopFocused) {
                 ShellState.createFolderRequested();
-            } else {
-                Quickshell.execDetached(["wtype", "-M", "ctrl", "-M", "shift", "-k", "n", "-m", "shift", "-m", "ctrl"]);
             }
         }
         function setWallpaper(path: string): void { ShellState.setWallpaper(path); }
