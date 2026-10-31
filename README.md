@@ -3,54 +3,26 @@
 [![Platform](https://img.shields.io/badge/Platform-Wayland%20%2F%20Linux-blue?logo=linux&logoColor=white)](https://github.com/deactivated0/weylume)
 [![UI Engine](https://img.shields.io/badge/UI%20Engine-Quickshell%20%2F%20QtQuick%206-41CD52?logo=qt&logoColor=white)](https://quickshell.outfoxxed.me/)
 [![Backend](https://img.shields.io/badge/Native%20Core-Rust-dea584?logo=rust&logoColor=white)](https://www.rust-lang.org/)
-[![RAM Usage](https://img.shields.io/badge/RAM%20Usage-~189%20MB%20RSS-brightgreen?logo=ram&logoColor=white)](#-performance--resource-efficiency)
-[![Idle CPU](https://img.shields.io/badge/Idle%20CPU-0.0%25%20Overhead-brightgreen?logo=cpu&logoColor=white)](#-performance--resource-efficiency)
-[![Compositors](https://img.shields.io/badge/Compositors-Hyprland%20%7C%20Labwc%20%7C%20Sway%20%7C%20Wayfire-orange)](https://github.com/deactivated0/weylume)
+[![RAM Usage](https://img.shields.io/badge/RAM%20Usage-~142%20MB%20total%20(with%20Labwc)-brightgreen?logo=ram&logoColor=white)](#-resource-usage-quickshell--labwc)
+[![Idle CPU](https://img.shields.io/badge/Idle%20CPU-0.0%25%20Overhead-brightgreen?logo=cpu&logoColor=white)](#-resource-usage-quickshell--labwc)
+[![Compositors](https://img.shields.io/badge/Compositors-Labwc%20%7C%20Hyprland%20%7C%20Sway%20%7C%20Wayfire-orange)](https://github.com/deactivated0/weylume)
 [![Tests](https://img.shields.io/badge/Tests-23%2F23%20Passing-success)](native/tests/contracts.rs)
 
-**Weylume** is a modern, ultra-responsive desktop shell and environment for Wayland compositors (Hyprland, Labwc, Sway, Wayfire), built using **Quickshell (QtQuick / QML)** for hardware-accelerated fluid visual presentation and a dedicated **Rust** background daemon for low-latency system integration and monitoring.
+**Weylume** is a modern, ultra-responsive desktop shell and environment for Wayland compositors (Labwc, Hyprland, Sway, Wayfire), built using **Quickshell (QtQuick / QML)** for hardware-accelerated fluid visual presentation and a dedicated **Rust** background daemon for low-latency system integration and monitoring.
 
-Featuring Windows-like desktop ergonomics, full multi-selection workflows, quick settings, rich notifications, per-app audio mixing, and native Wayland protocols—all while maintaining an astonishingly low footprint of **~189 MB RAM** and **0.0% idle CPU**.
-
----
-
-## 🏷️ GitHub Topics & SEO Tags
-
-Add these tags to your GitHub repository settings under **Topics** for top search visibility:
-
-```text
-quickshell, wayland, desktop-shell, wayland-compositor, desktop-environment, hyprland, labwc, sway, wayfire, rice, dotfiles, qt6, qtquick, qml, rust, linux-desktop, fluent-design, low-memory, high-performance
-```
-
-| Category | Keywords |
-|---|---|
-| **Ecosystem** | `quickshell`, `wayland`, `desktop-shell`, `wayland-compositor`, `desktop-environment` |
-| **Compositors** | `hyprland`, `labwc`, `sway`, `wayfire`, `river` |
-| **Linux Customization** | `rice`, `dotfiles`, `unixporn`, `linux-desktop`, `fluent-design` |
-| **Tech Stack** | `qt6`, `qtquick`, `qml`, `rust`, `pipewire`, `wireplumber`, `networkmanager` |
-| **Performance** | `low-memory`, `high-performance`, `lightweight`, `zero-overhead` |
+Featuring Windows-like desktop ergonomics, full multi-selection workflows, quick settings, rich notifications, per-app audio mixing, and native Wayland protocols—all while maintaining an astonishingly low footprint of **~142 MB RAM** and **0.0% idle CPU**.
 
 ---
 
-## ⚡ Performance & Resource Efficiency
+## ⚡ Resource Usage (Quickshell + Labwc)
 
-Weylume was re-engineered and optimized from the ground up to achieve production-grade performance, lightning-fast input latency, and minimal resource consumption:
+Running **Weylume** together with the **Labwc** Wayland compositor uses only **~142 MB of RAM** and **virtually 0% CPU** at idle:
 
-| Metric | Before Optimization | After Optimization | Improvement |
-|---|---|---|---|
-| **Steady-State RAM (RSS)** | 1.5 GB | **~189 MB** | **-87.4% reduction** |
-| **Peak Resident Memory** | 3.7 GB | **~210 MB** | **-94.3% reduction** |
-| **Swap Space Utilized** | 385 MB | **0 B (Zero Swap)** | **Eliminated** |
-| **Idle CPU Overhead** | ~1.2% - 3.5% | **0.0%** | **Near-zero idle cycles** |
-| **Daemon Context Switches** | 60/sec (`malloc_trim` loop) | **0 / sec (Event-driven)** | **Zero busy-waiting** |
-| **Command Probing Latency** | 1.41 ms (4k-file directory scan) | **0.32 ms** (`faccessat` direct probe) | **-77.3% faster** |
-| **Calendar Event Lookup** | $O(N)$ linear scans | **$O(1)$ Hash Map Cache** | **Instantaneous render** |
-
-### Key Architectural Optimizations:
-- **Transparent Huge Pages (THP) Fragmentation Fix**: Invokes `libc::prctl(PR_SET_THP_DISABLE)` on process startup, preventing QtQuick and Mesa graphics drivers from ballooning memory buffers into 2MB page fragments.
-- **Direct Directory Descriptor Probing**: Replaced slow recursive file iterations in `available_commands()` with direct `libc::open(O_DIRECTORY | O_PATH)` and `libc::faccessat(dir_fd, cmd, X_OK, 0)` checks cached via process-wide `OnceLock`.
-- **Debounced Heap Trimming**: Eliminated 1-second interval kernel page-table heap scans, replacing them with debounced cleanup triggers after large desktop operations.
-- **Pre-resolved Heuristic Lookups**: Desktop entries and window matching identifiers are resolved once per window group, eliminating repeated string allocations and layout recalculations across multiple monitors.
+- **Labwc Compositor**: `~37 MB` RAM
+- **Quickshell Shell (`qs`)**: `~100 MB` RAM
+- **Rust Native Daemon (`weylume-native`)**: `~5 MB` RAM
+- **Total Combined RAM**: **~142 MB** (0 B swap used)
+- **Idle CPU Overhead**: **~0.0% – 0.5%**
 
 ---
 
