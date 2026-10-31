@@ -51,6 +51,7 @@ PopupWindow {
     signal autoArrangeRequested()
     signal sortByNameRequested()
     signal sortByDateRequested()
+    signal createFolderRequested()
 
     readonly property bool isStartPinned: checkItemPinnedToStart(root.itemData)
     readonly property bool isTaskPinned: checkItemPinnedToTaskbar(root.itemData)
@@ -382,7 +383,7 @@ PopupWindow {
                 label: "New Folder"
                 onTriggered: {
                     root.dismiss();
-                    Quickshell.execDetached([Quickshell.shellPath("weylume-native"), "desktop", "create", "folder", "New Folder"]);
+                    root.createFolderRequested();
                 }
             }
 

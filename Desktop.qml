@@ -26,7 +26,9 @@ PanelWindow {
     property var selectedMap: ({})
     property int selectedCount: 0
     property int selectedIndex: -1
+    property int selectionAnchorIndex: -1
     property int renamingIndex: -1
+    property string pendingRenameName: ""
     property var dragHoverFolder: null
 
     property int dragLeaderIndex: -1
@@ -75,8 +77,44 @@ PanelWindow {
 
     readonly property bool hasSelection: root.selectedCount > 0 || root.selectedIndex >= 0
 
+    function createNewFolder() {
+        let baseName = "New Folder";
+        let targetName = baseName;
+        const items = root.desktopItems || [];
+        const names = {};
+        for (let i = 0; i < items.length; i++) {
+            if (items[i] && items[i].name) names[items[i].name] = true;
+        }
+        let counter = 2;
+        while (names[targetName]) {
+            targetName = baseName + " (" + counter + ")";
+            counter++;
+        }
+        root.pendingRenameName = targetName;
+        Quickshell.execDetached([Quickshell.shellPath("weylume-native"), "desktop", "create", "folder", targetName]);
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Shift+N"
+        onActivated: root.createNewFolder()
+    }
+
     onDesktopItemsChanged: {
         if (root.positionsLoaded) root.ensurePositions();
+        if (root.pendingRenameName) {
+            const nameToFind = root.pendingRenameName;
+            root.pendingRenameName = "";
+            const items = root.desktopItems;
+            if (items) {
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i] && items[i].name === nameToFind) {
+                        root.setSingleSelection(i);
+                        root.startRenameSelectedItem();
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     Component.onCompleted: {
@@ -174,6 +212,11 @@ PanelWindow {
 
     function handleDesktopKeyPress(event) {
         if (event.modifiers & Qt.ControlModifier) {
+            if ((event.modifiers & Qt.ShiftModifier) && event.key === Qt.Key_N) {
+                root.createNewFolder();
+                event.accepted = true;
+                return;
+            }
             if (event.key === Qt.Key_Up) {
                 if (root.hasSelection && root.renamingIndex < 0) {
                     root.zoomInIcons();
@@ -195,6 +238,7 @@ PanelWindow {
                     root.selectedMap = allMap;
                     root.selectedCount = root.desktopItems.length;
                     root.selectedIndex = root.desktopItems.length > 0 ? 0 : -1;
+                    root.selectionAnchorIndex = 0;
                     event.accepted = true;
                     return;
                 }
@@ -221,22 +265,38 @@ PanelWindow {
             return;
         }
 
-        if (root.renamingIndex < 0 && !(event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier))) {
-            if (event.key === Qt.Key_Down || event.key === Qt.Key_Right) {
-                if (root.desktopItems && root.desktopItems.length > 0) {
-                    const nextIdx = (root.selectedIndex >= 0) ? ((root.selectedIndex + 1) % root.desktopItems.length) : 0;
-                    root.setSingleSelection(nextIdx);
-                    keyHandler.forceActiveFocus();
-                    event.accepted = true;
-                    return;
-                }
-            } else if (event.key === Qt.Key_Up || event.key === Qt.Key_Left) {
-                if (root.desktopItems && root.desktopItems.length > 0) {
-                    const prevIdx = (root.selectedIndex >= 0) ? ((root.selectedIndex - 1 + root.desktopItems.length) % root.desktopItems.length) : (root.desktopItems.length - 1);
-                    root.setSingleSelection(prevIdx);
-                    keyHandler.forceActiveFocus();
-                    event.accepted = true;
-                    return;
+        if (root.renamingIndex < 0 && !(event.modifiers & (Qt.AltModifier | Qt.MetaModifier))) {
+            const isCtrl = Boolean(event.modifiers & Qt.ControlModifier);
+            const isShift = Boolean(event.modifiers & Qt.ShiftModifier);
+            if (!isCtrl) {
+                if (event.key === Qt.Key_Down || event.key === Qt.Key_Right) {
+                    if (root.desktopItems && root.desktopItems.length > 0) {
+                        const nextIdx = (root.selectedIndex >= 0) ? ((root.selectedIndex + 1) % root.desktopItems.length) : 0;
+                        if (isShift) {
+                            const anchor = (root.selectionAnchorIndex >= 0) ? root.selectionAnchorIndex : ((root.selectedIndex >= 0) ? root.selectedIndex : 0);
+                            if (root.selectionAnchorIndex < 0) root.selectionAnchorIndex = anchor;
+                            root.selectRange(anchor, nextIdx, false);
+                        } else {
+                            root.setSingleSelection(nextIdx);
+                        }
+                        keyHandler.forceActiveFocus();
+                        event.accepted = true;
+                        return;
+                    }
+                } else if (event.key === Qt.Key_Up || event.key === Qt.Key_Left) {
+                    if (root.desktopItems && root.desktopItems.length > 0) {
+                        const prevIdx = (root.selectedIndex >= 0) ? ((root.selectedIndex - 1 + root.desktopItems.length) % root.desktopItems.length) : (root.desktopItems.length - 1);
+                        if (isShift) {
+                            const anchor = (root.selectionAnchorIndex >= 0) ? root.selectionAnchorIndex : ((root.selectedIndex >= 0) ? root.selectedIndex : (root.desktopItems.length - 1));
+                            if (root.selectionAnchorIndex < 0) root.selectionAnchorIndex = anchor;
+                            root.selectRange(anchor, prevIdx, false);
+                        } else {
+                            root.setSingleSelection(prevIdx);
+                        }
+                        keyHandler.forceActiveFocus();
+                        event.accepted = true;
+                        return;
+                    }
                 }
             }
         }
@@ -281,15 +341,20 @@ PanelWindow {
         root.selectedMap = ({});
         root.selectedCount = 0;
         root.selectedIndex = -1;
+        root.selectionAnchorIndex = -1;
     }
 
     function setSingleSelection(idx) {
-        if (root.selectedIndex === idx && root.selectedCount === 1 && root.selectedMap && root.selectedMap[idx]) return;
+        if (root.selectedIndex === idx && root.selectedCount === 1 && root.selectedMap && root.selectedMap[idx]) {
+            root.selectionAnchorIndex = idx;
+            return;
+        }
         const next = {};
         next[idx] = true;
         root.selectedMap = next;
         root.selectedCount = 1;
         root.selectedIndex = idx;
+        root.selectionAnchorIndex = idx;
     }
 
     function toggleSelection(idx) {
@@ -303,6 +368,21 @@ PanelWindow {
         root.selectedMap = next;
         root.selectedCount = keys.length;
         root.selectedIndex = keys.length > 0 ? (next[idx] ? idx : parseInt(keys[0])) : -1;
+        root.selectionAnchorIndex = idx;
+    }
+
+    function selectRange(fromIdx, toIdx, keepExisting) {
+        if (!root.desktopItems || root.desktopItems.length === 0) return;
+        const start = Math.max(0, Math.min(fromIdx, toIdx));
+        const end = Math.min(root.desktopItems.length - 1, Math.max(fromIdx, toIdx));
+        const next = keepExisting ? Object.assign({}, root.selectedMap) : {};
+        for (let i = start; i <= end; i++) {
+            next[i] = true;
+        }
+        const keys = Object.keys(next);
+        root.selectedMap = next;
+        root.selectedCount = keys.length;
+        root.selectedIndex = toIdx;
     }
 
     onSelectedIndexChanged: {
@@ -1389,7 +1469,12 @@ PanelWindow {
 
                         if (mouse.button === Qt.LeftButton) {
                             const isCtrl = Boolean(mouse.modifiers & Qt.ControlModifier);
-                            if (isCtrl) {
+                            const isShift = Boolean(mouse.modifiers & Qt.ShiftModifier);
+                            if (isShift) {
+                                const anchor = (root.selectionAnchorIndex >= 0) ? root.selectionAnchorIndex : ((root.selectedIndex >= 0) ? root.selectedIndex : itemWrapper.index);
+                                if (root.selectionAnchorIndex < 0) root.selectionAnchorIndex = anchor;
+                                root.selectRange(anchor, itemWrapper.index, isCtrl);
+                            } else if (isCtrl) {
                                 root.toggleSelection(itemWrapper.index);
                             } else {
                                 if (!itemWrapper.isSelected) {
@@ -1468,7 +1553,14 @@ PanelWindow {
                             event.accepted = true;
                         } else {
                             const isCtrl = Boolean(event.modifiers & Qt.ControlModifier);
-                            if (!isCtrl) {
+                            const isShift = Boolean(event.modifiers & Qt.ShiftModifier);
+                            if (isShift) {
+                                const anchor = (root.selectionAnchorIndex >= 0) ? root.selectionAnchorIndex : ((root.selectedIndex >= 0) ? root.selectedIndex : itemWrapper.index);
+                                if (root.selectionAnchorIndex < 0) root.selectionAnchorIndex = anchor;
+                                root.selectRange(anchor, itemWrapper.index, isCtrl);
+                            } else if (isCtrl) {
+                                // Handled in onPressed
+                            } else {
                                 root.setSingleSelection(itemWrapper.index);
                             }
                             ShellState.closeFlyouts();
@@ -1658,6 +1750,9 @@ PanelWindow {
 
     DesktopContextMenu {
         id: desktopContextMenu
+        onCreateFolderRequested: {
+            root.createNewFolder();
+        }
         onRenameRequested: {
             root.startRenameSelectedItem();
         }

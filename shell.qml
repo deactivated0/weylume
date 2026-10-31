@@ -97,6 +97,9 @@ ShellRoot {
                 });
             }
         }
+        function createFolder(): void {
+            Quickshell.execDetached([Quickshell.shellPath("weylume-native"), "desktop", "create", "folder", "New Folder"]);
+        }
         function setWallpaper(path: string): void { ShellState.setWallpaper(path); }
         function closeAll(): void { ShellState.closeFlyouts(); }
     }
