@@ -11,7 +11,7 @@ PanelWindow {
     exclusiveZone: -1
     WlrLayershell.layer: WlrLayer.Bottom
     WlrLayershell.namespace: "weylume-desktop"
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+    WlrLayershell.keyboardFocus: root.renamingIndex >= 0 ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand
 
     readonly property var desktopItems: SystemData.desktopItems
     property var positions: ({})
@@ -101,12 +101,25 @@ PanelWindow {
         onActivated: root.createNewFolder()
     }
 
+    Shortcut {
+        sequences: ["F2"]
+        context: Qt.ApplicationShortcut
+        enabled: (root.selectedIndex >= 0 || root.selectedCount > 0) && root.renamingIndex < 0
+        onActivated: root.startRenameSelectedItem()
+    }
+
     Connections {
         target: ShellState
         function onCreateFolderRequested() {
             const firstScreen = Quickshell.screens && Quickshell.screens.length > 0 ? Quickshell.screens[0] : null;
             if (!root.screen || !firstScreen || root.screen === firstScreen || (root.screen.name && root.screen.name === firstScreen.name)) {
                 root.createNewFolder();
+            }
+        }
+        function onRenameRequested() {
+            const firstScreen = Quickshell.screens && Quickshell.screens.length > 0 ? Quickshell.screens[0] : null;
+            if (!root.screen || !firstScreen || root.screen === firstScreen || (root.screen.name && root.screen.name === firstScreen.name)) {
+                root.startRenameSelectedItem();
             }
         }
     }
@@ -120,8 +133,11 @@ PanelWindow {
             if (items) {
                 for (let i = 0; i < items.length; i++) {
                     if (items[i] && items[i].name === nameToFind) {
-                        root.setSingleSelection(i);
-                        root.startRenameSelectedItem();
+                        const targetIdx = i;
+                        root.setSingleSelection(targetIdx);
+                        Qt.callLater(() => {
+                            root.renamingIndex = targetIdx;
+                        });
                         break;
                     }
                 }
@@ -400,13 +416,13 @@ PanelWindow {
     }
 
     onSelectedIndexChanged: {
-        if (selectedIndex >= 0) {
+        if (selectedIndex >= 0 && root.renamingIndex < 0) {
             keyHandler.forceActiveFocus();
         }
     }
 
     onSelectedCountChanged: {
-        if (selectedCount > 0) {
+        if (selectedCount > 0 && root.renamingIndex < 0) {
             keyHandler.forceActiveFocus();
         }
     }
@@ -970,7 +986,6 @@ PanelWindow {
 
         onPressed: mouse => {
             ShellState.desktopFocused = true;
-            Quickshell.execDetached(["wtype", "-M", "logo", "-k", "F24", "-m", "logo"]);
             keyHandler.forceActiveFocus();
             if (mouse.button === Qt.RightButton) {
                 bgMenuAnchor.x = mouse.x;
@@ -1357,6 +1372,7 @@ PanelWindow {
                         // Inline Rename Input
                         Rectangle {
                             visible: itemWrapper.isRenaming
+                            z: 20
                             Layout.fillWidth: false
                             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                             Layout.preferredWidth: Math.min(root.colWidth + 24, Math.max(itemWrapper.width, renameInput.contentWidth + 16))
@@ -1395,49 +1411,60 @@ PanelWindow {
                                     }
                                 }
 
-                                Component.onCompleted: {
-                                    if (itemWrapper.isRenaming) {
-                                        forceActiveFocus();
-                                        selectBaseName();
-                                    }
+                                function activateRename() {
+                                    text = itemWrapper.modelData.name || "";
+                                    Qt.callLater(() => {
+                                        renameInput.forceActiveFocus();
+                                        renameInput.selectBaseName();
+                                    });
                                 }
 
-                                onVisibleChanged: {
-                                    if (visible) {
-                                        text = itemWrapper.modelData.name || "";
-                                        forceActiveFocus();
-                                        selectBaseName();
+                                function commitRename() {
+                                    if (root.renamingIndex !== itemWrapper.index) return;
+                                    const val = text.trim();
+                                    if (val.length > 0 && val !== itemWrapper.modelData.name) {
+                                        const oldPath = itemWrapper.modelData.path;
+                                        const oldKey = itemWrapper.itemKey;
+                                        const oldPos = root.positions[oldKey] || root.positions[oldPath];
+
+                                        if (oldPath) {
+                                            const slashIdx = oldPath.lastIndexOf("/");
+                                            const dir = slashIdx > 0 ? oldPath.substring(0, slashIdx) : "/home/pc/Desktop";
+                                            const newPath = dir + "/" + val;
+
+                                            if (oldPos) {
+                                                let updated = Object.assign({}, root.positions);
+                                                updated[newPath] = { x: oldPos.x, y: oldPos.y };
+                                                delete updated[oldKey];
+                                                delete updated[oldPath];
+                                                root.positions = updated;
+                                                if (StateStore.ready) {
+                                                    posStore.setText(JSON.stringify(updated, null, 2));
+                                                }
+                                            }
+                                            Quickshell.execDetached([Quickshell.shellPath("weylume-native"), "desktop", "rename", oldPath, val]);
+                                        }
+                                    }
+                                    root.renamingIndex = -1;
+                                    keyHandler.forceActiveFocus();
+                                }
+
+                                Component.onCompleted: {
+                                    if (itemWrapper.isRenaming) activateRename();
+                                }
+
+                                Connections {
+                                    target: itemWrapper
+                                    function onIsRenamingChanged() {
+                                        if (itemWrapper.isRenaming) {
+                                            renameInput.activateRename();
+                                        }
                                     }
                                 }
 
                                 Keys.onPressed: event => {
                                     if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                                        const val = text.trim();
-                                        if (val.length > 0 && val !== itemWrapper.modelData.name) {
-                                            const oldPath = itemWrapper.modelData.path;
-                                            const oldKey = itemWrapper.itemKey;
-                                            const oldPos = root.positions[oldKey] || root.positions[oldPath];
-
-                                            if (oldPath) {
-                                                const slashIdx = oldPath.lastIndexOf("/");
-                                                const dir = slashIdx > 0 ? oldPath.substring(0, slashIdx) : "/home/pc/Desktop";
-                                                const newPath = dir + "/" + val;
-
-                                                if (oldPos) {
-                                                    let updated = Object.assign({}, root.positions);
-                                                    updated[newPath] = { x: oldPos.x, y: oldPos.y };
-                                                    delete updated[oldKey];
-                                                    delete updated[oldPath];
-                                                    root.positions = updated;
-                                                    if (StateStore.ready) {
-                                                        posStore.setText(JSON.stringify(updated, null, 2));
-                                                    }
-                                                }
-                                                Quickshell.execDetached([Quickshell.shellPath("weylume-native"), "desktop", "rename", oldPath, val]);
-                                            }
-                                        }
-                                        root.renamingIndex = -1;
-                                        keyHandler.forceActiveFocus();
+                                        renameInput.commitRename();
                                         event.accepted = true;
                                     } else if (event.key === Qt.Key_Escape) {
                                         root.renamingIndex = -1;
@@ -1455,6 +1482,7 @@ PanelWindow {
                     anchors.fill: parent
                     hoverEnabled: true
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    enabled: !itemWrapper.isRenaming
 
                     property real pressX: 0
                     property real pressY: 0
@@ -1508,7 +1536,6 @@ PanelWindow {
                             root.renamingIndex = -1;
                         }
                         ShellState.desktopFocused = true;
-                        Quickshell.execDetached(["wtype", "-M", "logo", "-k", "F24", "-m", "logo"]);
                         keyHandler.forceActiveFocus();
                     }
 

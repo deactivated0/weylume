@@ -107,6 +107,12 @@ ShellRoot {
                 ShellState.createFolderRequested();
             }
         }
+        function renameIfDesktop(): void {
+            const act = ToplevelManager.activeToplevel;
+            if (!act || !act.activated || ShellState.desktopFocused) {
+                ShellState.renameRequested();
+            }
+        }
         function setWallpaper(path: string): void { ShellState.setWallpaper(path); }
         function closeAll(): void { ShellState.closeFlyouts(); }
     }

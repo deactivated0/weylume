@@ -9,6 +9,7 @@ Scope {
     id: root
     signal taskMenusCloseRequested()
     signal createFolderRequested()
+    signal renameRequested()
 
     property bool startOpen: false
     property bool quickOpen: false
