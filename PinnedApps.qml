@@ -7,18 +7,7 @@ import Quickshell.Wayland
 Scope {
     id: root
 
-    readonly property var defaultPins: [
-        { label: "Helium", icon: "helium", fallback: "H", command: ["helium"], appIds: ["helium", "helium-browser"] },
-        { label: "Files", icon: "system-file-manager", fallback: "D", command: ["pcmanfm-qt", Quickshell.env("HOME")], appIds: ["pcmanfm-qt", "pcmanfm"] },
-        { label: "Kitty", icon: "kitty", fallback: ">_", command: ["kitty"], appIds: ["kitty"] },
-        { label: "Settings", icon: "weylume-settings", fallback: "S", command: ["qs", "-c", "weylume", "ipc", "call", "shell", "toggleSettings"], appIds: ["weylume-settings", "org.quickshell"] },
-        { label: "Steam", icon: "steam", fallback: "S", command: ["steam"], appIds: ["steam", "com.valvesoftware.steam"] },
-        { label: "Discord", icon: "discord", fallback: "D", command: ["discord"], appIds: ["discord"] },
-        { label: "Discord PTB", icon: "discord-ptb", fallback: "P", command: ["discord-ptb"], appIds: ["discord-ptb"] },
-        { label: "Discord Canary", icon: "discord-canary", fallback: "C", command: ["discord-canary"], appIds: ["discord-canary"] },
-        { label: "Discord Development", icon: "discord-development", fallback: "D+", command: ["discord-development"], appIds: ["discord-development"] },
-        { label: "Spotify", icon: "spotify-launcher", fallback: "♪", command: ["spotify-launcher"], appIds: ["spotify-launcher", "spotify", "Spotify"] }
-    ]
+    readonly property var defaultPins: []
 
     property var items: defaultPins
     readonly property var unpinnedAppGroups: getUnpinnedAppGroups()
@@ -114,7 +103,7 @@ Scope {
             const str = store.text();
             if (str && str.trim().length > 0) {
                 const parsed = JSON.parse(str);
-                if (Array.isArray(parsed) && parsed.length > 0) {
+                if (Array.isArray(parsed)) {
                     root.items = parsed;
                     return;
                 }

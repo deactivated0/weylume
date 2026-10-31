@@ -6,19 +6,28 @@ import Quickshell.Io
 Scope {
     id: root
 
-    readonly property var defaultFavorites: [
-        { label: "Helium", icon: "helium", command: ["helium"], appIds: ["helium"] },
-        { label: "Kitty Terminal", icon: "kitty", command: ["kitty"], appIds: ["kitty"] },
-        { label: "Files", icon: "system-file-manager", command: ["xdg-open", Quickshell.env("HOME")], appIds: ["pcmanfm-qt", "pcmanfm"] },
-        { label: "Steam", icon: "steam", command: ["steam"], appIds: ["steam", "com.valvesoftware.steam"] },
-        { label: "Discord Development", icon: "discord-development", command: ["discord-development"], appIds: ["discord-development"] },
-        { label: "Spotify", icon: "spotify-launcher", command: ["spotify-launcher"], appIds: ["spotify-launcher"] },
-        { label: "Text Editor", icon: "featherpad", command: ["featherpad"], appIds: ["featherpad"] },
-        { label: "Media Player", icon: "mpv", command: ["haruna"], appIds: ["haruna", "mpv"] },
-        { label: "Settings", icon: "preferences-system", command: ["qs", "-c", "weylume", "ipc", "call", "shell", "toggleSettings"], appIds: ["weylume-settings"] }
-    ]
+    readonly property var defaultFavorites: []
 
     property var items: defaultFavorites
+
+    function isAppInstalled(fav) {
+        if (!fav) return false;
+        const lbl = String(fav.label || fav.name || "").toLowerCase();
+        if (lbl === "settings" || (fav.command && Array.isArray(fav.command) && fav.command.includes("toggleSettings"))) {
+            return true;
+        }
+        const ids = fav.appIds || (fav.appId ? [fav.appId] : (fav.id ? [fav.id] : []));
+        for (let i = 0; i < ids.length; i++) {
+            const id = ids[i];
+            if (id && (DesktopEntries.byId(id) || DesktopEntries.heuristicLookup(id))) return true;
+        }
+        if (fav.command && Array.isArray(fav.command) && fav.command.length > 0) {
+            const cmd = fav.command[0];
+            if (cmd && (DesktopEntries.byId(cmd) || DesktopEntries.heuristicLookup(cmd))) return true;
+        }
+        if (fav.label && DesktopEntries.heuristicLookup(fav.label)) return true;
+        return false;
+    }
 
     FileView {
         id: store
@@ -28,8 +37,8 @@ Scope {
                 const str = text();
                 if (str && str.trim().length > 0) {
                     const parsed = JSON.parse(str);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
-                        root.items = parsed;
+                    if (Array.isArray(parsed)) {
+                        root.items = parsed.filter(item => root.isAppInstalled(item));
                         return;
                     }
                 }

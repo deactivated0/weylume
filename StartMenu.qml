@@ -773,6 +773,36 @@ PopupWindow {
                                         }
                                     }
                                 }
+
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    Layout.topMargin: 36
+                                    Layout.leftMargin: 12
+                                    Layout.rightMargin: 12
+                                    spacing: 8
+                                    visible: !StartFavorites.items || StartFavorites.items.length === 0
+
+                                    Text {
+                                        Layout.alignment: Qt.AlignHCenter
+                                        text: "No pinned apps"
+                                        color: Theme.muted
+                                        font.family: Theme.fontFamily
+                                        font.pixelSize: 13
+                                        font.weight: Font.DemiBold
+                                    }
+
+                                    Text {
+                                        Layout.alignment: Qt.AlignHCenter
+                                        Layout.fillWidth: true
+                                        horizontalAlignment: Text.AlignHCenter
+                                        wrapMode: Text.WordWrap
+                                        text: "Right-click any app in All Programs to pin it here"
+                                        color: Theme.muted
+                                        opacity: 0.7
+                                        font.family: Theme.fontFamily
+                                        font.pixelSize: 11
+                                    }
+                                }
                             }
                         }
 

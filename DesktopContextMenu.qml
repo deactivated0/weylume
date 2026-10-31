@@ -84,10 +84,11 @@ PopupWindow {
     }
 
     function getParentDir(p, isDir) {
-        if (!p) return "/home/pc";
+        const homeDir = Quickshell.env("HOME") || "/home/pc";
+        if (!p) return homeDir;
         if (isDir) return p;
         const lastSlash = p.lastIndexOf("/");
-        return lastSlash > 0 ? p.substring(0, lastSlash) : "/home/pc";
+        return lastSlash > 0 ? p.substring(0, lastSlash) : homeDir;
     }
 
     function getItemPath(data) {
@@ -416,7 +417,8 @@ PopupWindow {
                 label: "Open Terminal"
                 onTriggered: {
                     root.dismiss();
-                    Quickshell.execDetached(["kitty", "--directory", "/home/pc/Desktop"]);
+                    const desktopDir = (Quickshell.env("HOME") || "/home/pc") + "/Desktop";
+                    Quickshell.execDetached(["kitty", "--directory", desktopDir]);
                 }
             }
 
@@ -425,7 +427,8 @@ PopupWindow {
                 label: "Open Terminal (as Administrator)"
                 onTriggered: {
                     root.dismiss();
-                    Quickshell.execDetached(["kitty", "--directory", "/home/pc/Desktop", "-e", "sudo", "-i"]);
+                    const desktopDir = (Quickshell.env("HOME") || "/home/pc") + "/Desktop";
+                    Quickshell.execDetached(["kitty", "--directory", desktopDir, "-e", "sudo", "-i"]);
                 }
             }
 

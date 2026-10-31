@@ -1,16 +1,25 @@
 # ❄️ Weylume — High-Performance, Ultra-Lightweight Desktop Shell for Wayland
 
-[![Platform](https://img.shields.io/badge/Platform-Wayland%20%2F%20Linux-blue?logo=linux&logoColor=white)](https://github.com/deactivated0/weylume)
+[![Platform](https://img.shields.io/badge/Platform-Arch%20Linux%20%7C%20Labwc-blue?logo=arch-linux&logoColor=white)](https://github.com/deactivated0/weylume)
 [![UI Engine](https://img.shields.io/badge/UI%20Engine-Quickshell%20%2F%20QtQuick%206-41CD52?logo=qt&logoColor=white)](https://quickshell.outfoxxed.me/)
 [![Backend](https://img.shields.io/badge/Native%20Core-Rust-dea584?logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![RAM Usage](https://img.shields.io/badge/RAM%20Usage-~142%20MB%20total%20(with%20Labwc)-brightgreen?logo=ram&logoColor=white)](#-resource-usage-quickshell--labwc)
 [![Idle CPU](https://img.shields.io/badge/Idle%20CPU-0.0%25%20Overhead-brightgreen?logo=cpu&logoColor=white)](#-resource-usage-quickshell--labwc)
-[![Compositors](https://img.shields.io/badge/Compositors-Labwc%20%7C%20Hyprland%20%7C%20Sway%20%7C%20Wayfire-orange)](https://github.com/deactivated0/weylume)
+[![Compositors](https://img.shields.io/badge/Compositors-Labwc%20(Native)%20%7C%20Hyprland%20%7C%20Sway%20%7C%20Wayfire-orange)](https://github.com/deactivated0/weylume)
+[![AI Ready](https://img.shields.io/badge/AI%20Skill-Ready%20(skill.md)-purple?logo=openai&logoColor=white)](skill.md)
 [![Tests](https://img.shields.io/badge/Tests-23%2F23%20Passing-success)](native/tests/contracts.rs)
 
-**Weylume** is a modern, ultra-responsive desktop shell and environment for Wayland compositors (Labwc, Hyprland, Sway, Wayfire), built using **Quickshell (QtQuick / QML)** for hardware-accelerated fluid visual presentation and a dedicated **Rust** background daemon for low-latency system integration and monitoring.
+**Weylume** is a modern, ultra-responsive desktop shell and environment for Wayland compositors, built using **Quickshell (QtQuick / QML)** for hardware-accelerated fluid visual presentation and a dedicated **Rust** background daemon for low-latency system integration and monitoring.
 
 Featuring Windows-like desktop ergonomics, full multi-selection workflows, quick settings, rich notifications, per-app audio mixing, and native Wayland protocols—all while maintaining an astonishingly low footprint of **~142 MB RAM** and **0.0% idle CPU**.
+
+> [!IMPORTANT]
+> **Platform Compatibility:** Weylume works **out of the box with Arch Linux and Labwc**.
+> However, with the assistance of an AI terminal assistant (such as OpenCode, Antigravity, Codex, or Claude Code), you can readily adapt and run it on **Debian, Alpine, Fedora, openSUSE, Ubuntu**, or other Wayland setups using our provided [`skill.md`](skill.md).
+
+> [!TIP]
+> **Recommended Installation with AI Terminal CLI:**
+> Installing Weylume is strongly recommended using a Terminal AI CLI (**OpenCode**, **Antigravity**, **Codex**, or **Claude Code**). See the [AI Autonomous Installation](#-ai-autonomous-installation-recommended) section below.
 
 ---
 
@@ -23,6 +32,15 @@ Running **Weylume** together with the **Labwc** Wayland compositor uses only **~
 - **Rust Native Daemon (`weylume-native`)**: `~5 MB` RAM
 - **Total Combined RAM**: **~142 MB** (0 B swap used)
 - **Idle CPU Overhead**: **~0.0% – 0.5%**
+
+---
+
+## 🧼 Clean Slate on Fresh Install
+
+Weylume is built with zero bloat and zero ghost entries:
+- **0 Pinned Apps in Taskbar Dock**: Fresh installations start with an empty, clean taskbar dock ready for your custom pins.
+- **Shows Only Installed Applications**: The Start Menu dynamically discovers and presents **only applications physically installed on your own machine** (via local `.desktop` entry indexing). No phantom apps, dead shortcuts, or broken icons.
+- **Instant Customization**: Right-click any application in the Start Menu to pin it to your taskbar dock or favorites in one click.
 
 ---
 
@@ -115,17 +133,38 @@ flowchart TD
 
 ## 📦 Installation & Setup
 
-### Prerequisites
+### 🤖 AI Autonomous Installation (Recommended)
 
-- **Quickshell**: `quickshell` (>= 0.3.x)
-- **Rust Toolchain**: `cargo` & `rustc` (for building native backend)
-- **Libraries**: `libsystemd`, `libudev`, `glib-2.0`, `gio-2.0`, `libwayland-client`, `libpipewire-0.3`
-- **Compositor**: `labwc`, `hyprland`, `sway`, or `wayfire`
+Installing Weylume via an **AI Terminal CLI** (**OpenCode**, **Antigravity**, **Codex**, or **Claude Code**) is the easiest and recommended approach. The repository includes a full [`skill.md`](skill.md) containing autonomous instructions for dependency detection, cross-distro mapping, compilation, and systemd service creation.
 
-### 1. Clone & Build Native Core
+Simply prompt your AI CLI inside your terminal:
+
+```text
+Install and configure Weylume on my system according to skill.md
+```
+
+Your AI assistant will automatically:
+1. Detect your Linux distribution (Arch, Debian, Alpine, Fedora, openSUSE, etc.) and install the correct dependencies.
+2. Clone and build the optimized `weylume-native` Rust daemon.
+3. Configure your compositor keybindings and autostart in `~/.config/labwc/rc.xml`.
+4. Deploy and start the systemd user service (`quickshell-weylume.service`).
+
+---
+
+### 🛠️ Manual Installation (Arch Linux + Labwc)
+
+#### Prerequisites
+
+- **Distribution**: Arch Linux (Out-of-the-Box) or Debian/Fedora/Alpine (adapted)
+- **Compositor**: `labwc` (recommended), `hyprland`, `sway`, or `wayfire`
+- **Quickshell**: `quickshell-git` (>= 0.3.x from AUR)
+- **Rust Toolchain**: `cargo` & `rustc` (for building the native backend)
+- **Libraries**: `libsystemd`, `libudev`, `glib2`, `libpipewire-0.3`, `wireplumber`, `networkmanager`
+
+#### 1. Clone & Build Native Core
 
 ```bash
-# Clone the repository
+# Clone repository
 git clone https://github.com/deactivated0/weylume.git ~/.config/quickshell/weylume
 cd ~/.config/quickshell/weylume
 

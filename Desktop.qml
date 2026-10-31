@@ -788,9 +788,10 @@ PanelWindow {
             }
         }
 
+        const homeDir = Quickshell.env("HOME") || "/home/pc";
         if (!needsWork && root.positions) {
             for (let key in root.positions) {
-                if (!validKeys[key] && !key.startsWith("trash:///") && key !== "/mnt" && key !== "/home/pc") {
+                if (!validKeys[key] && !key.startsWith("trash:///") && key !== "/mnt" && key !== homeDir && key !== "/home/pc") {
                     needsWork = true;
                     break;
                 }
@@ -804,7 +805,7 @@ PanelWindow {
         let cleaned = false;
 
         for (let key in root.positions) {
-            if (!validKeys[key] && !key.startsWith("trash:///") && key !== "/mnt" && key !== "/home/pc") {
+            if (!validKeys[key] && !key.startsWith("trash:///") && key !== "/mnt" && key !== homeDir && key !== "/home/pc") {
                 delete updated[key];
                 cleaned = true;
                 continue;
@@ -1429,7 +1430,7 @@ PanelWindow {
 
                                         if (oldPath) {
                                             const slashIdx = oldPath.lastIndexOf("/");
-                                            const dir = slashIdx > 0 ? oldPath.substring(0, slashIdx) : "/home/pc/Desktop";
+                                            const dir = slashIdx > 0 ? oldPath.substring(0, slashIdx) : ((Quickshell.env("HOME") || "/home/pc") + "/Desktop");
                                             const newPath = dir + "/" + val;
 
                                             if (oldPos) {

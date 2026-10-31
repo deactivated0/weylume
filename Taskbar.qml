@@ -481,7 +481,7 @@ PanelWindow {
                         return "file:///opt/ABDownloadManager/lib/ABDownloadManager.png";
                     }
                     if (low.includes("walkietalkie") || low.includes("walkie talkie") || low.includes("io.walkietalkie")) {
-                        return "file:///home/pc/.local/share/waydroid/data/icons/io.walkietalkie.png";
+                        return "file://" + (Quickshell.env("HOME") || "/home/pc") + "/.local/share/waydroid/data/icons/io.walkietalkie.png";
                     }
                     return modelData.appId || "application-x-executable";
                 }
