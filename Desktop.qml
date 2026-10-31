@@ -9,7 +9,7 @@ PanelWindow {
     color: Theme.background
     anchors { top: true; right: true; bottom: true; left: true }
     exclusiveZone: -1
-    WlrLayershell.layer: WlrLayer.Background
+    WlrLayershell.layer: WlrLayer.Bottom
     WlrLayershell.namespace: "weylume-desktop"
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
 
@@ -95,8 +95,19 @@ PanelWindow {
     }
 
     Shortcut {
-        sequence: "Ctrl+Shift+N"
+        sequences: ["Ctrl+Shift+N", "Ctrl+Shift+n"]
+        context: Qt.ApplicationShortcut
+        enabled: !ToplevelManager.activeToplevel
         onActivated: root.createNewFolder()
+    }
+
+    Connections {
+        target: ShellState
+        function onCreateFolderRequested() {
+            if (!root.screen || root.screen === Quickshell.screens[0]) {
+                root.createNewFolder();
+            }
+        }
     }
 
     onDesktopItemsChanged: {
@@ -212,7 +223,9 @@ PanelWindow {
 
     function handleDesktopKeyPress(event) {
         if (event.modifiers & Qt.ControlModifier) {
-            if ((event.modifiers & Qt.ShiftModifier) && event.key === Qt.Key_N) {
+            const isN = (event.key === Qt.Key_N) || (event.key === 78) || (event.key === 110) || (event.text && event.text.toLowerCase() === "n");
+            const isShift = Boolean(event.modifiers & Qt.ShiftModifier) || (event.text === "N");
+            if (isShift && isN) {
                 root.createNewFolder();
                 event.accepted = true;
                 return;
@@ -955,6 +968,7 @@ PanelWindow {
         property string lastSelectionSig: ""
 
         onPressed: mouse => {
+            keyHandler.forceActiveFocus();
             if (mouse.button === Qt.RightButton) {
                 bgMenuAnchor.x = mouse.x;
                 bgMenuAnchor.y = mouse.y;

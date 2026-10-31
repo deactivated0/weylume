@@ -4,6 +4,7 @@
 //@ pragma UseQApplication
 import QtQuick
 import Quickshell
+import Quickshell.Wayland
 import Quickshell.Io
 import Quickshell.Services.Notifications
 import qs
@@ -98,7 +99,15 @@ ShellRoot {
             }
         }
         function createFolder(): void {
-            Quickshell.execDetached([Quickshell.shellPath("weylume-native"), "desktop", "create", "folder", "New Folder"]);
+            ShellState.createFolderRequested();
+        }
+        function createFolderIfDesktop(): void {
+            const act = ToplevelManager.activeToplevel;
+            if (!act || !act.activated) {
+                ShellState.createFolderRequested();
+            } else {
+                Quickshell.execDetached(["wtype", "-M", "ctrl", "-M", "shift", "-k", "n", "-m", "shift", "-m", "ctrl"]);
+            }
         }
         function setWallpaper(path: string): void { ShellState.setWallpaper(path); }
         function closeAll(): void { ShellState.closeFlyouts(); }

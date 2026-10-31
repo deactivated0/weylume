@@ -8,6 +8,7 @@ import Quickshell.Services.Pipewire
 Scope {
     id: root
     signal taskMenusCloseRequested()
+    signal createFolderRequested()
 
     property bool startOpen: false
     property bool quickOpen: false
