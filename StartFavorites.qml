@@ -22,7 +22,8 @@ Scope {
             if (id && (DesktopEntries.byId(id) || DesktopEntries.heuristicLookup(id))) return true;
         }
         if (fav.command && Array.isArray(fav.command) && fav.command.length > 0) {
-            const cmd = fav.command[0];
+            const cmd = String(fav.command[0] || "");
+            if (cmd === "gio" || cmd === "xdg-open" || cmd === "waydroid" || cmd === "env" || cmd === "qs") return true;
             if (cmd && (DesktopEntries.byId(cmd) || DesktopEntries.heuristicLookup(cmd))) return true;
         }
         if (fav.label && DesktopEntries.heuristicLookup(fav.label)) return true;
